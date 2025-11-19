@@ -11,6 +11,18 @@ module.exports = {
     },
     sourceType: "module",
   },
+  overrides: [
+    {
+      files: ["src/__tests__/**/*.js", "src/__tests__/**/*.jsx", "src/setupTests.js"],
+      globals: {
+        describe: "readonly",
+        it: "readonly",
+        expect: "readonly",
+        vi: "readonly",
+      },
+    },
+  ],
+  plugins: ["react"],
   settings: {
     react: {
       version: "detect",

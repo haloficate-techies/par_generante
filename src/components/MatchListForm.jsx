@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, useId } from "react";
 import AppEnvironment from "../app/app-environment";
 // -------- Reusable UI blocks --------
 const AppData = AppEnvironment.getData() || {};
@@ -185,6 +185,12 @@ const MatchFieldset = ({
     [gameOptions, index, onFieldChange]
   );
 
+  const homeInputId = `match-${index}-home`;
+  const awayInputId = `match-${index}-away`;
+  const dateInputId = `match-${index}-date`;
+  const timeInputId = `match-${index}-time`;
+  const gameSelectId = `match-${index}-game`;
+
   return (
     <fieldset className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
     <legend className="px-2 text-sm font-semibold text-slate-300">
@@ -192,10 +198,11 @@ const MatchFieldset = ({
     </legend>
     <div className="grid gap-3 md:grid-cols-2">
       <div className="flex flex-col">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <label htmlFor={homeInputId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Tim Tuan Rumah
         </label>
         <input
+          id={homeInputId}
           type="text"
           value={match.teamHome}
           onChange={(event) =>
@@ -206,10 +213,11 @@ const MatchFieldset = ({
         />
       </div>
       <div className="flex flex-col">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <label htmlFor={awayInputId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Tim Tamu
         </label>
         <input
+          id={awayInputId}
           type="text"
           value={match.teamAway}
           onChange={(event) =>
@@ -220,10 +228,11 @@ const MatchFieldset = ({
         />
       </div>
       <div className="flex flex-col">
-        <label className="text-xs font-semibol uppercase tracking-wdide text-slate-400">
+        <label htmlFor={dateInputId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Tanggal
         </label>
         <input
+          id={dateInputId}
           type="date"
           value={match.date}
           onChange={(event) =>
@@ -233,10 +242,11 @@ const MatchFieldset = ({
         />
       </div>
       <div className="flex flex-col">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <label htmlFor={timeInputId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Kick-off (WIB)
         </label>
         <input
+          id={timeInputId}
           type="time"
           value={match.time}
           onChange={(event) =>
@@ -280,11 +290,12 @@ const MatchFieldset = ({
     </div>
     {isEsportsMode && (
       <div className="mt-4 space-y-2">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <label htmlFor={gameSelectId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
           Game
         </label>
         <div className="flex flex-wrap items-center gap-3">
           <select
+            id={gameSelectId}
             value={match.gameLogo || ""}
             onChange={handleGameChange}
             className="flex-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
@@ -649,6 +660,7 @@ const BrandAssetSelector = ({
   headerRatioHint = "Disarankan 450 px (lebar) x 160 px (tinggi) - PNG transparan",
   footerRatioHint = "Maksimum 680 px (lebar) x 110 px (tinggi) - PNG/JPG",
 }) => {
+  const selectId = useId();
   const handleSelection = useCallback(
     (event) => {
       onChange(event.target.value);
@@ -663,7 +675,9 @@ const BrandAssetSelector = ({
     <div className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <p className="text-sm font-semibold text-slate-200">{label}</p>
+          <label htmlFor={selectId} className="text-sm font-semibold text-slate-200">
+            {label}
+          </label>
           <p className="text-xs text-slate-400">{helperText}</p>
         </div>
         {selectedHeaderSrc && (
@@ -678,6 +692,7 @@ const BrandAssetSelector = ({
       </div>
       <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
         <select
+          id={selectId}
           value={selectedHeaderSrc}
           onChange={handleSelection}
           className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950/30 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30 md:w-60"
@@ -780,6 +795,292 @@ const BannerBackgroundPreview = ({ src }) => (
     </div>
   </div>
 );
+
+const BannerMetadataSection = ({
+  showTitleField,
+  title,
+  onTitleChange,
+  brandLogoSrc,
+  footerSrc,
+  onBrandLogoChange,
+  brandOptions,
+  backgroundSrc,
+}) => {
+  const titleInputId = useId();
+  return (
+    <section className="grid gap-4">
+      {showTitleField && (
+        <div className="flex flex-col">
+          <label
+            htmlFor={titleInputId}
+            className="text-xs font-semibold uppercase tracking-wide text-slate-400"
+          >
+            Judul Banner
+          </label>
+          <input
+            id={titleInputId}
+            type="text"
+            value={title}
+            onChange={(event) => onTitleChange?.(event.target.value.toUpperCase())}
+            placeholder="Masukkan judul liga / kompetisinya"
+            className="mt-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 uppercase tracking-wide focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
+          />
+        </div>
+      )}
+      <BrandAssetSelector
+        label="Brand & Banner Footer"
+        helperText="Pilih brand untuk menampilkan logo header dan banner footer secara otomatis."
+        selectedHeaderSrc={brandLogoSrc}
+        footerPreviewSrc={footerSrc}
+        onChange={onBrandLogoChange}
+        options={brandOptions}
+      />
+      <BannerBackgroundPreview src={backgroundSrc} />
+    </section>
+  );
+};
+
+const MatchCountAdjuster = ({
+  count,
+  minCount,
+  maxCount,
+  onChange,
+}) => (
+  <div className="flex flex-col gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 md:flex-row md:items-center md:justify-between">
+    <div className="md:w-56">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        Jumlah Pertandingan Ditampilkan
+      </p>
+      <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+        Banner memuat maksimal 5 pertandingan agar tata letak tetap rapi dan mudah dibaca.
+      </p>
+    </div>
+    <div className="flex items-center justify-center gap-6 md:gap-10">
+      <button
+        type="button"
+        onClick={() => onChange(count - 1)}
+        disabled={count <= minCount}
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-600 text-lg font-bold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
+        aria-label="Kurangi jumlah pertandingan"
+      >
+        -
+      </button>
+      <span className="text-4xl font-bold text-slate-100">{count}</span>
+      <button
+        type="button"
+        onClick={() => onChange(count + 1)}
+        disabled={count >= maxCount}
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-600 text-lg font-bold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
+        aria-label="Tambah jumlah pertandingan"
+      >
+        +
+      </button>
+    </div>
+  </div>
+);
+
+const MatchesSection = ({
+  isTogelMode,
+  effectiveMatchCount,
+  minMatchCount,
+  maxMatchCount,
+  adjustMatchCount,
+  matches,
+  onMatchFieldChange,
+  onAutoLogoRequest,
+  onLogoAdjust,
+  isEsportsMode,
+  availableGameOptions,
+}) => {
+  if (isTogelMode) {
+    return null;
+  }
+  return (
+    <section className="grid gap-4">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
+        Detail Pertandingan
+      </h3>
+      <MatchCountAdjuster
+        count={effectiveMatchCount}
+        minCount={minMatchCount}
+        maxCount={maxMatchCount}
+        onChange={adjustMatchCount}
+      />
+      {matches.map((match, index) => (
+        <MatchFieldset
+          key={index}
+          match={match}
+          index={index}
+          onFieldChange={onMatchFieldChange}
+          onRequestAutoLogo={onAutoLogoRequest}
+          onLogoAdjust={onLogoAdjust}
+          isEsportsMode={isEsportsMode}
+          gameOptions={availableGameOptions}
+        />
+      ))}
+    </section>
+  );
+};
+
+const TogelControlsSection = ({
+  isTogelMode,
+  pools,
+  selectedPool,
+  onPoolChange,
+  showVariantSelector,
+  poolVariants,
+  selectedVariant,
+  onVariantChange,
+  selectedPoolOption,
+  drawTimeConfig,
+  drawTimeOptions,
+  togelDrawTime,
+  onTogelDrawTimeChange,
+  shouldShowDrawTimeSelector,
+}) => {
+  const poolSelectId = useId();
+  const variantSelectId = useId();
+
+  if (!isTogelMode) {
+    return null;
+  }
+  return (
+    <section className="grid gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-300">
+      <div>
+        <h3 className="text-base font-semibold text-slate-100">
+          Pengaturan Pools Togel
+        </h3>
+        <p className="text-xs text-slate-400">
+          Pilih pools dan mode keluarannya sebelum merender banner.
+        </p>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="flex flex-col gap-1.5 text-slate-300">
+          <label
+            htmlFor={poolSelectId}
+            className="text-xs font-semibold uppercase tracking-wide text-slate-400"
+          >
+            Pools
+          </label>
+          <select
+            id={poolSelectId}
+            value={selectedPool}
+            onChange={onPoolChange}
+            className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950/30 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
+          >
+            <option value="">Pilih pools</option>
+            {pools.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        {showVariantSelector && (
+          <div className="flex flex-col gap-1.5 text-slate-300">
+            <label
+              htmlFor={variantSelectId}
+              className="text-xs font-semibold uppercase tracking-wide text-slate-400"
+            >
+              Mode Keluaran
+            </label>
+            <select
+              id={variantSelectId}
+              value={selectedVariant}
+              onChange={onVariantChange}
+              className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950/30 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
+            >
+              <option value="">Pilih mode</option>
+              {poolVariants.map((variant) => (
+                <option key={variant} value={variant}>
+                  {variant}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+      {!showVariantSelector && selectedPool && poolVariants.length === 1 && (
+        <p className="text-xs text-slate-400">
+          Mode keluaran hanya: {poolVariants[0]}
+        </p>
+      )}
+      {!selectedPool && (
+        <p className="text-xs text-rose-300">
+          Pilih pools terlebih dahulu untuk menentukan mode keluaran.
+        </p>
+      )}
+      {shouldShowDrawTimeSelector && (
+        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+          <p className="text-sm font-semibold text-slate-200">
+            Jam Keluaran {selectedPoolOption?.label?.toUpperCase() ?? ""} ({selectedVariant})
+          </p>
+          <p className="text-xs text-slate-400">
+            {drawTimeConfig.helperText || "Pilih salah satu jam keluaran di bawah ini."}
+          </p>
+          {drawTimeConfig.disabledReason ? (
+            <p className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+              {drawTimeConfig.disabledReason}
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {drawTimeOptions.map((time) => {
+                const isActive = togelDrawTime === time;
+                return (
+                  <button
+                    key={time}
+                    type="button"
+                    onClick={() => onTogelDrawTimeChange?.(time)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow ${
+                      isActive
+                        ? "bg-brand-yellow text-slate-900 shadow"
+                        : "border border-slate-700 text-slate-200 hover:border-brand-yellow/80"
+                    }`}
+                  >
+                    {time}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+};
+
+const TogelDigitsSection = ({
+  shouldShowDigits,
+  digitGridClass,
+  togelDigits,
+  onTogelDigitChange,
+}) => {
+  if (!shouldShowDigits) {
+    return null;
+  }
+  return (
+    <section className="grid gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+      <div>
+        <h3 className="text-base font-semibold text-slate-100">
+          Nomor Keluaran
+        </h3>
+        <p className="text-xs text-slate-400">
+          Setiap kolom mewakili satu digit. Gunakan panah untuk menyesuaikan angka dengan cepat.
+        </p>
+      </div>
+      <div className={`grid gap-3 justify-items-center ${digitGridClass}`}>
+        {togelDigits.map((digit, index) => (
+          <DigitStepperInput
+            key={`digit-${index}`}
+            label={`Digit ${index + 1}`}
+            value={digit}
+            onChange={(nextDigit) => onTogelDigitChange?.(index, nextDigit)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
 
 const MatchListForm = ({
   title,
@@ -887,203 +1188,51 @@ const MatchListForm = ({
 
   return (
     <form className="grid gap-6">
-    {/* Banner metadata section */}
-    <section className="grid gap-4">
-      {shouldShowTitleField && (
-        <div className="flex flex-col">
-          <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Judul Banner
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => onTitleChange?.(event.target.value.toUpperCase())}
-            placeholder="Masukkan judul liga / kompetisinya"
-            className="mt-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 uppercase tracking-wide focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
-          />
-        </div>
-      )}
-      <BrandAssetSelector
-        label="Brand & Banner Footer"
-        helperText="Pilih brand untuk menampilkan logo header dan banner footer secara otomatis."
-        selectedHeaderSrc={brandLogoSrc}
-        footerPreviewSrc={footerSrc}
-        onChange={onBrandLogoChange}
-        options={brandOptions}
+      <BannerMetadataSection
+        showTitleField={shouldShowTitleField}
+        title={title}
+        onTitleChange={onTitleChange}
+        brandLogoSrc={brandLogoSrc}
+        footerSrc={footerSrc}
+        onBrandLogoChange={onBrandLogoChange}
+        brandOptions={brandOptions}
+        backgroundSrc={backgroundSrc}
       />
-      <BannerBackgroundPreview src={backgroundSrc} />
-    </section>
-
-    {/* Matches section */}
-    {!isTogelMode ? (
-      <section className="grid gap-4">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
-          Detail Pertandingan
-        </h3>
-        <div className="flex flex-col gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 md:flex-row md:items-center md:justify-between">
-          <div className="md:w-56">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Jumlah Pertandingan Ditampilkan
-            </p>
-            <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-              Banner memuat maksimal 5 pertandingan agar tata letak tetap rapi dan mudah dibaca.
-            </p>
-          </div>
-          <div className="flex items-center justify-center gap-6 md:gap-10">
-            <button
-              type="button"
-              onClick={() => adjustMatchCount(effectiveMatchCount - 1)}
-              disabled={effectiveMatchCount <= minMatchCount}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-600 text-lg font-bold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
-              aria-label="Kurangi jumlah pertandingan"
-            >
-              -
-            </button>
-            <span className="text-4xl font-bold text-slate-100">
-              {effectiveMatchCount}
-            </span>
-            <button
-              type="button"
-              onClick={() => adjustMatchCount(effectiveMatchCount + 1)}
-              disabled={effectiveMatchCount >= maxMatchCount}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-600 text-lg font-bold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
-              aria-label="Tambah jumlah pertandingan"
-            >
-              +
-            </button>
-          </div>
-        </div>
-        {matches.map((match, index) => (
-          <MatchFieldset
-            key={index}
-            match={match}
-            index={index}
-            onFieldChange={onMatchFieldChange}
-            onRequestAutoLogo={onAutoLogoRequest}
-            onLogoAdjust={onLogoAdjust}
-            isEsportsMode={isEsportsMode}
-            gameOptions={availableGameOptions}
-          />
-        ))}
-      </section>
-    ) : (
-      <section className="grid gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-300">
-        <div>
-          <h3 className="text-base font-semibold text-slate-100">
-            Pengaturan Pools Togel
-          </h3>
-          <p className="text-xs text-slate-400">
-            Pilih pools dan mode keluarannya sebelum merender banner.
-          </p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="flex flex-col gap-1.5 text-slate-300">
-            <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Pools
-            </label>
-            <select
-              value={togelPool}
-              onChange={handleTogelPoolChange}
-              className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950/30 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
-            >
-              <option value="">Pilih pools</option>
-              {AVAILABLE_TOGEL_POOL_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          {shouldShowVariantSelector && (
-            <div className="flex flex-col gap-1.5 text-slate-300">
-              <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Mode Keluaran
-              </label>
-              <select
-                value={togelPoolVariant}
-                onChange={handleTogelVariantChange}
-                className="rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 shadow-inner shadow-slate-950/30 transition focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
-              >
-                <option value="">Pilih mode</option>
-                {poolVariantOptions.map((variant) => (
-                  <option key={variant} value={variant}>
-                    {variant}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-        {!shouldShowVariantSelector && togelPool && poolVariantOptions.length === 1 && (
-          <p className="text-xs text-slate-400">
-            Mode keluaran hanya: {poolVariantOptions[0]}
-          </p>
-        )}
-        {!togelPool && (
-          <p className="text-xs text-rose-300">
-            Pilih pools terlebih dahulu untuk menentukan mode keluaran.
-          </p>
-        )}
-        {shouldShowDrawTimeSelector && (
-          <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
-            <p className="text-sm font-semibold text-slate-200">
-              Jam Keluaran {selectedPoolOption?.label?.toUpperCase() ?? ""} ({togelPoolVariant})
-            </p>
-            <p className="text-xs text-slate-400">
-              {drawTimeConfig.helperText || "Pilih salah satu jam keluaran di bawah ini."}
-            </p>
-            {drawTimeConfig.disabledReason ? (
-              <p className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
-                {drawTimeConfig.disabledReason}
-              </p>
-            ) : (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {drawTimeOptions.map((time) => {
-                  const isActive = togelDrawTime === time;
-                  return (
-                    <button
-                      key={time}
-                      type="button"
-                      onClick={() => onTogelDrawTimeChange?.(time)}
-                      className={`rounded-full px-4 py-1.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow ${
-                        isActive
-                          ? "bg-brand-yellow text-slate-900 shadow"
-                          : "border border-slate-700 text-slate-200 hover:border-brand-yellow/80"
-                      }`}
-                    >
-                      {time}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-    )}
-
-    {shouldShowDigits && (
-      <section className="grid gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-4">
-        <div>
-          <h3 className="text-base font-semibold text-slate-100">
-            Nomor Keluaran
-          </h3>
-          <p className="text-xs text-slate-400">
-            Setiap kolom mewakili satu digit. Gunakan panah untuk menyesuaikan angka dengan cepat.
-          </p>
-        </div>
-        <div className={`grid gap-3 justify-items-center ${digitGridClass}`}>
-          {togelDigits.map((digit, index) => (
-            <DigitStepperInput
-              key={`digit-${index}`}
-              label={`Digit ${index + 1}`}
-              value={digit}
-              onChange={(nextDigit) => onTogelDigitChange?.(index, nextDigit)}
-            />
-          ))}
-        </div>
-      </section>
-    )}
+      <MatchesSection
+        isTogelMode={isTogelMode}
+        effectiveMatchCount={effectiveMatchCount}
+        minMatchCount={minMatchCount}
+        maxMatchCount={maxMatchCount}
+        adjustMatchCount={adjustMatchCount}
+        matches={matches}
+        onMatchFieldChange={onMatchFieldChange}
+        onAutoLogoRequest={onAutoLogoRequest}
+        onLogoAdjust={onLogoAdjust}
+        isEsportsMode={isEsportsMode}
+        availableGameOptions={availableGameOptions}
+      />
+      <TogelControlsSection
+        isTogelMode={isTogelMode}
+        pools={AVAILABLE_TOGEL_POOL_OPTIONS}
+        selectedPool={togelPool}
+        onPoolChange={handleTogelPoolChange}
+        showVariantSelector={shouldShowVariantSelector}
+        poolVariants={poolVariantOptions}
+        selectedVariant={togelPoolVariant}
+        onVariantChange={handleTogelVariantChange}
+        selectedPoolOption={selectedPoolOption}
+        drawTimeConfig={drawTimeConfig}
+        drawTimeOptions={drawTimeOptions}
+        togelDrawTime={togelDrawTime}
+        onTogelDrawTimeChange={onTogelDrawTimeChange}
+        shouldShowDrawTimeSelector={shouldShowDrawTimeSelector}
+      />
+      <TogelDigitsSection
+        shouldShowDigits={shouldShowDigits}
+        digitGridClass={digitGridClass}
+        togelDigits={togelDigits}
+        onTogelDigitChange={onTogelDigitChange}
+      />
     </form>
   );
 };

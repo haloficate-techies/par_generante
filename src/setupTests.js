@@ -1,4 +1,5 @@
 import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 const mockCanvasContext = {
   clearRect: () => {},
@@ -17,10 +18,14 @@ if (!HTMLCanvasElement.prototype.toDataURL) {
   });
 }
 
-if (typeof global.ResizeObserver === "undefined") {
-  global.ResizeObserver = class {
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}
   };
+}
+
+if (typeof window !== "undefined" && typeof window.alert !== "function") {
+  window.alert = vi.fn();
 }

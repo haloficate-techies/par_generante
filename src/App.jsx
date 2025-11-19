@@ -7,6 +7,7 @@ import AppGlobals from "./app/config/globals";
 import useBackgroundManager from "./hooks/background-manager";
 import useStreamingTheme from "./hooks/streaming-theme";
 import useTogelControls from "./hooks/togel-controls";
+import useImageCache from "./hooks/use-image-cache";
 import BannerHeader from "./components/layout/BannerHeader";
 import BannerPreviewPanel from "./components/layout/BannerPreviewPanel";
 import PreviewModal from "./components/layout/PreviewModal";
@@ -63,7 +64,6 @@ const deriveBrandPalette = (image) => {
 
 const App = () => {
   const canvasRef = useRef(null);
-  const imageCacheRef = useRef(new Map());
   const [title, setTitle] = useState("");
   const [matches, setMatches] = useState(() => createInitialMatches(MAX_MATCHES));
   const [activeMatchCount, setActiveMatchCount] = useState(1);
@@ -100,24 +100,7 @@ const App = () => {
     [matches, activeMatchCount]
   );
 
-  const loadCachedOptionalImage = useCallback((src) => {
-    if (!src) return Promise.resolve(null);
-    const cache = imageCacheRef.current;
-    if (cache.has(src)) {
-      return cache.get(src);
-    }
-    const loader = loadOptionalImage(src)
-      .then((image) => {
-        cache.set(src, image);
-        return image;
-      })
-      .catch((error) => {
-        cache.delete(src);
-        throw error;
-      });
-    cache.set(src, loader);
-    return loader;
-  }, []);
+  const { loadImage: loadCachedOptionalImage, prefetchImages } = useImageCache(loadOptionalImage);
 
   const streamingTheme = useStreamingTheme({
     isTogelMode,
@@ -630,6 +613,13 @@ const App = () => {
             modeSpecificBackground || modeDefaultBackground || footballDefaultBackground;
         }
 
+        await prefetchImages([
+          option.value,
+          footerForBrand,
+          backgroundForBrand,
+          includeMiniBanner ? DEFAULT_ESPORT_MINI_BANNER : null,
+        ]);
+
         const renderedCanvas = await renderBanner({
           brandLogoSrc: option.value,
           footerSrc: footerForBrand,
@@ -684,6 +674,8 @@ const App = () => {
     isTogelMode,
     togelBackgroundSrc,
     togelPool,
+    includeMiniBanner,
+    prefetchImages,
   ]);
 
   const handleClosePreview = useCallback(() => {
