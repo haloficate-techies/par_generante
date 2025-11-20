@@ -60,10 +60,11 @@ const averageHexColor = (startHex, endHex) => {
   );
 };
 
-const pickReadableTextColor = (startHex, endHex) => {
+const pickReadableTextColor = (startHex, endHex, { preferLight = false } = {}) => {
   const midpoint = averageHexColor(startHex, endHex);
   const luminance = getRelativeLuminanceSafe(midpoint);
-  return luminance > 0.6 ? "#0f172a" : "#f8fafc";
+  const threshold = preferLight ? 0.78 : 0.6;
+  return luminance > threshold ? "#0f172a" : "#f8fafc";
 };
 
 const getTodayDateLabel = () => {
@@ -500,8 +501,8 @@ const drawMatches = (
   const headerEnd = paletteSafe?.headerEnd ?? DEFAULT_BRAND_PALETTE.headerEnd;
   const footerStart = paletteSafe?.footerStart ?? DEFAULT_BRAND_PALETTE.footerStart;
   const footerEnd = paletteSafe?.footerEnd ?? DEFAULT_BRAND_PALETTE.footerEnd;
-  const dateTextColor = pickReadableTextColor(headerStart, headerEnd);
-  const timeTextColor = pickReadableTextColor(footerStart, footerEnd);
+  const dateTextColor = pickReadableTextColor(headerStart, headerEnd, { preferLight: true });
+  const timeTextColor = pickReadableTextColor(footerStart, footerEnd, { preferLight: true });
   const extraBottomSpacing = clampMin(options?.extraBottomSpacing ?? 0, 0);
   const FOOTER_HEIGHT = 110;
   const FOOTER_SPACING = 60 + extraBottomSpacing;

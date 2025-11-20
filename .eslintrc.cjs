@@ -80,7 +80,7 @@ module.exports = {
     {
       files: ["src/__tests__/**/*.js", "src/__tests__/**/*.jsx", "src/setupTests.js"],
       env: {
-        "vitest/globals": true,
+        "vitest/env": true,
       },
     },
   ],

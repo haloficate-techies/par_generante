@@ -55,12 +55,14 @@ const deriveBrandPaletteFn =
   AppData.deriveBrandPalette ||
   AppData.DERIVE_BRAND_PALETTE ||
   (() => DEFAULT_BRAND_PALETTE);
+const BRAND_PALETTE_CACHE_LIMIT = 50;
 const deriveBrandPalette = (image) => {
   if (typeof deriveBrandPaletteFn === "function") {
     return deriveBrandPaletteFn(image) || DEFAULT_BRAND_PALETTE;
   }
   return DEFAULT_BRAND_PALETTE;
 };
+const BASE_LAYER_CACHE_LIMIT = 12;
 
 const App = () => {
   const canvasRef = useRef(null);
@@ -92,9 +94,20 @@ const App = () => {
   const [footerLink, setFooterLink] = useState("");
   const [isRendering, setIsRendering] = useState(false);
   const [isBulkDownloading, setIsBulkDownloading] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState(0);
   const [lastRenderAt, setLastRenderAt] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const renderTimeoutRef = useRef(null);
+  const baseLayerCacheRef = useRef(new Map());
+  const brandPaletteCacheRef = useRef(new Map());
+  const yieldToFrame = useCallback(
+    () =>
+      new Promise((resolve) => {
+        window.setTimeout(resolve, 0);
+      }),
+    []
+  );
   const visibleMatches = useMemo(
     () => matches.slice(0, activeMatchCount),
     [matches, activeMatchCount]
@@ -299,10 +312,41 @@ const App = () => {
     setActiveMatchCount(normalizedCount);
   }, []);
 
+  // Prefetch backgrounds relevant to active mode to reduce unnecessary loads.
+  useEffect(() => {
+    const modeDefaults = MODE_BACKGROUND_DEFAULTS || {};
+    const modeSpecificBackgrounds = AVAILABLE_BRAND_LOGOS
+      .map((option) => option?.backgroundByMode?.[activeMode])
+      .filter(Boolean);
+    const sharedBackgrounds = AVAILABLE_BRAND_LOGOS
+      .map((option) => option?.backgroundValue)
+      .filter(Boolean);
+    const candidates = [
+      ...modeSpecificBackgrounds,
+      ...sharedBackgrounds,
+      modeDefaults[activeMode],
+      activeMode === "football" ? footballDefaultBackground : null,
+      includeMiniBanner ? DEFAULT_ESPORT_MINI_BANNER : null,
+    ].filter(Boolean);
+    if (candidates.length) {
+      prefetchImages(candidates);
+    }
+  }, [
+    activeMode,
+    AVAILABLE_BRAND_LOGOS,
+    footballDefaultBackground,
+    includeMiniBanner,
+    prefetchImages,
+  ]);
+
   // Draws the entire banner on the canvas.
   const renderBanner = useCallback(async (overrides = {}) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const baseSize = 1080;
+    const devicePixelRatioSafe = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = baseSize * devicePixelRatioSafe;
+    canvas.height = baseSize * devicePixelRatioSafe;
 
     const {
       brandLogoSrc: overrideBrandLogoSrc,
@@ -329,7 +373,10 @@ const App = () => {
     setIsRendering(true);
     try {
       const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(devicePixelRatioSafe, 0, 0, devicePixelRatioSafe, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.clearRect(0, 0, baseSize, baseSize);
 
       const effectiveBrandLogoSrc = overrideBrandLogoSrc ?? brandLogoSrc;
       const effectiveFooterSrc = overrideFooterSrc ?? footerSrc;
@@ -356,8 +403,29 @@ const App = () => {
       ]);
       const brandPalette =
         brandLogoImage
-          ? deriveBrandPalette(brandLogoImage)
+          ? (() => {
+              const cacheKey = effectiveBrandLogoSrc || "logo-pal";
+              const brandPaletteCache = brandPaletteCacheRef.current;
+              if (brandPaletteCache.has(cacheKey)) {
+                return brandPaletteCache.get(cacheKey);
+              }
+              const palette = deriveBrandPalette(brandLogoImage) || DEFAULT_BRAND_PALETTE;
+              if (brandPaletteCache.size >= BRAND_PALETTE_CACHE_LIMIT) {
+                brandPaletteCache.delete(brandPaletteCache.keys().next().value);
+              }
+              brandPaletteCache.set(cacheKey, palette);
+              return palette;
+            })()
           : DEFAULT_BRAND_PALETTE;
+      const brandPaletteKey = JSON.stringify(brandPalette || {});
+      const baseLayerCacheKey = [
+        devicePixelRatioSafe,
+        activeMode,
+        effectiveBackgroundSrc || "none",
+        brandPaletteKey,
+      ].join("|");
+      const baseLayerCache = baseLayerCacheRef.current;
+      let baseLayerApplied = false;
       const miniBannerLayout =
         miniBannerImage && includeMiniBanner
           ? computeMiniBannerLayout(canvas, miniBannerImage)
@@ -377,8 +445,29 @@ const App = () => {
             })
           );
 
-      drawBackground(ctx, backgroundImage);
-      drawOverlay(ctx);
+      const cachedLayer = baseLayerCache.get(baseLayerCacheKey);
+      if (cachedLayer) {
+        try {
+          ctx.putImageData(cachedLayer, 0, 0);
+          baseLayerApplied = true;
+        } catch (error) {
+          console.warn("Gagal menerapkan cache base layer:", error);
+          baseLayerCache.delete(baseLayerCacheKey);
+        }
+      }
+      if (!baseLayerApplied) {
+        drawBackground(ctx, backgroundImage);
+        drawOverlay(ctx);
+        try {
+          const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          if (baseLayerCache.size >= BASE_LAYER_CACHE_LIMIT) {
+            baseLayerCache.delete(baseLayerCache.keys().next().value);
+          }
+          baseLayerCache.set(baseLayerCacheKey, snapshot);
+        } catch (error) {
+          console.warn("Gagal menyimpan cache base layer:", error);
+        }
+      }
 
       const brandBottom = drawBrandLogo(ctx, brandLogoImage, brandPalette);
       const headerBottom = shouldSkipHeader
@@ -448,10 +537,29 @@ const App = () => {
     shouldSkipHeader,
   ]);
 
+  const scheduleRender = useCallback(() => {
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
+    }
+    renderTimeoutRef.current = setTimeout(() => {
+      renderTimeoutRef.current = null;
+      renderBanner();
+    }, 80);
+  }, [renderBanner]);
+
   // Keeps preview up to date when form data changes.
   useEffect(() => {
-    renderBanner();
-  }, [renderBanner]);
+    scheduleRender();
+  }, [scheduleRender]);
+
+  useEffect(
+    () => () => {
+      if (renderTimeoutRef.current) {
+        clearTimeout(renderTimeoutRef.current);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (!brandLogoSrc) return;
@@ -514,6 +622,18 @@ const App = () => {
         setSelectedBasketballBackground(MODE_BACKGROUND_DEFAULTS.basketball);
         setSelectedEsportsBackground(MODE_BACKGROUND_DEFAULTS.esports);
       }
+
+      const prefetchCandidates = [
+        newValue,
+        matchedBrandOption?.backgroundByMode?.[activeMode],
+        matchedBrandOption?.backgroundValue,
+        activeMode === "football" ? footballDefaultBackground : null,
+        activeMode === "esports" ? MODE_BACKGROUND_DEFAULTS.esports : null,
+        activeMode === "basketball" ? MODE_BACKGROUND_DEFAULTS.basketball : null,
+      ].filter(Boolean);
+      if (prefetchCandidates.length) {
+        prefetchImages(prefetchCandidates);
+      }
     },
     [
       AVAILABLE_BRAND_LOGOS,
@@ -525,6 +645,7 @@ const App = () => {
       setSelectedFootballBackground,
       setSelectedBasketballBackground,
       setSelectedEsportsBackground,
+      prefetchImages,
     ]
   );
 
@@ -576,6 +697,7 @@ const App = () => {
     }
 
     setIsBulkDownloading(true);
+    setBulkProgress(0);
     const timestampBase = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "");
     const modeDefaultBackground = MODE_BACKGROUND_DEFAULTS[activeMode] || footballDefaultBackground;
     const togelBulkBackground =
@@ -587,6 +709,9 @@ const App = () => {
 
     try {
       const zip = new JSZip();
+      const totalBrands = AVAILABLE_BRAND_LOGOS.length;
+      const prefetchedInBulk = new Set();
+      const BATCH_SIZE = 3;
 
       for (let index = 0; index < AVAILABLE_BRAND_LOGOS.length; index += 1) {
         const option = AVAILABLE_BRAND_LOGOS[index];
@@ -613,12 +738,17 @@ const App = () => {
             modeSpecificBackground || modeDefaultBackground || footballDefaultBackground;
         }
 
-        await prefetchImages([
+        const maybePrefetch = [
           option.value,
           footerForBrand,
           backgroundForBrand,
           includeMiniBanner ? DEFAULT_ESPORT_MINI_BANNER : null,
-        ]);
+        ].filter(Boolean);
+        const freshSources = maybePrefetch.filter((src) => !prefetchedInBulk.has(src));
+        if (freshSources.length) {
+          freshSources.forEach((src) => prefetchedInBulk.add(src));
+          await prefetchImages(freshSources);
+        }
 
         const renderedCanvas = await renderBanner({
           brandLogoSrc: option.value,
@@ -646,6 +776,12 @@ const App = () => {
           `football-banner-${brandSlugLower}-${timestampBase}.png`,
           arrayBuffer
         );
+
+        const nextProgress = (index + 1) / totalBrands;
+        setBulkProgress(nextProgress);
+        if ((index + 1) % BATCH_SIZE === 0) {
+          await yieldToFrame();
+        }
       }
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -661,6 +797,7 @@ const App = () => {
     } finally {
       await renderBanner();
       setIsBulkDownloading(false);
+      setBulkProgress(0);
     }
   }, [
     AVAILABLE_BRAND_LOGOS,
@@ -676,6 +813,8 @@ const App = () => {
     togelPool,
     includeMiniBanner,
     prefetchImages,
+    yieldToFrame,
+    setBulkProgress,
   ]);
 
   const handleClosePreview = useCallback(() => {
@@ -734,6 +873,7 @@ const App = () => {
               canvasRef={canvasRef}
               isRendering={isRendering}
               isBulkDownloading={isBulkDownloading}
+              bulkProgress={bulkProgress}
               onPreviewClick={handlePreviewClick}
               onDownloadPng={downloadBanner}
               onDownloadZip={downloadAllBanners}

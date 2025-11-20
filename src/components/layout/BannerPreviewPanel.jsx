@@ -5,6 +5,7 @@ const BannerPreviewPanel = ({
   canvasRef,
   isRendering,
   isBulkDownloading,
+  bulkProgress = 0,
   onPreviewClick,
   onDownloadPng,
   onDownloadZip,
@@ -25,7 +26,7 @@ const BannerPreviewPanel = ({
       ref={canvasRef}
       width="1080"
       height="1080"
-      className="w-full max-w-full rounded-xl border border-slate-800 bg-slate-900 shadow-inner shadow-slate-950/40"
+      className="w-full max-w-full aspect-square rounded-xl border border-slate-800 bg-slate-900 shadow-inner shadow-slate-950/40"
     />
     <div className="flex flex-wrap gap-3">
       <button
@@ -50,9 +51,24 @@ const BannerPreviewPanel = ({
         disabled={isRendering || isBulkDownloading}
         className="flex-1 rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
       >
-        {isBulkDownloading ? "Menyiapkan ZIP..." : "Download Semua Brand (ZIP)"}
+        {isBulkDownloading
+          ? `Menyiapkan ZIP${bulkProgress ? ` (${Math.round(bulkProgress * 100)}%)` : "..."}`
+          : "Download Semua Brand (ZIP)"}
       </button>
     </div>
+    {isBulkDownloading ? (
+      <div className="flex items-center gap-2 text-xs text-slate-300">
+        <div className="h-1 flex-1 rounded-full bg-slate-800">
+          <div
+            className="h-full rounded-full bg-brand-yellow transition-all"
+            style={{ width: `${Math.min(Math.max(bulkProgress, 0), 1) * 100}%` }}
+          />
+        </div>
+        <span className="min-w-[3ch] text-right text-slate-200">
+          {Math.round(Math.min(Math.max(bulkProgress, 0), 1) * 100)}%
+        </span>
+      </div>
+    ) : null}
   </section>
 );
 
