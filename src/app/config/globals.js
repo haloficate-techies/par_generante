@@ -11,6 +11,10 @@ const AVAILABLE_FOOTER_LOGOS = Array.isArray(AppData.BANNER_FOOTER_OPTIONS)
 const AVAILABLE_TOGEL_POOL_OPTIONS = Array.isArray(AppData.TOGEL_POOL_OPTIONS)
   ? AppData.TOGEL_POOL_OPTIONS
   : [];
+const resolveTogelDrawTimeConfig =
+  typeof AppData.resolveTogelDrawTimeConfig === "function"
+    ? AppData.resolveTogelDrawTimeConfig
+    : () => ({ options: [] });
 const MODE_BACKGROUND_DEFAULTS = {
   basketball: "assets/BASKET/banner_background/BACKGROUND.webp",
   esports: "assets/ESPORT/banner_background/BACKGROUND.webp",
@@ -487,6 +491,7 @@ const APP_GLOBALS_BUNDLE = {
   splitAssetExtension,
   resolveImageAssetSrc,
   TOGEL_BACKGROUND_EXTENSION_PRIORITY,
+  resolveTogelDrawTimeConfig,
 };
 
 AppEnvironment.setGlobals(APP_GLOBALS_BUNDLE);
