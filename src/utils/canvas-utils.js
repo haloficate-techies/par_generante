@@ -835,6 +835,207 @@ const drawMatches = (
   ctx.restore();
 };
 
+const drawScoreboardMatches = (
+  ctx,
+  matches = [],
+  startY = 0,
+  palette = DEFAULT_BRAND_PALETTE,
+  options = {}
+) => {
+  if (!ctx || !Array.isArray(matches) || matches.length === 0) {
+    return;
+  }
+
+  const canvasWidth = ctx.canvas.width;
+  const referenceWidth = 1080;
+  const scale = canvasWidth / referenceWidth || 1;
+  const baseRowHeight = 150;
+  const baseGap = 24;
+  const baseBarHeight = 72;
+  const baseCircleSize = 110;
+  const baseCenterWidth = 240;
+  const baseCenterHeight = 108;
+  const baseTextPadding = 28;
+  const paddingX = 90 * scale;
+  const extraBottomSpacing = Math.max(options?.extraBottomSpacing ?? 0, 0);
+  const infoLabel = typeof options?.infoLabel === "string" ? options.infoLabel.trim() : "";
+  const FOOTER_HEIGHT = 110;
+  const FOOTER_SPACING = 60 + extraBottomSpacing;
+  const bottomLimit = ctx.canvas.height - (FOOTER_HEIGHT + FOOTER_SPACING);
+
+  const infoBadgeSpacing = 28 * scale;
+  let contentStart = startY;
+  if (infoLabel) {
+    const badgeHeight = 48 * scale;
+    const horizontalPadding = 36 * scale;
+    const badgeText = infoLabel.toUpperCase();
+    ctx.save();
+    ctx.font = `700 ${Math.round(18 * scale)}px "Poppins", sans-serif`;
+    const textWidth = ctx.measureText(badgeText).width;
+    const badgeWidth = Math.min(
+      canvasWidth - paddingX * 2,
+      textWidth + horizontalPadding * 2
+    );
+    const badgeX = (canvasWidth - badgeWidth) / 2;
+    const badgeY = startY;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+    ctx.shadowBlur = 18 * scale;
+    ctx.shadowOffsetY = 6 * scale;
+    drawRoundedRectPath(ctx, badgeX, badgeY, badgeWidth, badgeHeight, badgeHeight / 2);
+    const infoGradient = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeWidth, badgeY + badgeHeight);
+    infoGradient.addColorStop(0, palette?.headerStart || "#f59e0b");
+    infoGradient.addColorStop(1, palette?.headerEnd || "#d97706");
+    ctx.fillStyle = infoGradient;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.font = `700 ${Math.round(18 * scale)}px "Poppins", sans-serif`;
+    ctx.fillStyle = "#f8fafc";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(badgeText, canvasWidth / 2, badgeY + badgeHeight / 2);
+    ctx.restore();
+
+    contentStart = badgeY + badgeHeight + infoBadgeSpacing;
+  }
+
+  const matchCount = Math.max(matches.length, 1);
+  const rawAvailable = bottomLimit - contentStart;
+  const availableHeight = Math.max(rawAvailable, 220);
+  const baseTotalHeight = matchCount * baseRowHeight + Math.max(matchCount - 1, 0) * baseGap;
+  const layoutScale = baseTotalHeight > availableHeight ? availableHeight / baseTotalHeight : 1;
+
+  const rowHeight = Math.max(90 * scale, baseRowHeight * scale * layoutScale);
+  const gap = Math.max(14 * scale, baseGap * scale * layoutScale);
+  const centerPanelWidth = Math.max(200 * scale, baseCenterWidth * scale * layoutScale);
+  const centerPanelHeight = Math.max(80 * scale, baseCenterHeight * scale * layoutScale);
+  const barHeight = centerPanelHeight;
+  const circleSizeCandidate = Math.max(barHeight - 6 * scale, 60 * scale);
+  const circleSize = Math.min(circleSizeCandidate, baseCircleSize * scale);
+  const textPadding = Math.max(18 * scale, baseTextPadding * scale * layoutScale);
+  const barRadius = barHeight / 2;
+  const centerRadius = Math.min(centerPanelHeight / 2, 36 * scale);
+  const adjustedHeight =
+    matchCount * rowHeight + Math.max(matchCount - 1, 0) * gap;
+  const verticalOffset =
+    adjustedHeight < availableHeight ? (availableHeight - adjustedHeight) / 2 : 0;
+
+  const nameBarStartColor = "#192133";
+  const nameBarEndColor = "#0f172a";
+  const scoreStartColor = palette?.footerStart || "#ef4444";
+  const scoreEndColor = palette?.footerEnd || "#ea580c";
+  const labelColor = "rgba(248, 250, 252, 0.95)";
+
+  const normalizeScore = (value) => {
+    const strValue = value === null || value === undefined ? "" : String(value);
+    const digits = strValue.replace(/[^0-9]/g, "").slice(0, 3);
+    return digits || "0";
+  };
+
+  const renderTeamLabel = (name, areaX, areaWidth, centerY) => {
+    if (areaWidth <= 0) return;
+    const fallback = "YOUR TEAM";
+    const rawLabel = name && name.trim() ? name : fallback;
+    const layout = layoutTeamName(ctx, rawLabel.toUpperCase(), {
+      maxWidth: areaWidth,
+      maxFontSize: 32 * scale,
+      minFontSize: 16 * scale,
+      fontFamily: '"Poppins", sans-serif',
+      fontWeight: 700,
+    });
+    const lines = layout.lines && layout.lines.length ? layout.lines : [rawLabel];
+    const lineSpacing = layout.fontSize * 1.15;
+    let startY = centerY - (lineSpacing * (lines.length - 1)) / 2;
+    ctx.save();
+    ctx.fillStyle = labelColor;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.font = `700 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
+    lines.forEach((line) => {
+      const targetX = areaX + areaWidth / 2;
+      ctx.fillText(line.toUpperCase(), targetX, startY);
+      startY += lineSpacing;
+    });
+    ctx.restore();
+  };
+
+  matches.forEach((match, index) => {
+    const rowTop = contentStart + verticalOffset + index * (rowHeight + gap);
+    const rowCenterY = rowTop + rowHeight / 2;
+    const barX = paddingX;
+    const barWidth = Math.max(canvasWidth - paddingX * 2, 320 * scale);
+    const barY = rowCenterY - barHeight / 2;
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+    ctx.shadowBlur = 18 * scale;
+    ctx.shadowOffsetY = 8 * scale;
+    drawRoundedRectPath(ctx, barX, barY, barWidth, barHeight, barRadius);
+    const barGradient = ctx.createLinearGradient(barX, rowCenterY, barX + barWidth, rowCenterY);
+    barGradient.addColorStop(0, nameBarStartColor);
+    barGradient.addColorStop(1, nameBarEndColor);
+    ctx.fillStyle = barGradient;
+    ctx.fill();
+    ctx.restore();
+
+    const centerX = (canvasWidth - centerPanelWidth) / 2;
+    const centerY = rowCenterY - centerPanelHeight / 2;
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
+    ctx.shadowBlur = 26 * scale;
+    ctx.shadowOffsetY = 12 * scale;
+    drawRoundedRectPath(ctx, centerX, centerY, centerPanelWidth, centerPanelHeight, centerRadius);
+    const centerGradient = ctx.createLinearGradient(
+      centerX,
+      centerY,
+      centerX + centerPanelWidth,
+      centerY + centerPanelHeight
+    );
+    centerGradient.addColorStop(0, scoreStartColor);
+    centerGradient.addColorStop(1, scoreEndColor);
+    ctx.fillStyle = centerGradient;
+    ctx.fill();
+    ctx.restore();
+
+    const scoreText = `${normalizeScore(match.scoreHome)}:${normalizeScore(match.scoreAway)}`;
+    ctx.save();
+    ctx.font = `800 ${Math.round(48 * scale)}px "Montserrat", "Poppins", sans-serif`;
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+    ctx.shadowBlur = 12 * scale;
+    ctx.fillText(scoreText, canvasWidth / 2, rowCenterY);
+    ctx.restore();
+
+    const logoY = rowCenterY - circleSize / 2;
+    const leftLogoX = barX + 7 * scale;
+    const rightLogoX = barX + barWidth - circleSize - 7 * scale;
+
+    drawLogoTile(ctx, match.homeLogoImage, leftLogoX, logoY, circleSize, match.teamHome, {
+      scale: match.teamHomeLogoScale,
+      offsetX: match.teamHomeLogoOffsetX,
+      offsetY: match.teamHomeLogoOffsetY,
+    });
+    drawLogoTile(ctx, match.awayLogoImage, rightLogoX, logoY, circleSize, match.teamAway, {
+      scale: match.teamAwayLogoScale,
+      offsetX: match.teamAwayLogoOffsetX,
+      offsetY: match.teamAwayLogoOffsetY,
+    });
+
+    const leftAreaStart = leftLogoX + circleSize + textPadding;
+    const leftAreaEnd = canvasWidth / 2 - centerPanelWidth / 2 - textPadding;
+    const leftAreaWidth = Math.max(60 * scale, leftAreaEnd - leftAreaStart);
+    const rightAreaEnd = rightLogoX - textPadding;
+    const rightAreaStart = canvasWidth / 2 + centerPanelWidth / 2 + textPadding;
+    const rightAreaWidth = Math.max(60 * scale, rightAreaEnd - rightAreaStart);
+
+    renderTeamLabel(match.teamHome, leftAreaStart, leftAreaWidth, rowCenterY);
+    renderTeamLabel(match.teamAway, rightAreaStart, rightAreaWidth, rowCenterY);
+  });
+};
+
 const STREAMING_THEME_CANVAS_COLOR = {
   gold: "#1A1A1A",
   blue: "#FFE27D",
@@ -1299,6 +1500,7 @@ export const CanvasUtils = {
   drawFooter,
   drawMiniFooterBanner,
   drawMatches,
+  drawScoreboardMatches,
   drawTogelResult,
 };
 

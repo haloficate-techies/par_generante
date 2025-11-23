@@ -64,6 +64,37 @@ const deriveBrandPalette = (image) => {
 };
 const BASE_LAYER_CACHE_LIMIT = 12;
 
+const SCORE_DATE_MODE_OPTIONS = [
+  { value: "today", label: "Hari Ini" },
+  { value: "yesterday", label: "Kemarin" },
+  { value: "yesterday_today", label: "Kemarin & Hari Ini" },
+];
+
+const formatScoreDateDisplay = (date) => {
+  try {
+    return date.toLocaleDateString("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
+  } catch (error) {
+    return "";
+  }
+};
+
+const resolveScoreDateText = (mode = "today") => {
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  if (mode === "yesterday") {
+    return formatScoreDateDisplay(yesterday);
+  }
+  if (mode === "yesterday_today") {
+    return `${formatScoreDateDisplay(yesterday)} & ${formatScoreDateDisplay(today)}`;
+  }
+  return formatScoreDateDisplay(today);
+};
+
 const App = () => {
   const canvasRef = useRef(null);
   const [title, setTitle] = useState("");
@@ -71,16 +102,36 @@ const App = () => {
   const [activeMatchCount, setActiveMatchCount] = useState(1);
   const [brandLogoSrc, setBrandLogoSrc] = useState("");
   const [activeMode, setActiveMode] = useState("football");
+  const [activeSubMenu, setActiveSubMenu] = useState("");
+  const [scoreDateMode, setScoreDateMode] = useState("today");
   const isTogelMode = activeMode === "togel";
   const isEsportsMode = activeMode === "esports";
   const includeMiniBanner = isEsportsMode;
   const shouldSkipHeader = isEsportsMode;
   const shouldShowTitle = !isEsportsMode;
+  const isScoreModeActive = activeMode === "football" && activeSubMenu === "scores";
   const activeModeConfig = useMemo(
     () => MODE_CONFIG.find((mode) => mode.id === activeMode) || MODE_CONFIG[0],
     [activeMode]
   );
+  useEffect(() => {
+    if (!activeModeConfig) {
+      setActiveSubMenu("");
+      return;
+    }
+    const availableSubMenus = Array.isArray(activeModeConfig.subMenus) ? activeModeConfig.subMenus : [];
+    if (availableSubMenus.length === 0) {
+      setActiveSubMenu("");
+      return;
+    }
+    const defaultSubMenuId =
+      activeModeConfig.defaultSubMenuId ||
+      availableSubMenus[0]?.id ||
+      "";
+    setActiveSubMenu(defaultSubMenuId);
+  }, [activeModeConfig]);
   const pageBackgroundClass = activeModeConfig.pageBackgroundClass || "bg-slate-950";
+  const scoreDateLabel = useMemo(() => resolveScoreDateText(scoreDateMode), [scoreDateMode]);
   const {
     footballDefaultBackground,
     backgroundSrc,
@@ -360,6 +411,7 @@ const App = () => {
       togelPool: overrideTogelPool,
       togelPoolVariant: overrideTogelPoolVariant,
       togelDrawTime: overrideTogelDrawTime,
+      activeSubMenu: overrideActiveSubMenu,
     } = overrides ?? {};
 
     if (document.fonts && document.fonts.ready) {
@@ -478,6 +530,7 @@ const App = () => {
       const layoutPayload = {
         ctx,
         activeMode,
+        activeSubMenu: overrideActiveSubMenu ?? activeSubMenu,
         matchesWithImages,
         matchesStartY,
         brandPalette,
@@ -494,6 +547,7 @@ const App = () => {
               streamingInfo: streamingInfoForRender,
             }
           : null,
+        scoreInfoLabel: isScoreModeActive ? `Pertandingan • ${scoreDateLabel}` : "",
       };
 
       const layoutConfig =
@@ -535,6 +589,9 @@ const App = () => {
     shouldShowTitle,
     includeMiniBanner,
     shouldSkipHeader,
+    activeSubMenu,
+    isScoreModeActive,
+    scoreDateLabel,
   ]);
 
   const scheduleRender = useCallback(() => {
@@ -835,7 +892,9 @@ const App = () => {
         <BannerHeader
           activeModeConfig={activeModeConfig}
           activeMode={activeMode}
+          activeSubMenu={activeSubMenu}
           onModeChange={setActiveMode}
+          onSubMenuChange={setActiveSubMenu}
           lastRenderAt={lastRenderAt}
         />
 
@@ -849,14 +908,18 @@ const App = () => {
                 onMatchFieldChange={handleMatchFieldChange}
                 onAutoLogoRequest={handleAutoLogoRequest}
                 onLogoAdjust={handleLogoAdjust}
-                brandLogoSrc={brandLogoSrc}
-                onBrandLogoChange={handleBrandLogoSelection}
-                brandOptions={AVAILABLE_BRAND_LOGOS}
-                backgroundSrc={backgroundSrc}
-                footerSrc={footerSrc}
-                matchCount={activeMatchCount}
-                onMatchCountChange={handleMatchCountChange}
-                matchCountOptions={MATCH_COUNT_OPTIONS}
+              brandLogoSrc={brandLogoSrc}
+              onBrandLogoChange={handleBrandLogoSelection}
+              brandOptions={AVAILABLE_BRAND_LOGOS}
+              backgroundSrc={backgroundSrc}
+              footerSrc={footerSrc}
+              activeSubMenu={activeSubMenu}
+              scoreDateModeOptions={SCORE_DATE_MODE_OPTIONS}
+              scoreDateMode={scoreDateMode}
+              onScoreDateModeChange={setScoreDateMode}
+              matchCount={activeMatchCount}
+              onMatchCountChange={handleMatchCountChange}
+              matchCountOptions={MATCH_COUNT_OPTIONS}
                 activeMode={activeMode}
                 togelPool={togelPool}
                 onTogelPoolChange={setTogelPool}

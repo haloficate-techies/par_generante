@@ -58,6 +58,12 @@ const AVAILABLE_ESPORT_GAME_OPTIONS =
     ? AppData.ESPORT_GAME_OPTIONS
     : DEFAULT_ESPORT_GAME_OPTIONS;
 
+const DEFAULT_SCORE_DATE_OPTIONS = [
+  { value: "today", label: "Hari Ini" },
+  { value: "yesterday", label: "Kemarin" },
+  { value: "yesterday_today", label: "Kemarin & Hari Ini" },
+];
+
 const getTogelDrawTimeConfig = (pool, variant) =>
   typeof resolveTogelDrawTimeConfigImpl === "function"
     ? resolveTogelDrawTimeConfigImpl(pool, variant)
@@ -167,6 +173,7 @@ const MatchFieldset = ({
   onLogoAdjust,
   isEsportsMode = false,
   gameOptions = [],
+  showScoreInputs = false,
 }) => {
   const gameSlotPreviewStyle = {
     backgroundImage: "linear-gradient(135deg, #0d1829, #050912)",
@@ -190,6 +197,17 @@ const MatchFieldset = ({
   const dateInputId = `match-${index}-date`;
   const timeInputId = `match-${index}-time`;
   const gameSelectId = `match-${index}-game`;
+  const homeScoreId = `match-${index}-score-home`;
+  const awayScoreId = `match-${index}-score-away`;
+
+  const handleScoreInput = useCallback(
+    (field, value) => {
+      const safeValue = typeof value === "string" ? value : String(value ?? "");
+      const normalized = safeValue.replace(/[^0-9]/g, "").slice(0, 2);
+      onFieldChange(index, field, normalized);
+    },
+    [index, onFieldChange]
+  );
 
   return (
     <fieldset className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
@@ -256,6 +274,38 @@ const MatchFieldset = ({
         />
       </div>
     </div>
+    {showScoreInputs && (
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="flex flex-col">
+          <label htmlFor={homeScoreId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Skor Tuan Rumah
+          </label>
+          <input
+            id={homeScoreId}
+            type="text"
+            inputMode="numeric"
+            value={match.scoreHome ?? ""}
+            onChange={(event) => handleScoreInput("scoreHome", event.target.value)}
+            placeholder="0"
+            className="mt-1 rounded-lg border border-fuchsia-700/60 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/40"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor={awayScoreId} className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Skor Tim Tamu
+          </label>
+          <input
+            id={awayScoreId}
+            type="text"
+            inputMode="numeric"
+            value={match.scoreAway ?? ""}
+            onChange={(event) => handleScoreInput("scoreAway", event.target.value)}
+            placeholder="0"
+            className="mt-1 rounded-lg border border-fuchsia-700/60 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/40"
+          />
+        </div>
+      </div>
+    )}
     <div className="mt-4 grid gap-4 md:grid-cols-2">
       <ImageUploadPreview
         label="Logo Tuan Rumah"
@@ -891,6 +941,7 @@ const MatchesSection = ({
   onLogoAdjust,
   isEsportsMode,
   availableGameOptions,
+  showScoreInputs = false,
 }) => {
   if (isTogelMode) {
     return null;
@@ -916,6 +967,7 @@ const MatchesSection = ({
           onLogoAdjust={onLogoAdjust}
           isEsportsMode={isEsportsMode}
           gameOptions={availableGameOptions}
+          showScoreInputs={showScoreInputs}
         />
       ))}
     </section>
@@ -1094,6 +1146,10 @@ const MatchListForm = ({
   brandOptions,
   backgroundSrc,
   footerSrc,
+  activeSubMenu,
+  scoreDateMode = "today",
+  onScoreDateModeChange,
+  scoreDateModeOptions = DEFAULT_SCORE_DATE_OPTIONS,
   matchCount,
   onMatchCountChange,
   matchCountOptions,
@@ -1112,6 +1168,8 @@ const MatchListForm = ({
     typeof value === "boolean" ? value : fallback;
   const isTogelMode = resolveFeatureFlag(modeFeatures.showTogelControls, activeMode === "togel");
   const isEsportsMode = resolveFeatureFlag(modeFeatures.showGameOptions, activeMode === "esports");
+  const isFootballMode = activeMode === "football";
+  const isScoreLayoutActive = isFootballMode && activeSubMenu === "scores";
   const effectiveMatchCount =
     typeof matchCount === "number" ? matchCount : matches.length;
   const availableMatchCountOptions =
@@ -1185,6 +1243,9 @@ const MatchListForm = ({
     modeFeatures.showTitle,
     !isTogelMode && !isEsportsMode
   );
+  const scoreDateOptions = Array.isArray(scoreDateModeOptions) && scoreDateModeOptions.length
+    ? scoreDateModeOptions
+    : DEFAULT_SCORE_DATE_OPTIONS;
 
   return (
     <form className="grid gap-6">
@@ -1198,6 +1259,35 @@ const MatchListForm = ({
         brandOptions={brandOptions}
         backgroundSrc={backgroundSrc}
       />
+      {isScoreLayoutActive && (
+        <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-200">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-base font-semibold text-slate-100">Label Pertandingan</h3>
+            <p className="text-xs text-slate-400">
+              Tampilkan tanggal yang cocok untuk kapsul &quot;Pertandingan&quot; di atas daftar skor.
+            </p>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {scoreDateOptions.map((option) => {
+              const isActive = option.value === scoreDateMode;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onScoreDateModeChange?.(option.value)}
+                  className={`rounded-full px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/40 ${
+                    isActive
+                      ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500 text-white shadow"
+                      : "border border-slate-700 bg-slate-900/40 text-slate-300 hover:border-fuchsia-400/50 hover:text-white"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
       <MatchesSection
         isTogelMode={isTogelMode}
         effectiveMatchCount={effectiveMatchCount}
@@ -1210,6 +1300,7 @@ const MatchListForm = ({
         onLogoAdjust={onLogoAdjust}
         isEsportsMode={isEsportsMode}
         availableGameOptions={availableGameOptions}
+        showScoreInputs={isScoreLayoutActive}
       />
       <TogelControlsSection
         isTogelMode={isTogelMode}

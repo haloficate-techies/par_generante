@@ -973,6 +973,8 @@ export const createInitialMatches = (count) => {
       teamAwayLogoScale: 1,
       teamAwayLogoOffsetX: 0,
       teamAwayLogoOffsetY: 0,
+      scoreHome: "0",
+      scoreAway: "0",
     };
   });
 };

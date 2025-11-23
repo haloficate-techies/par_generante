@@ -253,6 +253,14 @@ const resolveTogelStreamingInfo = (pool, variant, poolLabel = "") => {
 const MATCH_COUNT_OPTIONS = [1, 2, 3, 4, 5];
 const MAX_MATCHES = MATCH_COUNT_OPTIONS[MATCH_COUNT_OPTIONS.length - 1];
 
+const FOOTBALL_SUB_MENUS = [
+  { id: "schedule", label: "Jadwal" },
+  { id: "scores", label: "Skor Bola" },
+  { id: "big_match", label: "Big Match" },
+];
+
+const DEFAULT_SUB_MENUS = [{ id: "schedule", label: "Jadwal" }];
+
 const MODE_CONFIG = [
   {
     id: "football",
@@ -260,6 +268,8 @@ const MODE_CONFIG = [
     title: "Football Banner Generator",
     subtitle: "Buat banner jadwal sepakbola berukuran 1080 x 1080 dengan cepat.",
     pageBackgroundClass: "bg-slate-950",
+    subMenus: FOOTBALL_SUB_MENUS,
+    defaultSubMenuId: "schedule",
   },
   {
     id: "basketball",
@@ -267,6 +277,8 @@ const MODE_CONFIG = [
     title: "Basketball Banner Generator",
     subtitle: "Layout sama sementara, siap untuk penyesuaian konten basket.",
     pageBackgroundClass: "bg-gradient-to-br from-orange-950 via-slate-950 to-slate-950",
+    subMenus: DEFAULT_SUB_MENUS,
+    defaultSubMenuId: "schedule",
   },
   {
     id: "esports",
@@ -274,6 +286,8 @@ const MODE_CONFIG = [
     title: "E-Sports Banner Generator",
     subtitle: "Gunakan template ini untuk jadwal turnamen gim favoritmu.",
     pageBackgroundClass: "bg-slate-950",
+    subMenus: DEFAULT_SUB_MENUS,
+    defaultSubMenuId: "schedule",
   },
   {
     id: "togel",
@@ -281,6 +295,8 @@ const MODE_CONFIG = [
     title: "Togel Banner Generator",
     subtitle: "Template siap pakai untuk informasi keluaran dan jadwal togel.",
     pageBackgroundClass: "bg-slate-950",
+    subMenus: [],
+    defaultSubMenuId: "",
   },
 ];
 
