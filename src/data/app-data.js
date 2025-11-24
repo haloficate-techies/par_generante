@@ -975,6 +975,8 @@ export const createInitialMatches = (count) => {
       teamAwayLogoOffsetY: 0,
       scoreHome: "0",
       scoreAway: "0",
+      teamHomePlayerImage: null,
+      teamAwayPlayerImage: null,
     };
   });
 };

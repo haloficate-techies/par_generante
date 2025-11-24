@@ -62,6 +62,18 @@ const deriveBrandPalette = (image) => {
   }
   return DEFAULT_BRAND_PALETTE;
 };
+const formatMatchDateLabel =
+  AppData.formatDate ||
+  ((dateString) => {
+    if (!dateString) return "";
+    return dateString;
+  });
+const formatMatchTimeLabel =
+  AppData.formatTime ||
+  ((timeString) => {
+    if (!timeString) return "";
+    return timeString;
+  });
 const BASE_LAYER_CACHE_LIMIT = 12;
 
 const SCORE_DATE_MODE_OPTIONS = [
@@ -73,9 +85,9 @@ const SCORE_DATE_MODE_OPTIONS = [
 const formatScoreDateDisplay = (date) => {
   try {
     return date.toLocaleDateString("id-ID", {
-      weekday: "long",
       day: "numeric",
       month: "long",
+      year: "numeric",
     });
   } catch (error) {
     return "";
@@ -95,21 +107,28 @@ const resolveScoreDateText = (mode = "today") => {
   return formatScoreDateDisplay(today);
 };
 
+const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
+
+const BIG_MATCH_TITLE = "BIG MATCH";
+
 const App = () => {
   const canvasRef = useRef(null);
   const [title, setTitle] = useState("");
   const [matches, setMatches] = useState(() => createInitialMatches(MAX_MATCHES));
   const [activeMatchCount, setActiveMatchCount] = useState(1);
   const [brandLogoSrc, setBrandLogoSrc] = useState("");
+  const [leagueLogoSrc, setLeagueLogoSrc] = useState("");
   const [activeMode, setActiveMode] = useState("football");
   const [activeSubMenu, setActiveSubMenu] = useState("");
   const [scoreDateMode, setScoreDateMode] = useState("today");
   const isTogelMode = activeMode === "togel";
   const isEsportsMode = activeMode === "esports";
+  const isScoreModeActive = activeMode === "football" && activeSubMenu === "scores";
+  const isBigMatchLayout = activeMode === "football" && activeSubMenu === "big_match";
   const includeMiniBanner = isEsportsMode;
   const shouldSkipHeader = isEsportsMode;
   const shouldShowTitle = !isEsportsMode;
-  const isScoreModeActive = activeMode === "football" && activeSubMenu === "scores";
+  const shouldShowTitleInput = !isEsportsMode && !isScoreModeActive && !isBigMatchLayout;
   const activeModeConfig = useMemo(
     () => MODE_CONFIG.find((mode) => mode.id === activeMode) || MODE_CONFIG[0],
     [activeMode]
@@ -129,9 +148,14 @@ const App = () => {
       availableSubMenus[0]?.id ||
       "";
     setActiveSubMenu(defaultSubMenuId);
-  }, [activeModeConfig]);
-  const pageBackgroundClass = activeModeConfig.pageBackgroundClass || "bg-slate-950";
-  const scoreDateLabel = useMemo(() => resolveScoreDateText(scoreDateMode), [scoreDateMode]);
+    }, [activeModeConfig]);
+    const pageBackgroundClass = activeModeConfig.pageBackgroundClass || "bg-slate-950";
+    const scoreDateLabel = useMemo(() => resolveScoreDateText(scoreDateMode), [scoreDateMode]);
+    useEffect(() => {
+      if (isBigMatchLayout && activeMatchCount !== 1) {
+        setActiveMatchCount(1);
+      }
+    }, [isBigMatchLayout, activeMatchCount]);
   const {
     footballDefaultBackground,
     backgroundSrc,
@@ -399,20 +423,21 @@ const App = () => {
     canvas.width = baseSize * devicePixelRatioSafe;
     canvas.height = baseSize * devicePixelRatioSafe;
 
-    const {
-      brandLogoSrc: overrideBrandLogoSrc,
-      footerSrc: overrideFooterSrc,
-      footerLink: overrideFooterLink,
-      backgroundSrc: overrideBackgroundSrc,
-      title: overrideTitle,
-      matches: overrideMatches,
-      skipTimestamp = false,
-      togelDigits: overrideTogelDigits,
-      togelPool: overrideTogelPool,
-      togelPoolVariant: overrideTogelPoolVariant,
-      togelDrawTime: overrideTogelDrawTime,
-      activeSubMenu: overrideActiveSubMenu,
-    } = overrides ?? {};
+      const {
+        brandLogoSrc: overrideBrandLogoSrc,
+        footerSrc: overrideFooterSrc,
+        footerLink: overrideFooterLink,
+        backgroundSrc: overrideBackgroundSrc,
+        title: overrideTitle,
+        matches: overrideMatches,
+        skipTimestamp = false,
+        togelDigits: overrideTogelDigits,
+        togelPool: overrideTogelPool,
+        togelPoolVariant: overrideTogelPoolVariant,
+        togelDrawTime: overrideTogelDrawTime,
+        activeSubMenu: overrideActiveSubMenu,
+        leagueLogoSrc: overrideLeagueLogoSrc,
+      } = overrides ?? {};
 
     if (document.fonts && document.fonts.ready) {
       try {
@@ -435,12 +460,24 @@ const App = () => {
       const effectiveFooterLink = overrideFooterLink ?? footerLink;
       const effectiveBackgroundSrc = overrideBackgroundSrc ?? backgroundSrc;
       const effectiveMatches = overrideMatches ?? matches;
+      const effectiveLeagueLogoSrc = overrideLeagueLogoSrc ?? leagueLogoSrc;
       const effectiveTogelDigits = overrideTogelDigits ?? togelDigits;
       const effectiveTogelPool = overrideTogelPool ?? togelPool;
       const effectiveTogelVariant = overrideTogelPoolVariant ?? togelPoolVariant;
       const effectiveTogelDrawTime = overrideTogelDrawTime ?? togelDrawTime;
+      const layoutSubMenu = overrideActiveSubMenu ?? activeSubMenu;
+      const isBigMatchLayoutActive = activeMode === "football" && layoutSubMenu === "big_match";
+      const isScoreLayoutActive = activeMode === "football" && layoutSubMenu === "scores";
       const poolLabel = resolveTogelPoolLabel(effectiveTogelPool);
-      const baseTitleInput = overrideTitle ?? (shouldShowTitle ? title : "");
+      const baseTitleInput =
+        overrideTitle ??
+        (isScoreLayoutActive
+          ? SCORE_MODE_TITLE
+          : isBigMatchLayoutActive
+          ? BIG_MATCH_TITLE
+          : shouldShowTitle
+          ? title
+          : "");
       const effectiveTitle = isTogelMode
         ? buildTogelTitle(baseTitleInput, poolLabel, effectiveTogelVariant)
         : baseTitleInput;
@@ -483,19 +520,32 @@ const App = () => {
           ? computeMiniBannerLayout(canvas, miniBannerImage)
           : null;
 
-      const activeMatches = isTogelMode ? [] : effectiveMatches.slice(0, activeMatchCount);
+      const matchesToUse = isBigMatchLayoutActive ? 1 : activeMatchCount;
+      const activeMatches = isTogelMode ? [] : effectiveMatches.slice(0, matchesToUse);
       const matchesWithImages = isTogelMode
         ? []
         : await Promise.all(
             activeMatches.map(async (match) => {
-              const [homeLogoImage, awayLogoImage, gameLogoImage] = await Promise.all([
-                loadMatchLogoImage(match.teamHomeLogo, match.teamHomeLogoIsAuto),
-                loadMatchLogoImage(match.teamAwayLogo, match.teamAwayLogoIsAuto),
-                match.gameLogo ? loadCachedOptionalImage(match.gameLogo) : Promise.resolve(null),
-              ]);
-              return { ...match, homeLogoImage, awayLogoImage, gameLogoImage };
+              const [homeLogoImage, awayLogoImage, gameLogoImage, homePlayerImage, awayPlayerImage] =
+                await Promise.all([
+                  loadMatchLogoImage(match.teamHomeLogo, match.teamHomeLogoIsAuto),
+                  loadMatchLogoImage(match.teamAwayLogo, match.teamAwayLogoIsAuto),
+                  match.gameLogo ? loadCachedOptionalImage(match.gameLogo) : Promise.resolve(null),
+                  match.teamHomePlayerImage ? loadCachedOptionalImage(match.teamHomePlayerImage) : Promise.resolve(null),
+                  match.teamAwayPlayerImage ? loadCachedOptionalImage(match.teamAwayPlayerImage) : Promise.resolve(null),
+                ]);
+              return { ...match, homeLogoImage, awayLogoImage, gameLogoImage, homePlayerImage, awayPlayerImage };
             })
           );
+
+      const leagueLogoImage = isBigMatchLayoutActive
+        ? await loadCachedOptionalImage(effectiveLeagueLogoSrc)
+        : null;
+      const firstMatchForBigLayout = isBigMatchLayoutActive ? matchesWithImages[0] : null;
+      const bigMatchDateLabel =
+        firstMatchForBigLayout?.date ? formatMatchDateLabel(firstMatchForBigLayout.date) : "";
+      const bigMatchTimeLabel =
+        firstMatchForBigLayout?.time ? formatMatchTimeLabel(firstMatchForBigLayout.time) : "";
 
       const cachedLayer = baseLayerCache.get(baseLayerCacheKey);
       if (cachedLayer) {
@@ -537,6 +587,13 @@ const App = () => {
         miniBannerLayout,
         miniBannerImage,
         streamingInfo: streamingInfoForRender,
+        bigMatchDetails: isBigMatchLayoutActive
+          ? {
+              leagueLogoImage,
+              matchDateLabel: bigMatchDateLabel,
+              matchTimeLabel: bigMatchTimeLabel,
+            }
+          : null,
         togelData: isTogelMode
           ? {
               digits: effectiveTogelDigits,
@@ -575,6 +632,7 @@ const App = () => {
     backgroundSrc,
     footerSrc,
     brandLogoSrc,
+    leagueLogoSrc,
     matches,
     title,
     footerLink,
@@ -592,6 +650,7 @@ const App = () => {
     activeSubMenu,
     isScoreModeActive,
     scoreDateLabel,
+    isBigMatchLayout,
   ]);
 
   const scheduleRender = useCallback(() => {
@@ -907,7 +966,7 @@ const App = () => {
                 matches={visibleMatches}
                 onMatchFieldChange={handleMatchFieldChange}
                 onAutoLogoRequest={handleAutoLogoRequest}
-                onLogoAdjust={handleLogoAdjust}
+              onLogoAdjust={handleLogoAdjust}
               brandLogoSrc={brandLogoSrc}
               onBrandLogoChange={handleBrandLogoSelection}
               brandOptions={AVAILABLE_BRAND_LOGOS}
@@ -920,15 +979,19 @@ const App = () => {
               matchCount={activeMatchCount}
               onMatchCountChange={handleMatchCountChange}
               matchCountOptions={MATCH_COUNT_OPTIONS}
-                activeMode={activeMode}
-                togelPool={togelPool}
-                onTogelPoolChange={setTogelPool}
-                togelPoolVariant={togelPoolVariant}
-                onTogelPoolVariantChange={setTogelPoolVariant}
+              activeMode={activeMode}
+              togelPool={togelPool}
+              onTogelPoolChange={setTogelPool}
+              togelPoolVariant={togelPoolVariant}
+              onTogelPoolVariantChange={setTogelPoolVariant}
               togelDigits={togelDigits}
               onTogelDigitChange={handleTogelDigitChange}
               togelDrawTime={togelDrawTime}
               onTogelDrawTimeChange={setTogelDrawTime}
+              showTitleFieldOverride={shouldShowTitleInput}
+              leagueLogoSrc={leagueLogoSrc}
+              onLeagueLogoChange={setLeagueLogoSrc}
+              isBigMatchLayout={isBigMatchLayout}
             />
             </section>
 

@@ -16,8 +16,8 @@ const BannerHeaderComponent = ({
   const subMenus = Array.isArray(activeModeConfig?.subMenus) ? activeModeConfig.subMenus : [];
   const showSubMenus = subMenus.length > 0;
 
-  const gradientActiveClasses =
-    "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500 text-white shadow-lg shadow-fuchsia-900/40";
+  const activeButtonClasses =
+    "bg-brand-yellow text-slate-900 shadow-lg shadow-brand-yellow/40";
   const inactiveClasses = "bg-slate-800/70 text-slate-300 hover:text-white";
 
   return (
@@ -41,8 +41,8 @@ const BannerHeaderComponent = ({
                   key={mode.id}
                   type="button"
                   onClick={() => onModeChange(mode.id)}
-                  className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-fuchsia-300/40 ${
-                    isActive ? gradientActiveClasses : inactiveClasses
+                    className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-yellow/30 ${
+                    isActive ? activeButtonClasses : inactiveClasses
                   }`}
                 >
                   {mode.label}
@@ -59,8 +59,8 @@ const BannerHeaderComponent = ({
                     key={menuItem.id}
                     type="button"
                     onClick={() => onSubMenuChange?.(menuItem.id)}
-                    className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-fuchsia-300/40 ${
-                      isSelected ? gradientActiveClasses : inactiveClasses
+                    className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-yellow/30 ${
+                      isSelected ? activeButtonClasses : inactiveClasses
                     }`}
                   >
                     {menuItem.label}

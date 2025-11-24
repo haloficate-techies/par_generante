@@ -1,7 +1,7 @@
 import { CanvasUtils } from "../../utils/canvas-utils";
 import AppEnvironment from "../../app/app-environment";
 
-const { drawMatches, drawMiniFooterBanner, drawScoreboardMatches } = typeof CanvasUtils === "object"
+const { drawMatches, drawMiniFooterBanner, drawScoreboardMatches, drawBigMatchLayout } = typeof CanvasUtils === "object"
   ? CanvasUtils
   : window;
 
@@ -14,12 +14,22 @@ const renderMatchModeLayout = ({
   activeSubMenu,
   miniBannerLayout,
   miniBannerImage,
+  bigMatchDetails,
   scoreInfoLabel,
 }) => {
   if (!ctx) return;
+  const shouldUseBigMatchLayout =
+    activeMode === "football" && activeSubMenu === "big_match" && typeof drawBigMatchLayout === "function";
   const shouldUseScoreboard =
     activeMode === "football" && activeSubMenu === "scores" && typeof drawScoreboardMatches === "function";
-  if (shouldUseScoreboard) {
+  if (shouldUseBigMatchLayout) {
+    drawBigMatchLayout(ctx, {
+      matchesWithImages,
+      matchesStartY,
+      brandPalette,
+      bigMatchDetails,
+    });
+  } else if (shouldUseScoreboard) {
     drawScoreboardMatches(ctx, matchesWithImages, matchesStartY, brandPalette, {
       extraBottomSpacing: miniBannerLayout?.totalHeight ?? 0,
       infoLabel: scoreInfoLabel,

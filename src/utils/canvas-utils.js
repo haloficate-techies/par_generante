@@ -850,7 +850,7 @@ const drawScoreboardMatches = (
   const referenceWidth = 1080;
   const scale = canvasWidth / referenceWidth || 1;
   const baseRowHeight = 150;
-  const baseGap = 24;
+  const baseGap = 32;
   const baseBarHeight = 72;
   const baseCircleSize = 110;
   const baseCenterWidth = 240;
@@ -870,7 +870,7 @@ const drawScoreboardMatches = (
     const horizontalPadding = 36 * scale;
     const badgeText = infoLabel.toUpperCase();
     ctx.save();
-    ctx.font = `700 ${Math.round(18 * scale)}px "Poppins", sans-serif`;
+    ctx.font = `700 ${Math.round(24 * scale)}px "Poppins", sans-serif`;
     const textWidth = ctx.measureText(badgeText).width;
     const badgeWidth = Math.min(
       canvasWidth - paddingX * 2,
@@ -890,11 +890,25 @@ const drawScoreboardMatches = (
     ctx.restore();
 
     ctx.save();
-    ctx.font = `700 ${Math.round(18 * scale)}px "Poppins", sans-serif`;
-    ctx.fillStyle = "#f8fafc";
+    ctx.font = `700 ${Math.round(24 * scale)}px "Poppins", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(badgeText, canvasWidth / 2, badgeY + badgeHeight / 2);
+    const textX = canvasWidth / 2;
+    const textY = badgeY + badgeHeight / 2;
+
+    ctx.fillStyle = "rgba(15, 23, 42, 0.65)";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.65)";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = -1 * scale;
+    ctx.shadowOffsetY = -1 * scale;
+    ctx.fillText(badgeText, textX, textY);
+
+    ctx.fillStyle = "#f8fafc";
+    ctx.shadowColor = "rgba(15, 23, 42, 0.4)";
+    ctx.shadowBlur = 14 * scale;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 4 * scale;
+    ctx.fillText(badgeText, textX, textY);
     ctx.restore();
 
     contentStart = badgeY + badgeHeight + infoBadgeSpacing;
@@ -998,7 +1012,7 @@ const drawScoreboardMatches = (
     ctx.fill();
     ctx.restore();
 
-    const scoreText = `${normalizeScore(match.scoreHome)}:${normalizeScore(match.scoreAway)}`;
+    const scoreText = `${normalizeScore(match.scoreHome)} - ${normalizeScore(match.scoreAway)}`;
     ctx.save();
     ctx.font = `800 ${Math.round(48 * scale)}px "Montserrat", "Poppins", sans-serif`;
     ctx.fillStyle = "#fff";
@@ -1033,6 +1047,179 @@ const drawScoreboardMatches = (
 
     renderTeamLabel(match.teamHome, leftAreaStart, leftAreaWidth, rowCenterY);
     renderTeamLabel(match.teamAway, rightAreaStart, rightAreaWidth, rowCenterY);
+  });
+};
+
+const drawBigMatchLayout = (
+  ctx,
+  {
+    matchesWithImages = [],
+    matchesStartY = 0,
+    brandPalette = DEFAULT_BRAND_PALETTE,
+    bigMatchDetails = {},
+  } = {}
+) => {
+  const match = matchesWithImages[0];
+  if (!match) return;
+
+  const canvasWidth = ctx.canvas.width;
+  const contentPadding = Math.max(60, canvasWidth * 0.06);
+  const leagueLogoSize = Math.min(Math.max(canvasWidth * 0.12, 120), 180);
+  const leagueLogoImage = bigMatchDetails?.leagueLogoImage || null;
+  const leagueLogoX = Math.max(40, contentPadding * 0.4);
+  const leagueLogoY = 40;
+
+  const drawLeagueLogo = () => {
+    ctx.save();
+    drawRoundedRectPath(ctx, leagueLogoX, leagueLogoY, leagueLogoSize, leagueLogoSize, leagueLogoSize * 0.2);
+    ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (leagueLogoImage) {
+      drawImageCover(
+        ctx,
+        leagueLogoImage,
+        leagueLogoX + 12,
+        leagueLogoY + 12,
+        leagueLogoSize - 24,
+        leagueLogoSize - 24
+      );
+    } else {
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = `600 ${Math.round(leagueLogoSize * 0.18)}px "Poppins", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("LOGO LIGA", leagueLogoX + leagueLogoSize / 2, leagueLogoY + leagueLogoSize / 2);
+    }
+    ctx.restore();
+  };
+
+  drawLeagueLogo();
+
+  const safeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoSize + 30);
+  const footerGuard = 210;
+  const maxSafeBottom = ctx.canvas.height - footerGuard;
+  const safeBottom = Math.max(safeTop + 240, Math.min(maxSafeBottom, ctx.canvas.height - 40));
+  const safeHeight = Math.max(240, safeBottom - safeTop);
+  const basePanelHeight = 360;
+  const baseBannerHeight = 90;
+  const basePillHeight = 56;
+  const baseSpacingPanelToBanner = 28;
+  const baseSpacingBannerToPill = 30;
+  const requiredHeight =
+    basePanelHeight + baseBannerHeight + basePillHeight + baseSpacingPanelToBanner + baseSpacingBannerToPill;
+  const layoutScale = Math.min(1, safeHeight / requiredHeight);
+
+  const playerPanelHeight = Math.max(220, basePanelHeight * layoutScale);
+  const bannerHeight = Math.max(64, baseBannerHeight * layoutScale);
+  const pillHeight = Math.max(44, basePillHeight * layoutScale);
+  const spacingPanelToBanner = baseSpacingPanelToBanner * layoutScale;
+  const spacingBannerToPill = baseSpacingBannerToPill * layoutScale;
+
+  const panelY = safeTop;
+  const panelGap = Math.max(40, canvasWidth * 0.04);
+  const availableWidth = canvasWidth - contentPadding * 2;
+  const playerPanelWidth = (availableWidth - panelGap) / 2;
+  const leftPanelX = contentPadding;
+  const rightPanelX = canvasWidth - contentPadding - playerPanelWidth;
+  const panelRadius = 32 * layoutScale;
+
+  const drawPlayerPanel = (x, image, fallback) => {
+    ctx.save();
+    drawRoundedRectPath(ctx, x, panelY, playerPanelWidth, playerPanelHeight, panelRadius);
+    const gradient = ctx.createLinearGradient(x, panelY, x + playerPanelWidth, panelY + playerPanelHeight);
+    gradient.addColorStop(0, "rgba(15, 23, 42, 0.3)");
+    gradient.addColorStop(1, "rgba(51, 65, 85, 0.2)");
+    ctx.fillStyle = gradient;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    if (image) {
+      drawImageCover(ctx, image, x, panelY, playerPanelWidth, playerPanelHeight);
+    } else {
+      ctx.fillStyle = "#e2e8f0";
+      ctx.font = `600 ${Math.round(playerPanelHeight * 0.08)}px "Poppins", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(fallback, x + playerPanelWidth / 2, panelY + playerPanelHeight / 2);
+    }
+    ctx.restore();
+  };
+
+  drawPlayerPanel(leftPanelX, match.homePlayerImage, "Pemain Tuan Rumah");
+  drawPlayerPanel(rightPanelX, match.awayPlayerImage, "Pemain Tandang");
+
+  const bannerY = panelY + playerPanelHeight + spacingPanelToBanner;
+  const bannerRadius = bannerHeight / 2;
+  const accentColor = brandPalette?.accent || "#fbbf24";
+
+  const drawTeamBanner = (x, width, label, logoImage, align = "left") => {
+    ctx.save();
+    drawRoundedRectPath(ctx, x, bannerY, width, bannerHeight, bannerRadius);
+    const baseGradient = ctx.createLinearGradient(x, bannerY, x + width, bannerY);
+    baseGradient.addColorStop(0, "rgba(255,255,255,0.98)");
+    baseGradient.addColorStop(1, "rgba(241, 245, 249, 0.92)");
+    ctx.fillStyle = baseGradient;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(239, 68, 68, 0.8)";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.restore();
+
+    const logoSize = Math.min(64, bannerHeight * 0.75);
+    const logoX = align === "left" ? x + 16 : x + width - logoSize - 16;
+    const logoY = bannerY + (bannerHeight - logoSize) / 2;
+    drawLogoTile(ctx, logoImage, logoX, logoY, logoSize, label);
+
+    const textAreaX = align === "left" ? logoX + logoSize + 20 : x + 20;
+    const textAreaWidth = width - (logoSize + 40);
+    ctx.save();
+    ctx.fillStyle = "#0f172a";
+    ctx.font = `800 ${Math.round(bannerHeight * 0.35)}px "Poppins", sans-serif`;
+    ctx.textAlign = align === "left" ? "left" : "right";
+    ctx.textBaseline = "middle";
+    const textX = align === "left" ? textAreaX : x + width - 20;
+    ctx.fillText((label || "Tim TBD").toUpperCase(), textX, bannerY + bannerHeight / 2, textAreaWidth);
+    ctx.restore();
+  };
+
+  const bannerWidth = playerPanelWidth;
+  drawTeamBanner(leftPanelX, bannerWidth, match.teamHome, match.homeLogoImage, "left");
+  drawTeamBanner(rightPanelX, bannerWidth, match.teamAway, match.awayLogoImage, "right");
+
+  const vsCenterX = canvasWidth / 2;
+  const vsCenterY = bannerY + bannerHeight / 2;
+  drawVsBadge(ctx, vsCenterX, vsCenterY, 70, 1);
+
+  const pillTextParts = [];
+  if (bigMatchDetails?.matchDateLabel) {
+    pillTextParts.push(bigMatchDetails.matchDateLabel.toUpperCase());
+  }
+  if (bigMatchDetails?.matchTimeLabel) {
+    pillTextParts.push(bigMatchDetails.matchTimeLabel.toUpperCase());
+  }
+  const pillText = pillTextParts.length ? pillTextParts.join("  |  ") : "TANGGAL & JAM PERTANDINGAN";
+  ctx.save();
+  ctx.font = `700 ${Math.round(pillHeight * 0.45)}px "Poppins", sans-serif`;
+  const measuredTextWidth = ctx.measureText ? ctx.measureText(pillText).width : canvasWidth * 0.4;
+  ctx.restore();
+  const pillWidth = Math.min(canvasWidth * 0.8, measuredTextWidth + 120);
+  const pillX = (canvasWidth - pillWidth) / 2;
+  const pillY = bannerY + bannerHeight + spacingBannerToPill;
+  drawTogelInfoPill(ctx, {
+    x: pillX,
+    y: pillY,
+    width: pillWidth,
+    height: pillHeight,
+    text: pillText,
+    gradientStart: brandPalette?.headerStart || "#fbbf24",
+    gradientEnd: brandPalette?.headerEnd || "#f59e0b",
+    textColor: "#0f172a",
+    fontSize: pillHeight * 0.45,
+    textShadowColor: "rgba(255, 255, 255, 0.35)",
   });
 };
 
@@ -1501,6 +1688,7 @@ export const CanvasUtils = {
   drawMiniFooterBanner,
   drawMatches,
   drawScoreboardMatches,
+  drawBigMatchLayout,
   drawTogelResult,
 };
 

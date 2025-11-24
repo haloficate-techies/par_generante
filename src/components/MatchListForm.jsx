@@ -174,6 +174,7 @@ const MatchFieldset = ({
   isEsportsMode = false,
   gameOptions = [],
   showScoreInputs = false,
+  showBigMatchExtras = false,
 }) => {
   const gameSlotPreviewStyle = {
     backgroundImage: "linear-gradient(135deg, #0d1829, #050912)",
@@ -287,7 +288,7 @@ const MatchFieldset = ({
             value={match.scoreHome ?? ""}
             onChange={(event) => handleScoreInput("scoreHome", event.target.value)}
             placeholder="0"
-            className="mt-1 rounded-lg border border-fuchsia-700/60 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/40"
+            className="mt-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
           />
         </div>
         <div className="flex flex-col">
@@ -301,7 +302,7 @@ const MatchFieldset = ({
             value={match.scoreAway ?? ""}
             onChange={(event) => handleScoreInput("scoreAway", event.target.value)}
             placeholder="0"
-            className="mt-1 rounded-lg border border-fuchsia-700/60 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/40"
+            className="mt-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
           />
         </div>
       </div>
@@ -372,6 +373,28 @@ const MatchFieldset = ({
             )}
           </div>
         </div>
+      </div>
+    )}
+    {showBigMatchExtras && (
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <ImageUploadPreview
+          label="Foto Pemain Tim Tuan Rumah"
+          helperText="Gunakan gambar PNG/JPG dengan latar bersih."
+          previewSrc={match.teamHomePlayerImage}
+          onChange={(value) => onFieldChange(index, "teamHomePlayerImage", value)}
+          inputId={`home-player-${index}`}
+          ratioHint="Format potret disarankan"
+          slotHeight="h-52"
+        />
+        <ImageUploadPreview
+          label="Foto Pemain Tim Tandang"
+          helperText="Gunakan gambar PNG/JPG dengan latar bersih."
+          previewSrc={match.teamAwayPlayerImage}
+          onChange={(value) => onFieldChange(index, "teamAwayPlayerImage", value)}
+          inputId={`away-player-${index}`}
+          ratioHint="Format potret disarankan"
+          slotHeight="h-52"
+        />
       </div>
     )}
   </fieldset>
@@ -855,6 +878,9 @@ const BannerMetadataSection = ({
   onBrandLogoChange,
   brandOptions,
   backgroundSrc,
+  showLeagueLogoInput = false,
+  leagueLogoSrc,
+  onLeagueLogoChange,
 }) => {
   const titleInputId = useId();
   return (
@@ -885,6 +911,17 @@ const BannerMetadataSection = ({
         onChange={onBrandLogoChange}
         options={brandOptions}
       />
+      {showLeagueLogoInput ? (
+        <ImageUploadPreview
+          label="Logo Liga"
+          helperText="Opsional: tampilkan logo kompetisi/liga di banner Big Match."
+          previewSrc={leagueLogoSrc}
+          onChange={onLeagueLogoChange}
+          inputId="league-logo"
+          slotHeight="h-32"
+          ratioHint="Rekomendasi persegi"
+        />
+      ) : null}
       <BannerBackgroundPreview src={backgroundSrc} />
     </section>
   );
@@ -942,6 +979,8 @@ const MatchesSection = ({
   isEsportsMode,
   availableGameOptions,
   showScoreInputs = false,
+  showBigMatchExtras = false,
+  disableMatchCountAdjuster = false,
 }) => {
   if (isTogelMode) {
     return null;
@@ -951,13 +990,19 @@ const MatchesSection = ({
       <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-300">
         Detail Pertandingan
       </h3>
-      <MatchCountAdjuster
-        count={effectiveMatchCount}
-        minCount={minMatchCount}
-        maxCount={maxMatchCount}
-        onChange={adjustMatchCount}
-      />
-      {matches.map((match, index) => (
+      {disableMatchCountAdjuster ? (
+        <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-300">
+          Layout Big Match menggunakan 1 pertandingan utama. Isi data pada pertandingan pertama.
+        </div>
+      ) : (
+        <MatchCountAdjuster
+          count={effectiveMatchCount}
+          minCount={minMatchCount}
+          maxCount={maxMatchCount}
+          onChange={adjustMatchCount}
+        />
+      )}
+      {(disableMatchCountAdjuster ? matches.slice(0, 1) : matches).map((match, index) => (
         <MatchFieldset
           key={index}
           match={match}
@@ -968,6 +1013,7 @@ const MatchesSection = ({
           isEsportsMode={isEsportsMode}
           gameOptions={availableGameOptions}
           showScoreInputs={showScoreInputs}
+          showBigMatchExtras={showBigMatchExtras}
         />
       ))}
     </section>
@@ -1163,6 +1209,10 @@ const MatchListForm = ({
   togelDrawTime,
   onTogelDrawTimeChange,
   modeFeatures = {},
+  showTitleFieldOverride,
+  leagueLogoSrc = "",
+  onLeagueLogoChange,
+  isBigMatchLayout = false,
 }) => {
   const resolveFeatureFlag = (value, fallback) =>
     typeof value === "boolean" ? value : fallback;
@@ -1239,10 +1289,15 @@ const MatchListForm = ({
     isTogelMode &&
     (drawTimeOptions.length > 0 || Boolean(drawTimeConfig.disabledReason));
   const availableGameOptions = isEsportsMode ? AVAILABLE_ESPORT_GAME_OPTIONS : [];
-  const shouldShowTitleField = resolveFeatureFlag(
+  const isBigMatchLayoutActive = Boolean(isBigMatchLayout);
+  const resolvedShowTitle = resolveFeatureFlag(
     modeFeatures.showTitle,
     !isTogelMode && !isEsportsMode
   );
+  const shouldShowTitleField =
+    typeof showTitleFieldOverride === "boolean"
+      ? showTitleFieldOverride
+      : resolvedShowTitle;
   const scoreDateOptions = Array.isArray(scoreDateModeOptions) && scoreDateModeOptions.length
     ? scoreDateModeOptions
     : DEFAULT_SCORE_DATE_OPTIONS;
@@ -1258,6 +1313,9 @@ const MatchListForm = ({
         onBrandLogoChange={onBrandLogoChange}
         brandOptions={brandOptions}
         backgroundSrc={backgroundSrc}
+        showLeagueLogoInput={isBigMatchLayoutActive}
+        leagueLogoSrc={leagueLogoSrc}
+        onLeagueLogoChange={onLeagueLogoChange}
       />
       {isScoreLayoutActive && (
         <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-200">
@@ -1275,10 +1333,10 @@ const MatchListForm = ({
                   key={option.value}
                   type="button"
                   onClick={() => onScoreDateModeChange?.(option.value)}
-                  className={`rounded-full px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-300/40 ${
+                  className={`rounded-full px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/30 ${
                     isActive
-                      ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500 text-white shadow"
-                      : "border border-slate-700 bg-slate-900/40 text-slate-300 hover:border-fuchsia-400/50 hover:text-white"
+                      ? "bg-brand-yellow text-slate-900 shadow"
+                      : "border border-slate-700 bg-slate-900/40 text-slate-300 hover:border-brand-yellow/60 hover:text-white"
                   }`}
                 >
                   {option.label}
@@ -1301,6 +1359,8 @@ const MatchListForm = ({
         isEsportsMode={isEsportsMode}
         availableGameOptions={availableGameOptions}
         showScoreInputs={isScoreLayoutActive}
+        showBigMatchExtras={isBigMatchLayoutActive}
+        disableMatchCountAdjuster={isBigMatchLayoutActive}
       />
       <TogelControlsSection
         isTogelMode={isTogelMode}
