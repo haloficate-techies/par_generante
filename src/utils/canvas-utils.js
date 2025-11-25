@@ -1101,18 +1101,18 @@ const drawBigMatchLayout = (
   const safeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoSize + 30);
   const footerGuard = 210;
   const maxSafeBottom = ctx.canvas.height - footerGuard;
-  const safeBottom = Math.max(safeTop + 240, Math.min(maxSafeBottom, ctx.canvas.height - 40));
-  const safeHeight = Math.max(240, safeBottom - safeTop);
-  const basePanelHeight = 360;
-  const baseBannerHeight = 90;
+  const safeBottom = Math.max(safeTop + 420, Math.min(maxSafeBottom, ctx.canvas.height - 40));
+  const safeHeight = Math.max(420, safeBottom - safeTop);
+  const basePanelHeight = 400;
+  const baseBannerHeight = 95;
   const basePillHeight = 56;
-  const baseSpacingPanelToBanner = 28;
-  const baseSpacingBannerToPill = 30;
+  const baseSpacingPanelToBanner = 0;
+  const baseSpacingBannerToPill = 60;
   const requiredHeight =
     basePanelHeight + baseBannerHeight + basePillHeight + baseSpacingPanelToBanner + baseSpacingBannerToPill;
   const layoutScale = Math.min(1, safeHeight / requiredHeight);
 
-  const playerPanelHeight = Math.max(220, basePanelHeight * layoutScale);
+  const playerPanelHeight = Math.max(300, basePanelHeight * layoutScale);
   const bannerHeight = Math.max(64, baseBannerHeight * layoutScale);
   const pillHeight = Math.max(44, basePillHeight * layoutScale);
   const spacingPanelToBanner = baseSpacingPanelToBanner * layoutScale;
@@ -1129,17 +1129,18 @@ const drawBigMatchLayout = (
   const drawPlayerPanel = (x, image, fallback) => {
     ctx.save();
     drawRoundedRectPath(ctx, x, panelY, playerPanelWidth, playerPanelHeight, panelRadius);
-    const gradient = ctx.createLinearGradient(x, panelY, x + playerPanelWidth, panelY + playerPanelHeight);
-    gradient.addColorStop(0, "rgba(15, 23, 42, 0.3)");
-    gradient.addColorStop(1, "rgba(51, 65, 85, 0.2)");
-    ctx.fillStyle = gradient;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
     if (image) {
+      ctx.clip();
       drawImageCover(ctx, image, x, panelY, playerPanelWidth, playerPanelHeight);
     } else {
+      const gradient = ctx.createLinearGradient(x, panelY, x + playerPanelWidth, panelY + playerPanelHeight);
+      gradient.addColorStop(0, "rgba(15, 23, 42, 0.3)");
+      gradient.addColorStop(1, "rgba(51, 65, 85, 0.2)");
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
       ctx.fillStyle = "#e2e8f0";
       ctx.font = `600 ${Math.round(playerPanelHeight * 0.08)}px "Poppins", sans-serif`;
       ctx.textAlign = "center";
@@ -1169,20 +1170,57 @@ const drawBigMatchLayout = (
     ctx.stroke();
     ctx.restore();
 
-    const logoSize = Math.min(64, bannerHeight * 0.75);
-    const logoX = align === "left" ? x + 16 : x + width - logoSize - 16;
+    const logoSize = Math.min(90, bannerHeight * 0.92);
+    const logoMargin = Math.max(16, bannerHeight * 0.1);
+    const logoX = align === "left" ? x + logoMargin : x + width - logoSize - logoMargin;
     const logoY = bannerY + (bannerHeight - logoSize) / 2;
-    drawLogoTile(ctx, logoImage, logoX, logoY, logoSize, label);
+    const logoOptions =
+      align === "left"
+        ? {
+            scale: match?.teamHomeLogoScale,
+            offsetX: match?.teamHomeLogoOffsetX,
+            offsetY: match?.teamHomeLogoOffsetY,
+          }
+        : {
+            scale: match?.teamAwayLogoScale,
+            offsetX: match?.teamAwayLogoOffsetX,
+            offsetY: match?.teamAwayLogoOffsetY,
+          };
+    drawLogoTile(ctx, logoImage, logoX, logoY, logoSize, label, logoOptions);
 
-    const textAreaX = align === "left" ? logoX + logoSize + 20 : x + 20;
-    const textAreaWidth = width - (logoSize + 40);
+    const textAreaStart = align === "left" ? logoX + logoSize + 20 : x + 20;
+    const textAreaEnd = align === "left" ? x + width - 20 : logoX - 20;
+    const textAreaWidth = Math.max(0, textAreaEnd - textAreaStart);
+    const centerOffset = align === "left" ? -20 : 20;
+    const effectiveTextWidth = Math.max(0, textAreaWidth - Math.abs(centerOffset) * 2);
+    const textAreaCenter = textAreaStart + textAreaWidth / 2 + centerOffset;
     ctx.save();
+    ctx.beginPath();
+    ctx.rect(textAreaStart, bannerY, textAreaWidth, bannerHeight);
+    ctx.clip();
     ctx.fillStyle = "#0f172a";
-    ctx.font = `800 ${Math.round(bannerHeight * 0.35)}px "Poppins", sans-serif`;
-    ctx.textAlign = align === "left" ? "left" : "right";
+    const maxFontSize = Math.min(bannerHeight * 0.38, 38);
+    const minFontSize = Math.max(18, bannerHeight * 0.22);
+    const layout = layoutTeamName(ctx, (label || "Tim TBD").toUpperCase(), {
+      maxWidth: effectiveTextWidth,
+      maxFontSize,
+      minFontSize,
+      fontWeight: 800,
+      fontFamily: '"Poppins", sans-serif',
+    });
+    const lines =
+      layout.lines && layout.lines.length
+        ? layout.lines.slice(0, 2)
+        : [(label || "Tim TBD").toUpperCase()];
+    const fontSize = Math.round(layout.fontSize || maxFontSize);
+    ctx.font = `800 ${fontSize}px "Poppins", sans-serif`;
+    ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const textX = align === "left" ? textAreaX : x + width - 20;
-    ctx.fillText((label || "Tim TBD").toUpperCase(), textX, bannerY + bannerHeight / 2, textAreaWidth);
+    const lineHeight = fontSize * (lines.length > 1 ? 1.05 : 1);
+    const firstLineY = bannerY + bannerHeight / 2 - ((lines.length - 1) * lineHeight) / 2;
+    lines.forEach((line, index) => {
+      ctx.fillText(line, textAreaCenter, firstLineY + index * lineHeight, effectiveTextWidth);
+    });
     ctx.restore();
   };
 
@@ -1199,7 +1237,7 @@ const drawBigMatchLayout = (
     pillTextParts.push(bigMatchDetails.matchDateLabel.toUpperCase());
   }
   if (bigMatchDetails?.matchTimeLabel) {
-    pillTextParts.push(bigMatchDetails.matchTimeLabel.toUpperCase());
+    pillTextParts.push(`PUKUL : ${bigMatchDetails.matchTimeLabel.toUpperCase()} WIB`);
   }
   const pillText = pillTextParts.length ? pillTextParts.join("  |  ") : "TANGGAL & JAM PERTANDINGAN";
   ctx.save();
