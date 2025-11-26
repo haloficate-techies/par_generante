@@ -1098,25 +1098,37 @@ const drawBigMatchLayout = (
 
   drawLeagueLogo();
 
-  const safeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoSize + 30);
-  const footerGuard = 210;
+  const baseSafeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoSize + 30);
+  const leagueGuardTop = leagueLogoY + leagueLogoSize + 20;
+  const maxPanelLift = 60;
+  const liftableAmount = Math.max(0, baseSafeTop - leagueGuardTop);
+  const appliedLift = Math.min(maxPanelLift, liftableAmount);
+  const safeTop = baseSafeTop - appliedLift;
+  const footerGuard = 120;
   const maxSafeBottom = ctx.canvas.height - footerGuard;
   const safeBottom = Math.max(safeTop + 420, Math.min(maxSafeBottom, ctx.canvas.height - 40));
   const safeHeight = Math.max(420, safeBottom - safeTop);
-  const basePanelHeight = 400;
+  const basePanelHeight = 500;
   const baseBannerHeight = 95;
   const basePillHeight = 56;
   const baseSpacingPanelToBanner = 0;
-  const baseSpacingBannerToPill = 60;
+  const baseSpacingBannerToPill = 10;
   const requiredHeight =
     basePanelHeight + baseBannerHeight + basePillHeight + baseSpacingPanelToBanner + baseSpacingBannerToPill;
   const layoutScale = Math.min(1, safeHeight / requiredHeight);
 
-  const playerPanelHeight = Math.max(300, basePanelHeight * layoutScale);
   const bannerHeight = Math.max(64, baseBannerHeight * layoutScale);
   const pillHeight = Math.max(44, basePillHeight * layoutScale);
   const spacingPanelToBanner = baseSpacingPanelToBanner * layoutScale;
   const spacingBannerToPill = baseSpacingBannerToPill * layoutScale;
+  const staticBlockHeight =
+    spacingPanelToBanner + bannerHeight + spacingBannerToPill + pillHeight;
+  const fallbackPanelHeight = Math.max(320, basePanelHeight * layoutScale);
+  const computedPanelHeight = safeHeight - staticBlockHeight;
+  const playerPanelHeight =
+    computedPanelHeight > 0
+      ? Math.max(320, computedPanelHeight)
+      : fallbackPanelHeight;
 
   const panelY = safeTop;
   const panelGap = Math.max(40, canvasWidth * 0.04);
