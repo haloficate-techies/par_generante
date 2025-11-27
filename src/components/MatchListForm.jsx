@@ -171,6 +171,7 @@ const MatchFieldset = ({
   onFieldChange,
   onRequestAutoLogo,
   onLogoAdjust,
+  onPlayerImageAdjust,
   isEsportsMode = false,
   gameOptions = [],
   showScoreInputs = false,
@@ -385,6 +386,10 @@ const MatchFieldset = ({
           inputId={`home-player-${index}`}
           ratioHint="Format potret disarankan"
           slotHeight="h-52"
+          scale={match.teamHomePlayerScale}
+          offsetX={match.teamHomePlayerOffsetX}
+          offsetY={match.teamHomePlayerOffsetY}
+          onAdjust={(adjustments) => onPlayerImageAdjust?.(index, "home", adjustments)}
         />
         <ImageUploadPreview
           label="Foto Pemain Tim Tandang"
@@ -394,6 +399,10 @@ const MatchFieldset = ({
           inputId={`away-player-${index}`}
           ratioHint="Format potret disarankan"
           slotHeight="h-52"
+          scale={match.teamAwayPlayerScale}
+          offsetX={match.teamAwayPlayerOffsetX}
+          offsetY={match.teamAwayPlayerOffsetY}
+          onAdjust={(adjustments) => onPlayerImageAdjust?.(index, "away", adjustments)}
         />
       </div>
     )}
@@ -662,7 +671,7 @@ const ImageUploadPreview = ({
       {hasAdjustments && previewSrc && (
         <div className="mt-4 space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-            Penyesuaian posisi logo
+            Penyesuaian posisi gambar
           </p>
           <div className="space-y-2">
             <label className="flex items-center justify-between text-[11px] text-slate-300">
@@ -976,6 +985,7 @@ const MatchesSection = ({
   onMatchFieldChange,
   onAutoLogoRequest,
   onLogoAdjust,
+  onPlayerImageAdjust,
   isEsportsMode,
   availableGameOptions,
   showScoreInputs = false,
@@ -1010,6 +1020,7 @@ const MatchesSection = ({
           onFieldChange={onMatchFieldChange}
           onRequestAutoLogo={onAutoLogoRequest}
           onLogoAdjust={onLogoAdjust}
+          onPlayerImageAdjust={onPlayerImageAdjust}
           isEsportsMode={isEsportsMode}
           gameOptions={availableGameOptions}
           showScoreInputs={showScoreInputs}
@@ -1187,6 +1198,7 @@ const MatchListForm = ({
   onMatchFieldChange,
   onAutoLogoRequest,
   onLogoAdjust,
+  onPlayerImageAdjust,
   brandLogoSrc,
   onBrandLogoChange,
   brandOptions,
@@ -1356,6 +1368,7 @@ const MatchListForm = ({
         onMatchFieldChange={onMatchFieldChange}
         onAutoLogoRequest={onAutoLogoRequest}
         onLogoAdjust={onLogoAdjust}
+        onPlayerImageAdjust={onPlayerImageAdjust}
         isEsportsMode={isEsportsMode}
         availableGameOptions={availableGameOptions}
         showScoreInputs={isScoreLayoutActive}

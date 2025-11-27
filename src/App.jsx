@@ -287,6 +287,11 @@ const App = () => {
               field === "teamHomeLogo" ? "teamHome" : "teamAway"
             );
           }
+        } else if (field === "teamHomePlayerImage" || field === "teamAwayPlayerImage") {
+          const baseKey = field === "teamHomePlayerImage" ? "teamHomePlayer" : "teamAwayPlayer";
+          updatedMatch[`${baseKey}Scale`] = 1;
+          updatedMatch[`${baseKey}OffsetX`] = 0;
+          updatedMatch[`${baseKey}OffsetY`] = 0;
         }
 
         return updatedMatch;
@@ -340,6 +345,61 @@ const App = () => {
           side === "home" ? "teamHomeLogoOffsetX" : "teamAwayLogoOffsetX";
         const offsetYKey =
           side === "home" ? "teamHomeLogoOffsetY" : "teamAwayLogoOffsetY";
+        let nextMatch = match;
+        const ensureDraft = () => {
+          if (nextMatch === match) {
+            nextMatch = { ...match };
+          }
+        };
+        const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+        if (Object.prototype.hasOwnProperty.call(updates, "scale")) {
+          const value = Number(updates.scale);
+          const current = match[scaleKey] ?? 1;
+          const nextValue = Number.isFinite(value)
+            ? clamp(value, 0.7, 1.5)
+            : current;
+          if (nextValue !== current) {
+            ensureDraft();
+            nextMatch[scaleKey] = nextValue;
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(updates, "offsetX")) {
+          const value = Number(updates.offsetX);
+          const current = match[offsetXKey] ?? 0;
+          const nextValue = Number.isFinite(value)
+            ? clamp(value, -0.75, 0.75)
+            : current;
+          if (nextValue !== current) {
+            ensureDraft();
+            nextMatch[offsetXKey] = nextValue;
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(updates, "offsetY")) {
+          const value = Number(updates.offsetY);
+          const current = match[offsetYKey] ?? 0;
+          const nextValue = Number.isFinite(value)
+            ? clamp(value, -0.75, 0.75)
+            : current;
+          if (nextValue !== current) {
+            ensureDraft();
+            nextMatch[offsetYKey] = nextValue;
+          }
+        }
+        return nextMatch;
+      })
+    );
+  }, []);
+
+  const handlePlayerImageAdjust = useCallback((index, side, updates) => {
+    if (!updates) return;
+    setMatches((prevMatches) =>
+      prevMatches.map((match, idx) => {
+        if (idx !== index) return match;
+        const scaleKey = side === "home" ? "teamHomePlayerScale" : "teamAwayPlayerScale";
+        const offsetXKey =
+          side === "home" ? "teamHomePlayerOffsetX" : "teamAwayPlayerOffsetX";
+        const offsetYKey =
+          side === "home" ? "teamHomePlayerOffsetY" : "teamAwayPlayerOffsetY";
         let nextMatch = match;
         const ensureDraft = () => {
           if (nextMatch === match) {
@@ -980,6 +1040,7 @@ const App = () => {
                 onMatchFieldChange={handleMatchFieldChange}
                 onAutoLogoRequest={handleAutoLogoRequest}
               onLogoAdjust={handleLogoAdjust}
+              onPlayerImageAdjust={handlePlayerImageAdjust}
               brandLogoSrc={brandLogoSrc}
               onBrandLogoChange={handleBrandLogoSelection}
               brandOptions={AVAILABLE_BRAND_LOGOS}

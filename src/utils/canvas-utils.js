@@ -18,6 +18,7 @@ const PLACEHOLDER_TEXT_COLOR = DATA_PLACEHOLDER_COLORS.text || "#e2e8f0";
 const DEFAULT_BRAND_PALETTE = DATA_DEFAULT_BRAND_PALETTE;
 const applyFittedFont = applyFittedFontHelper;
 const clampMin = clampMinHelper;
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const formatDate = formatDateHelper;
 const formatTime = formatTimeHelper;
 const hexToRgb = hexToRgbHelper;
@@ -259,14 +260,22 @@ const drawBrandLogo = (ctx, image, palette = DEFAULT_BRAND_PALETTE) => {
   return y + slotHeight;
 };
 
-const drawImageCover = (ctx, image, x, y, width, height) => {
+const drawImageCover = (ctx, image, x, y, width, height, options = {}) => {
   if (!image) return;
-  const scale = Math.max(width / image.width, height / image.height);
-  const drawWidth = image.width * scale;
-  const drawHeight = image.height * scale;
-  const offsetX = x + (width - drawWidth) / 2;
-  const offsetY = y + (height - drawHeight) / 2;
-  ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+  const baseScale = Math.max(width / image.width, height / image.height);
+  const scaleInput = Number(options.scale);
+  const scaleFactor = Number.isFinite(scaleInput) ? clamp(scaleInput, 0.5, 2) : 1;
+  const drawWidth = image.width * baseScale * scaleFactor;
+  const drawHeight = image.height * baseScale * scaleFactor;
+  const offsetRangeX = Math.max(width, drawWidth) * 0.25;
+  const offsetRangeY = Math.max(height, drawHeight) * 0.25;
+  const offsetXInput = Number(options.offsetX);
+  const offsetYInput = Number(options.offsetY);
+  const effectiveOffsetX = Number.isFinite(offsetXInput) ? clamp(offsetXInput, -1, 1) : 0;
+  const effectiveOffsetY = Number.isFinite(offsetYInput) ? clamp(offsetYInput, -1, 1) : 0;
+  const renderX = x + (width - drawWidth) / 2 + effectiveOffsetX * offsetRangeX;
+  const renderY = y + (height - drawHeight) / 2 + effectiveOffsetY * offsetRangeY;
+  ctx.drawImage(image, renderX, renderY, drawWidth, drawHeight);
 };
 
 const drawVsBadge = (ctx, centerX, centerY, radius, detailScale = 1) => {
@@ -1138,12 +1147,12 @@ const drawBigMatchLayout = (
   const rightPanelX = canvasWidth - contentPadding - playerPanelWidth;
   const panelRadius = 32 * layoutScale;
 
-  const drawPlayerPanel = (x, image, fallback) => {
+  const drawPlayerPanel = (x, image, fallback, adjustments = {}) => {
     ctx.save();
     drawRoundedRectPath(ctx, x, panelY, playerPanelWidth, playerPanelHeight, panelRadius);
     if (image) {
       ctx.clip();
-      drawImageCover(ctx, image, x, panelY, playerPanelWidth, playerPanelHeight);
+      drawImageCover(ctx, image, x, panelY, playerPanelWidth, playerPanelHeight, adjustments);
     } else {
       const gradient = ctx.createLinearGradient(x, panelY, x + playerPanelWidth, panelY + playerPanelHeight);
       gradient.addColorStop(0, "rgba(15, 23, 42, 0.3)");
@@ -1162,10 +1171,19 @@ const drawBigMatchLayout = (
     ctx.restore();
   };
 
-  drawPlayerPanel(leftPanelX, match.homePlayerImage, "Pemain Tuan Rumah");
-  drawPlayerPanel(rightPanelX, match.awayPlayerImage, "Pemain Tandang");
+  drawPlayerPanel(leftPanelX, match.homePlayerImage, "Pemain Tuan Rumah", {
+    scale: match?.teamHomePlayerScale,
+    offsetX: match?.teamHomePlayerOffsetX,
+    offsetY: match?.teamHomePlayerOffsetY,
+  });
+  drawPlayerPanel(rightPanelX, match.awayPlayerImage, "Pemain Tandang", {
+    scale: match?.teamAwayPlayerScale,
+    offsetX: match?.teamAwayPlayerOffsetX,
+    offsetY: match?.teamAwayPlayerOffsetY,
+  });
 
-  const bannerY = panelY + playerPanelHeight + spacingPanelToBanner;
+  const bannerLift = Math.max(0, Math.min(playerPanelHeight * 0.3, 50));
+  const bannerY = panelY + playerPanelHeight + spacingPanelToBanner - bannerLift;
   const bannerRadius = bannerHeight / 2;
   const accentColor = brandPalette?.accent || "#fbbf24";
 
@@ -1258,7 +1276,8 @@ const drawBigMatchLayout = (
   ctx.restore();
   const pillWidth = Math.min(canvasWidth * 0.8, measuredTextWidth + 120);
   const pillX = (canvasWidth - pillWidth) / 2;
-  const pillY = bannerY + bannerHeight + spacingBannerToPill;
+  const pillDrop = Math.max(bannerLift * 0.6, 30);
+  const pillY = bannerY + bannerHeight + spacingBannerToPill + pillDrop;
   drawTogelInfoPill(ctx, {
     x: pillX,
     y: pillY,
