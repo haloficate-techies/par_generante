@@ -914,7 +914,7 @@ const BRAND_ASSET_ENTRIES = BRAND_NAMES.map((brandName) => {
   const esportsBackgroundPath = resolveEsportBrandBackgroundPath(brandName);
   return {
     name: brandName,
-    headerPath: `assets/logo_header/${brandName}.webp`,
+    headerPath: `assets/BRAND/${brandName}.webp`,
     footerPath: `assets/BOLA/banner_footer/${brandName}.webp`,
     backgroundPath: footballBackgroundPath,
     backgroundByMode: {

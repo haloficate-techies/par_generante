@@ -1,7 +1,7 @@
 ## Pedoman Aset Banner
 
 ### Struktur Direktori
-- `public/assets/logo_header/`  
+- `public/assets/BRAND/`  
   Logo brand untuk header (303VIP, 7METER, dll). Digunakan pada slot utama di bagian atas banner.
 - `public/assets/BOLA/banner_background/`  
   Background khusus sepak bola. Nama file = nama brand (uppercase) + `.webp`. Ada fallback `BACKGROUND.webp`.
@@ -24,7 +24,7 @@
 3. **Game Esports**: nama uppercase dengan underscore (`CALL_OF_DUTY.webp`).
 
 ### Cara Menambah Brand Baru
-1. Tambah file logo header di `assets/logo_header/BRAND.webp`.
+1. Tambah file logo header di `assets/BRAND/BRAND.webp`.
 2. Tambah footer di `assets/BOLA/banner_footer/BRAND.webp`.
 3. (Opsional) Tambah background per mode:
    - Bola: `public/assets/BOLA/banner_background/BRAND.webp`
