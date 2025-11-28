@@ -1073,42 +1073,48 @@ const drawBigMatchLayout = (
 
   const canvasWidth = ctx.canvas.width;
   const contentPadding = Math.max(60, canvasWidth * 0.06);
-  const leagueLogoSize = Math.min(Math.max(canvasWidth * 0.12, 120), 180);
+  const leagueLogoSize = Math.min(Math.max(canvasWidth * 0.12, 220), 170);
+  const leagueLogoWidth = leagueLogoSize * 1.25;
+  const leagueLogoHeight = leagueLogoSize;
   const leagueLogoImage = bigMatchDetails?.leagueLogoImage || null;
-  const leagueLogoX = Math.max(40, contentPadding * 0.4);
-  const leagueLogoY = 40;
+  const leagueLogoX = Math.max(70, contentPadding * 0.2);
+  const leagueLogoY = 32;
 
   const drawLeagueLogo = () => {
+    if (leagueLogoImage) {
+      ctx.save();
+      drawRoundedRectPath(ctx, leagueLogoX, leagueLogoY, leagueLogoWidth, leagueLogoHeight, leagueLogoHeight * 0.2);
+      ctx.clip();
+      const imgWidth = leagueLogoImage.naturalWidth || leagueLogoImage.width || leagueLogoWidth;
+      const imgHeight = leagueLogoImage.naturalHeight || leagueLogoImage.height || leagueLogoHeight;
+      const scale = Math.min(leagueLogoWidth / imgWidth, leagueLogoHeight / imgHeight);
+      const renderWidth = imgWidth * scale;
+      const renderHeight = imgHeight * scale;
+      const renderX = leagueLogoX + (leagueLogoWidth - renderWidth) / 2;
+      const renderY = leagueLogoY + (leagueLogoHeight - renderHeight) / 2;
+      ctx.drawImage(leagueLogoImage, renderX, renderY, renderWidth, renderHeight);
+      ctx.restore();
+      return;
+    }
     ctx.save();
-    drawRoundedRectPath(ctx, leagueLogoX, leagueLogoY, leagueLogoSize, leagueLogoSize, leagueLogoSize * 0.2);
+    drawRoundedRectPath(ctx, leagueLogoX, leagueLogoY, leagueLogoWidth, leagueLogoHeight, leagueLogoHeight * 0.2);
     ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
     ctx.fill();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
     ctx.lineWidth = 2;
     ctx.stroke();
-    if (leagueLogoImage) {
-      drawImageCover(
-        ctx,
-        leagueLogoImage,
-        leagueLogoX + 12,
-        leagueLogoY + 12,
-        leagueLogoSize - 24,
-        leagueLogoSize - 24
-      );
-    } else {
-      ctx.fillStyle = "#e2e8f0";
-      ctx.font = `600 ${Math.round(leagueLogoSize * 0.18)}px "Poppins", sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("LOGO LIGA", leagueLogoX + leagueLogoSize / 2, leagueLogoY + leagueLogoSize / 2);
-    }
+    ctx.fillStyle = "#e2e8f0";
+    ctx.font = `600 ${Math.round(leagueLogoHeight * 0.18)}px "Poppins", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("LOGO LIGA", leagueLogoX + leagueLogoWidth / 2, leagueLogoY + leagueLogoHeight / 2);
     ctx.restore();
   };
 
   drawLeagueLogo();
 
-  const baseSafeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoSize + 30);
-  const leagueGuardTop = leagueLogoY + leagueLogoSize + 20;
+  const baseSafeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoHeight + 30);
+  const leagueGuardTop = leagueLogoY + leagueLogoHeight + 20;
   const maxPanelLift = 60;
   const liftableAmount = Math.max(0, baseSafeTop - leagueGuardTop);
   const appliedLift = Math.min(maxPanelLift, liftableAmount);

@@ -13,6 +13,8 @@ const resolveAutoLogoSrc =
   typeof AppData.resolveAutoLogoSrc === "function" ? AppData.resolveAutoLogoSrc : () => "";
 const readFileAsDataURL =
   typeof AppData.readFileAsDataURL === "function" ? AppData.readFileAsDataURL : async () => null;
+const AVAILABLE_LEAGUE_LOGO_OPTIONS =
+  Array.isArray(AppGlobals.LEAGUE_LOGO_OPTIONS) ? AppGlobals.LEAGUE_LOGO_OPTIONS : [];
 
 const DEFAULT_ESPORT_GAME_OPTIONS = [
   { label: "Age of Empires", value: "assets/ESPORT/logo_game/AGE_OF_EMPIRES.webp" },
@@ -731,6 +733,71 @@ const ImageUploadPreview = ({
   );
 };
 
+const LeagueLogoSelector = ({ label = "Logo Liga", helperText, value, onChange, options = [] }) => {
+  const selectId = useId();
+  const activeOption = options.find((option) => option.value === value) || null;
+  const handleChange = useCallback(
+    (event) => {
+      onChange?.(event.target.value);
+    },
+    [onChange]
+  );
+  const handleReset = useCallback(() => {
+    onChange?.("");
+  }, [onChange]);
+
+  return (
+    <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-slate-200">{label}</p>
+          <p className="text-xs text-slate-400">
+            {helperText || "Pilih logo liga/kompetisi untuk layout Big Match."}
+          </p>
+        </div>
+        {value ? (
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-xs font-semibold text-brand-yellow transition hover:text-amber-300"
+          >
+            Hapus
+          </button>
+        ) : null}
+      </div>
+      <div className="mt-3">
+        <label htmlFor={selectId} className="sr-only">
+          {label}
+        </label>
+        <select
+          id={selectId}
+          value={value}
+          onChange={handleChange}
+          className="w-full rounded-lg border border-slate-700 bg-slate-900/70 px-3 py-2 text-sm text-slate-100 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
+        >
+          <option value="">Pilih salah satu logo liga</option>
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="mt-3 flex h-28 items-center justify-center rounded-lg border border-dashed border-slate-700 bg-slate-900/60">
+        {activeOption ? (
+          <img
+            src={activeOption.value}
+            alt={`Logo ${activeOption.label}`}
+            className="max-h-24 max-w-full object-contain"
+          />
+        ) : (
+          <span className="text-xs text-slate-500">Belum memilih logo</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const BrandAssetSelector = ({
   label,
   helperText,
@@ -890,6 +957,7 @@ const BannerMetadataSection = ({
   showLeagueLogoInput = false,
   leagueLogoSrc,
   onLeagueLogoChange,
+  leagueLogoOptions = [],
 }) => {
   const titleInputId = useId();
   return (
@@ -921,14 +989,10 @@ const BannerMetadataSection = ({
         options={brandOptions}
       />
       {showLeagueLogoInput ? (
-        <ImageUploadPreview
-          label="Logo Liga"
-          helperText="Opsional: tampilkan logo kompetisi/liga di banner Big Match."
-          previewSrc={leagueLogoSrc}
+        <LeagueLogoSelector
+          value={leagueLogoSrc}
           onChange={onLeagueLogoChange}
-          inputId="league-logo"
-          slotHeight="h-32"
-          ratioHint="Rekomendasi persegi"
+          options={leagueLogoOptions}
         />
       ) : null}
       <BannerBackgroundPreview src={backgroundSrc} />
@@ -1225,6 +1289,7 @@ const MatchListForm = ({
   leagueLogoSrc = "",
   onLeagueLogoChange,
   isBigMatchLayout = false,
+  leagueLogoOptions = AVAILABLE_LEAGUE_LOGO_OPTIONS,
 }) => {
   const resolveFeatureFlag = (value, fallback) =>
     typeof value === "boolean" ? value : fallback;
@@ -1328,6 +1393,7 @@ const MatchListForm = ({
         showLeagueLogoInput={isBigMatchLayoutActive}
         leagueLogoSrc={leagueLogoSrc}
         onLeagueLogoChange={onLeagueLogoChange}
+        leagueLogoOptions={leagueLogoOptions}
       />
       {isScoreLayoutActive && (
         <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-200">
