@@ -126,6 +126,24 @@ const resolveScoreDateText = (mode = "today") => {
 const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
 
 const BIG_MATCH_TITLE = "BIG MATCH";
+const RAFFLE_DETAIL_ENDPOINT = "https://idnraffle.com/api/detail";
+
+const extractRaffleSlug = (rawValue) => {
+  if (!rawValue) {
+    return "";
+  }
+  const trimmed = rawValue.trim();
+  if (!trimmed) {
+    return "";
+  }
+  try {
+    const parsed = new URL(trimmed);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    return segments.pop() || trimmed;
+  } catch (error) {
+    return trimmed.replace(/^\/+|\/+$/g, "");
+  }
+};
 
 const App = () => {
   const canvasRef = useRef(null);
@@ -203,6 +221,11 @@ const App = () => {
   const [lastRenderAt, setLastRenderAt] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [raffleSlug, setRaffleSlug] = useState("");
+  const [raffleWinners, setRaffleWinners] = useState([]);
+  const [raffleInfo, setRaffleInfo] = useState(null);
+  const [isFetchingRaffle, setIsFetchingRaffle] = useState(false);
+  const [raffleFetchError, setRaffleFetchError] = useState("");
   const renderTimeoutRef = useRef(null);
   const baseLayerCacheRef = useRef(new Map());
   const brandPaletteCacheRef = useRef(new Map());
@@ -217,6 +240,65 @@ const App = () => {
     () => matches.slice(0, activeMatchCount),
     [matches, activeMatchCount]
   );
+  const handleRaffleSlugChange = useCallback((value) => {
+    setRaffleSlug(value);
+    setRaffleFetchError("");
+    if (!value || !value.trim()) {
+      setRaffleWinners([]);
+      setRaffleInfo(null);
+    }
+  }, []);
+  const handleFetchRaffleData = useCallback(async () => {
+    const normalizedSlug = extractRaffleSlug(raffleSlug);
+    if (!normalizedSlug) {
+      setRaffleFetchError("Masukkan slug detail raffle terlebih dahulu.");
+      setRaffleWinners([]);
+      setRaffleInfo(null);
+      return;
+    }
+    setIsFetchingRaffle(true);
+    setRaffleFetchError("");
+    try {
+      const response = await fetch(RAFFLE_DETAIL_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/plain, */*",
+        },
+        body: JSON.stringify({ slug: normalizedSlug }),
+      });
+      let payload;
+      try {
+        payload = await response.json();
+      } catch (parseError) {
+        throw new Error("Server raffle tidak mengembalikan JSON yang valid.");
+      }
+      if (!response.ok) {
+        const message =
+          payload?.message || payload?.error || "Gagal mengambil data pemenang dari IDN Raffle.";
+        throw new Error(message);
+      }
+      const prizes = Array.isArray(payload?.prizes) ? payload.prizes : [];
+      setRaffleWinners(prizes);
+      setRaffleInfo({
+        name: payload?.name || "",
+        totalPrize: payload?.total_prize || "",
+        endDate: payload?.end_date || "",
+        periode: payload?.periode || "",
+      });
+      setRaffleSlug(normalizedSlug);
+      if (!prizes.length) {
+        setRaffleFetchError("Respons berhasil tetapi tidak ada data pemenang.");
+      }
+    } catch (error) {
+      console.error("Gagal memuat data raffle:", error);
+      setRaffleFetchError(error?.message || "Gagal memuat data raffle.");
+      setRaffleWinners([]);
+      setRaffleInfo(null);
+    } finally {
+      setIsFetchingRaffle(false);
+    }
+  }, [raffleSlug]);
 
   const { loadImage: loadCachedOptionalImage, prefetchImages } = useImageCache(loadOptionalImage);
 
@@ -1086,6 +1168,13 @@ const App = () => {
               leagueLogoSrc={leagueLogoSrc}
               onLeagueLogoChange={setLeagueLogoSrc}
               isBigMatchLayout={isBigMatchLayout}
+              raffleSlug={raffleSlug}
+              onRaffleSlugChange={handleRaffleSlugChange}
+              onFetchRaffleData={handleFetchRaffleData}
+              raffleWinners={raffleWinners}
+              raffleInfo={raffleInfo}
+              isFetchingRaffle={isFetchingRaffle}
+              raffleFetchError={raffleFetchError}
             />
             </section>
 
