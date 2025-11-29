@@ -584,32 +584,41 @@ const drawMatches = (
   const cardRadius = Math.max(24, 34 * detailScale);
   const nameAreaHeight = cardHeight - innerPaddingY * 2;
 
-  const renderTeamName = (label, x, width, centerY, fallback) => {
-    if (width <= 0) return;
-    const rawText = (label && label.trim()) || fallback || "Tim TBD";
+  const nameFontFamily = '"Poppins", sans-serif';
+  const nameFontWeight = 700;
+
+  const buildTeamNameLayout = (label, width, fallback, forcedMaxFontSize) => {
+    if (width <= 0) return null;
+    const baseText = (label && label.trim()) || fallback || "Tim TBD";
+    const rawText = baseText.toUpperCase();
+    const paddingX = Math.max(14, 22 * detailScale);
+    const availableWidth = Math.max(0, width - paddingX * 2);
+    const targetMaxFontSize =
+      forcedMaxFontSize ?? Math.min(38 * detailScale, nameAreaHeight * 0.58);
+    const layout = layoutTeamName(ctx, rawText, {
+      maxWidth: availableWidth,
+      maxFontSize: targetMaxFontSize,
+      minFontSize: 18,
+      fontWeight: nameFontWeight,
+      fontFamily: nameFontFamily,
+    });
+    return { text: rawText, layout };
+  };
+
+  const renderTeamNameLayout = (info, x, width, centerY) => {
+    if (!info || !info.layout) return;
     ctx.save();
     ctx.textBaseline = "middle";
     ctx.fillStyle = "#e2e8f0";
-    const paddingX = Math.max(14, 22 * detailScale);
-    const availableWidth = Math.max(0, width - paddingX * 2);
-    const fontWeight = 700;
-    const fontFamily = '"Poppins", sans-serif';
-    const layout = layoutTeamName(ctx, rawText, {
-      maxWidth: availableWidth,
-      maxFontSize: Math.min(38 * detailScale, nameAreaHeight * 0.58),
-      minFontSize: 18,
-      fontWeight,
-      fontFamily,
-    });
-    ctx.font = `${fontWeight} ${Math.round(layout.fontSize)}px ${fontFamily}`;
-
     ctx.textAlign = "center";
-    const textX = x + width / 2;
-    const lineCount = layout.lines.length;
-    const lineHeight = layout.fontSize * (lineCount > 1 ? 1.08 : 1);
+    ctx.font = `${nameFontWeight} ${Math.round(info.layout.fontSize)}px ${nameFontFamily}`;
+    const lines =
+      info.layout.lines && info.layout.lines.length ? info.layout.lines : [info.text];
+    const lineCount = lines.length;
+    const lineHeight = info.layout.fontSize * (lineCount > 1 ? 1.08 : 1);
     const firstLineY = centerY - ((lineCount - 1) * lineHeight) / 2;
-    layout.lines.forEach((line, index) => {
-      ctx.fillText(line, textX, firstLineY + index * lineHeight);
+    lines.forEach((line, index) => {
+      ctx.fillText(line, x + width / 2, firstLineY + index * lineHeight);
     });
     ctx.restore();
   };
@@ -817,26 +826,42 @@ const drawMatches = (
     const vsCenterX = cardX + cardWidth / 2;
     const leftNameEnd = vsCenterX - vsRadius - gapBetweenBlocks;
     const leftNameWidth = Math.max(0, leftNameEnd - leftNameX);
-    renderTeamName(
-      match.teamHome,
-      leftNameX,
-      leftNameWidth,
-      textCenterY,
-      "Tuan Rumah",
-      "left"
-    );
 
     const rightNameX = vsCenterX + vsRadius + gapBetweenBlocks;
     const rightNameEnd = rightLogoX - gapBetweenBlocks;
     const rightNameWidth = Math.max(0, rightNameEnd - rightNameX);
-    renderTeamName(
-      match.teamAway,
-      rightNameX,
-      rightNameWidth,
-      textCenterY,
-      "Tim Tamu",
-      "right"
-    );
+
+    const homeNameLayout = buildTeamNameLayout(match.teamHome, leftNameWidth, "Tuan Rumah");
+    const awayNameLayout = buildTeamNameLayout(match.teamAway, rightNameWidth, "Tim Tamu");
+    let normalizedHomeLayout = homeNameLayout;
+    let normalizedAwayLayout = awayNameLayout;
+    if (homeNameLayout && awayNameLayout) {
+      const sharedFontSize = Math.min(
+        homeNameLayout.layout.fontSize || 0,
+        awayNameLayout.layout.fontSize || 0
+      );
+      if (Number.isFinite(sharedFontSize) && sharedFontSize > 0) {
+        if (sharedFontSize < (homeNameLayout.layout.fontSize || 0) - 0.1) {
+          normalizedHomeLayout = buildTeamNameLayout(
+            match.teamHome,
+            leftNameWidth,
+            "Tuan Rumah",
+            sharedFontSize
+          );
+        }
+        if (sharedFontSize < (awayNameLayout.layout.fontSize || 0) - 0.1) {
+          normalizedAwayLayout = buildTeamNameLayout(
+            match.teamAway,
+            rightNameWidth,
+            "Tim Tamu",
+            sharedFontSize
+          );
+        }
+      }
+    }
+
+    renderTeamNameLayout(normalizedHomeLayout, leftNameX, leftNameWidth, textCenterY);
+    renderTeamNameLayout(normalizedAwayLayout, rightNameX, rightNameWidth, textCenterY);
 
     drawVsBadge(ctx, vsCenterX, textCenterY, vsRadius, detailScale);
   });
@@ -860,7 +885,6 @@ const drawScoreboardMatches = (
   const scale = canvasWidth / referenceWidth || 1;
   const baseRowHeight = 150;
   const baseGap = 32;
-  const baseBarHeight = 72;
   const baseCircleSize = 110;
   const baseCenterWidth = 240;
   const baseCenterHeight = 108;
@@ -960,14 +984,15 @@ const drawScoreboardMatches = (
     if (areaWidth <= 0) return;
     const fallback = "YOUR TEAM";
     const rawLabel = name && name.trim() ? name : fallback;
-    const layout = layoutTeamName(ctx, rawLabel.toUpperCase(), {
+    const upperLabel = rawLabel.toUpperCase();
+    const layout = layoutTeamName(ctx, upperLabel, {
       maxWidth: areaWidth,
       maxFontSize: 32 * scale,
       minFontSize: 16 * scale,
       fontFamily: '"Poppins", sans-serif',
       fontWeight: 700,
     });
-    const lines = layout.lines && layout.lines.length ? layout.lines : [rawLabel];
+    const lines = layout.lines && layout.lines.length ? layout.lines : [upperLabel];
     const lineSpacing = layout.fontSize * 1.15;
     let startY = centerY - (lineSpacing * (lines.length - 1)) / 2;
     ctx.save();
@@ -1191,7 +1216,6 @@ const drawBigMatchLayout = (
   const bannerLift = Math.max(0, Math.min(playerPanelHeight * 0.3, 50));
   const bannerY = panelY + playerPanelHeight + spacingPanelToBanner - bannerLift;
   const bannerRadius = bannerHeight / 2;
-  const accentColor = brandPalette?.accent || "#fbbf24";
 
   const drawTeamBanner = (x, width, label, logoImage, align = "left") => {
     ctx.save();
@@ -1292,9 +1316,9 @@ const drawBigMatchLayout = (
     text: pillText,
     gradientStart: brandPalette?.headerStart || "#fbbf24",
     gradientEnd: brandPalette?.headerEnd || "#f59e0b",
-    textColor: "#0f172a",
+    textColor: "#f8fafc",
     fontSize: pillHeight * 0.45,
-    textShadowColor: "rgba(255, 255, 255, 0.35)",
+    textShadowColor: "rgba(15, 23, 42, 0.35)",
   });
 };
 
@@ -1350,35 +1374,62 @@ const drawTogelInfoPill = (
     gradientEnd,
     textColor = "#f8fafc",
     fontSize = 20,
-    textShadowColor = "rgba(15, 23, 42, 0.55)",
+    textShadowColor = "rgba(15, 23, 42, 0.35)",
   }
 ) => {
   if (width <= 0 || height <= 0) return;
+
+  const dropShadowColor = "rgba(15, 23, 42, 0.45)";
+  const dropShadowBlur = Math.max(12, height * 0.35);
+  const dropShadowOffsetY = Math.max(6, height * 0.2);
+
   ctx.save();
   drawRoundedRectPath(ctx, x, y, width, height, height / 2);
   const gradient = ctx.createLinearGradient(x, y, x + width, y + height);
   gradient.addColorStop(0, gradientStart);
   gradient.addColorStop(1, gradientEnd);
+  ctx.shadowColor = dropShadowColor;
+  ctx.shadowBlur = dropShadowBlur;
+  ctx.shadowOffsetY = dropShadowOffsetY;
+  ctx.shadowOffsetX = 0;
   ctx.fillStyle = gradient;
   ctx.fill();
+  ctx.restore();
 
+  ctx.save();
+  drawRoundedRectPath(ctx, x, y, width, height, height / 2);
+  const bevelGradient = ctx.createLinearGradient(x, y, x, y + height);
+  bevelGradient.addColorStop(0, "rgba(255, 255, 255, 0.55)");
+  bevelGradient.addColorStop(0.4, "rgba(255, 255, 255, 0.15)");
+  bevelGradient.addColorStop(0.55, "rgba(255, 255, 255, 0.04)");
+  bevelGradient.addColorStop(0.65, "rgba(15, 23, 42, 0.18)");
+  bevelGradient.addColorStop(1, "rgba(15, 23, 42, 0.35)");
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = bevelGradient;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
   const glare = ctx.createLinearGradient(x, y, x, y + height);
-  glare.addColorStop(0, "rgba(255, 255, 255, 0.35)");
-  glare.addColorStop(0.5, "rgba(255, 255, 255, 0.12)");
+  glare.addColorStop(0, "rgba(255, 255, 255, 0.4)");
+  glare.addColorStop(0.45, "rgba(255, 255, 255, 0.15)");
+  glare.addColorStop(0.7, "rgba(255, 255, 255, 0.05)");
   glare.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.globalAlpha = 0.75;
   ctx.fillStyle = glare;
-  ctx.globalAlpha = 0.8;
   drawRoundedRectPath(ctx, x, y, width, height, height / 2);
   ctx.fill();
+  ctx.restore();
   ctx.globalAlpha = 1;
 
+  ctx.save();
   ctx.fillStyle = textColor;
   ctx.font = `700 ${Math.round(fontSize)}px Poppins`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.shadowColor = textShadowColor;
-  ctx.shadowBlur = Math.max(6, height * 0.2);
-  ctx.shadowOffsetY = Math.max(2, height * 0.1);
+  ctx.shadowBlur = Math.max(8, height * 0.25);
+  ctx.shadowOffsetY = Math.max(3, height * 0.12);
   ctx.fillText(text, x + width / 2, y + height / 2);
   ctx.restore();
 };

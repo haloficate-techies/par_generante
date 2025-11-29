@@ -56,6 +56,19 @@ const deriveBrandPaletteFn =
   AppData.DERIVE_BRAND_PALETTE ||
   (() => DEFAULT_BRAND_PALETTE);
 const BRAND_PALETTE_CACHE_LIMIT = 50;
+const getStableDevicePixelRatio = () => {
+  if (typeof window === "undefined") {
+    return 1;
+  }
+  const viewportScale =
+    typeof window.visualViewport !== "undefined" && typeof window.visualViewport.scale === "number"
+      ? window.visualViewport.scale
+      : 1;
+  const ratio = window.devicePixelRatio || 1;
+  const normalizedRatio = ratio / (viewportScale || 1);
+  return Math.min(Math.max(normalizedRatio, 1), 2);
+};
+
 const deriveBrandPalette = (image) => {
   if (typeof deriveBrandPaletteFn === "function") {
     return deriveBrandPaletteFn(image) || DEFAULT_BRAND_PALETTE;
@@ -140,8 +153,9 @@ const App = () => {
   const isBigMatchLayout = activeMode === "football" && activeSubMenu === "big_match";
   const includeMiniBanner = isEsportsMode;
   const shouldSkipHeader = isEsportsMode;
-  const shouldShowTitle = !isEsportsMode;
-  const shouldShowTitleInput = !isEsportsMode && !isScoreModeActive && !isBigMatchLayout;
+  const shouldShowTitle = !isEsportsMode && !isTogelMode;
+  const shouldShowTitleInput =
+    !isEsportsMode && !isTogelMode && !isScoreModeActive && !isBigMatchLayout;
   const activeModeConfig = useMemo(
     () => MODE_CONFIG.find((mode) => mode.id === activeMode) || MODE_CONFIG[0],
     [activeMode]
@@ -492,7 +506,7 @@ const App = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const baseSize = 1080;
-    const devicePixelRatioSafe = Math.min(window.devicePixelRatio || 1, 2);
+    const devicePixelRatioSafe = getStableDevicePixelRatio();
     canvas.width = baseSize * devicePixelRatioSafe;
     canvas.height = baseSize * devicePixelRatioSafe;
 
@@ -548,7 +562,7 @@ const App = () => {
           ? SCORE_MODE_TITLE
           : isBigMatchLayoutActive
           ? BIG_MATCH_TITLE
-          : shouldShowTitle
+          : shouldShowTitle && !isTogelMode
           ? title
           : "");
       const effectiveTitle = isTogelMode

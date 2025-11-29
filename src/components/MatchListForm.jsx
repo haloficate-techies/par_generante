@@ -1374,7 +1374,7 @@ const MatchListForm = ({
   const shouldShowTitleField =
     typeof showTitleFieldOverride === "boolean"
       ? showTitleFieldOverride
-      : resolvedShowTitle;
+      : !isTogelMode && resolvedShowTitle;
   const scoreDateOptions = Array.isArray(scoreDateModeOptions) && scoreDateModeOptions.length
     ? scoreDateModeOptions
     : DEFAULT_SCORE_DATE_OPTIONS;

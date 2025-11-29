@@ -210,7 +210,8 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["liverpool", "liverpool fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/879px-Liverpool_FC.svg.png?size=256",
+    source:
+      "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/800px-Liverpool_FC.svg.png?size=256",
   },
   {
     names: ["luton town", "luton"],
@@ -410,7 +411,7 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["juventus"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Juventus_FC_-_pictogram_white_%28Italy%2C_2017%29.svg/1297px-Juventus_FC_-_pictogram_white_%28Italy%2C_2017%29.svg.png?size=256",
+    source: "https://1000logos.net/wp-content/uploads/2021/05/Juventus-logo.png?size=256",
   },
   {
     names: ["napoli", "ssc napoli"],
