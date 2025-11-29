@@ -28,6 +28,7 @@ const {
   drawFooter = () => {},
 } = CanvasUtils || {};
 const getModeLayoutConfig = AppEnvironment.getModeLayoutResolver();
+const getModeModule = AppEnvironment.getModeModuleResolver();
 
 const AVAILABLE_BRAND_LOGOS = Array.isArray(AppData.BRAND_LOGO_OPTIONS)
   ? AppData.BRAND_LOGO_OPTIONS
@@ -35,6 +36,7 @@ const AVAILABLE_BRAND_LOGOS = Array.isArray(AppData.BRAND_LOGO_OPTIONS)
 const BACKGROUND_LOOKUP = AppData.BANNER_BACKGROUND_LOOKUP || {};
 const DEFAULT_BRAND_PALETTE = AppData.DEFAULT_BRAND_PALETTE || FALLBACK_BRAND_PALETTE;
 const MODE_BACKGROUND_DEFAULTS = AppGlobals.MODE_BACKGROUND_DEFAULTS || {};
+const DEFAULT_RAFFLE_FOOTER = AppGlobals.DEFAULT_RAFFLE_FOOTER || "assets/RAFFLE/banner_footer/FOOTER.webp";
 const DEFAULT_ESPORT_MINI_BANNER = AppGlobals.DEFAULT_ESPORT_MINI_BANNER || AppData.ESPORT_MINI_BANNER_FOOTER || null;
 const TOGEL_POOL_BACKGROUND_LOOKUP = AppGlobals.TOGEL_POOL_BACKGROUND_LOOKUP || {};
 const MODE_CONFIG = AppGlobals.MODE_CONFIG || [];
@@ -56,18 +58,6 @@ const deriveBrandPaletteFn =
   AppData.DERIVE_BRAND_PALETTE ||
   (() => DEFAULT_BRAND_PALETTE);
 const BRAND_PALETTE_CACHE_LIMIT = 50;
-const getStableDevicePixelRatio = () => {
-  if (typeof window === "undefined") {
-    return 1;
-  }
-  const viewportScale =
-    typeof window.visualViewport !== "undefined" && typeof window.visualViewport.scale === "number"
-      ? window.visualViewport.scale
-      : 1;
-  const ratio = window.devicePixelRatio || 1;
-  const normalizedRatio = ratio / (viewportScale || 1);
-  return Math.min(Math.max(normalizedRatio, 1), 2);
-};
 
 const deriveBrandPalette = (image) => {
   if (typeof deriveBrandPaletteFn === "function") {
@@ -149,17 +139,30 @@ const App = () => {
   const [scoreDateMode, setScoreDateMode] = useState("today");
   const isTogelMode = activeMode === "togel";
   const isEsportsMode = activeMode === "esports";
+  const isRaffleMode = activeMode === "raffle";
   const isScoreModeActive = activeMode === "football" && activeSubMenu === "scores";
   const isBigMatchLayout = activeMode === "football" && activeSubMenu === "big_match";
-  const includeMiniBanner = isEsportsMode;
-  const shouldSkipHeader = isEsportsMode;
-  const shouldShowTitle = !isEsportsMode && !isTogelMode;
-  const shouldShowTitleInput =
-    !isEsportsMode && !isTogelMode && !isScoreModeActive && !isBigMatchLayout;
   const activeModeConfig = useMemo(
     () => MODE_CONFIG.find((mode) => mode.id === activeMode) || MODE_CONFIG[0],
     [activeMode]
   );
+  const activeModeModule = useMemo(
+    () => (typeof getModeModule === "function" ? getModeModule(activeMode) : null),
+    [activeMode]
+  );
+  const modeFeatures = activeModeModule?.features || {};
+  const includeMiniBanner =
+    typeof modeFeatures.includeMiniBanner === "boolean" ? modeFeatures.includeMiniBanner : isEsportsMode;
+  const shouldSkipHeader =
+    typeof modeFeatures.skipHeader === "boolean" ? modeFeatures.skipHeader : isEsportsMode;
+  const allowCustomTitle =
+    typeof modeFeatures.showTitle === "boolean"
+      ? modeFeatures.showTitle
+      : !isEsportsMode && !isTogelMode && !isRaffleMode;
+  const shouldShowTitleInput =
+    allowCustomTitle && !isTogelMode && !isRaffleMode && !isScoreModeActive && !isBigMatchLayout;
+  const shouldRenderMatches =
+    typeof modeFeatures.showMatches === "boolean" ? modeFeatures.showMatches : !isTogelMode;
   useEffect(() => {
     if (!activeModeConfig) {
       setActiveSubMenu("");
@@ -506,9 +509,8 @@ const App = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const baseSize = 1080;
-    const devicePixelRatioSafe = getStableDevicePixelRatio();
-    canvas.width = baseSize * devicePixelRatioSafe;
-    canvas.height = baseSize * devicePixelRatioSafe;
+    canvas.width = baseSize;
+    canvas.height = baseSize;
 
       const {
         brandLogoSrc: overrideBrandLogoSrc,
@@ -537,7 +539,6 @@ const App = () => {
     setIsRendering(true);
     try {
       const ctx = canvas.getContext("2d");
-      ctx.setTransform(devicePixelRatioSafe, 0, 0, devicePixelRatioSafe, 0, 0);
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
       ctx.clearRect(0, 0, baseSize, baseSize);
@@ -562,7 +563,7 @@ const App = () => {
           ? SCORE_MODE_TITLE
           : isBigMatchLayoutActive
           ? BIG_MATCH_TITLE
-          : shouldShowTitle && !isTogelMode
+          : allowCustomTitle
           ? title
           : "");
       const effectiveTitle = isTogelMode
@@ -594,12 +595,7 @@ const App = () => {
             })()
           : DEFAULT_BRAND_PALETTE;
       const brandPaletteKey = JSON.stringify(brandPalette || {});
-      const baseLayerCacheKey = [
-        devicePixelRatioSafe,
-        activeMode,
-        effectiveBackgroundSrc || "none",
-        brandPaletteKey,
-      ].join("|");
+      const baseLayerCacheKey = [baseSize, activeMode, effectiveBackgroundSrc || "none", brandPaletteKey].join("|");
       const baseLayerCache = baseLayerCacheRef.current;
       let baseLayerApplied = false;
       const miniBannerLayout =
@@ -608,10 +604,9 @@ const App = () => {
           : null;
 
       const matchesToUse = isBigMatchLayoutActive ? 1 : activeMatchCount;
-      const activeMatches = isTogelMode ? [] : effectiveMatches.slice(0, matchesToUse);
-      const matchesWithImages = isTogelMode
-        ? []
-        : await Promise.all(
+      const activeMatches = shouldRenderMatches ? effectiveMatches.slice(0, matchesToUse) : [];
+      const matchesWithImages = shouldRenderMatches
+        ? await Promise.all(
             activeMatches.map(async (match) => {
               const [homeLogoImage, awayLogoImage, gameLogoImage, homePlayerImage, awayPlayerImage] =
                 await Promise.all([
@@ -623,7 +618,8 @@ const App = () => {
                 ]);
               return { ...match, homeLogoImage, awayLogoImage, gameLogoImage, homePlayerImage, awayPlayerImage };
             })
-          );
+          )
+        : [];
 
       const leagueLogoImage = isBigMatchLayoutActive
         ? await loadCachedOptionalImage(effectiveLeagueLogoSrc)
@@ -731,9 +727,10 @@ const App = () => {
     togelDrawTime,
     togelStreamingInfo,
     isTogelMode,
-    shouldShowTitle,
+    allowCustomTitle,
     includeMiniBanner,
     shouldSkipHeader,
+    shouldRenderMatches,
     activeSubMenu,
     isScoreModeActive,
     scoreDateLabel,
@@ -765,6 +762,10 @@ const App = () => {
   );
 
   useEffect(() => {
+    if (activeMode === "raffle") {
+      setFooterSrc(DEFAULT_RAFFLE_FOOTER);
+      return;
+    }
     if (!brandLogoSrc) return;
     const matchedBrandOption = AVAILABLE_BRAND_LOGOS.find(
       (option) => option && option.value === brandLogoSrc
@@ -772,14 +773,14 @@ const App = () => {
     const brandName = matchedBrandOption?.brand ?? null;
     const nextFooterSrc = resolveFooterSrcForBrand(brandName, brandLogoSrc, activeMode);
     setFooterSrc(nextFooterSrc);
-  }, [activeMode, AVAILABLE_BRAND_LOGOS, brandLogoSrc]);
+  }, [activeMode, AVAILABLE_BRAND_LOGOS, brandLogoSrc, DEFAULT_RAFFLE_FOOTER]);
 
   const handleBrandLogoSelection = useCallback(
     (newValue) => {
       setBrandLogoSrc(newValue);
 
       if (!newValue) {
-        setFooterSrc("");
+        setFooterSrc(isRaffleMode ? DEFAULT_RAFFLE_FOOTER : "");
         setFooterLink("");
         setSelectedFootballBackground(footballDefaultBackground);
         setSelectedBasketballBackground(MODE_BACKGROUND_DEFAULTS.basketball);
@@ -833,6 +834,8 @@ const App = () => {
         activeMode === "football" ? footballDefaultBackground : null,
         activeMode === "esports" ? MODE_BACKGROUND_DEFAULTS.esports : null,
         activeMode === "basketball" ? MODE_BACKGROUND_DEFAULTS.basketball : null,
+        activeMode === "raffle" ? MODE_BACKGROUND_DEFAULTS.raffle : null,
+        activeMode === "raffle" ? DEFAULT_RAFFLE_FOOTER : null,
       ].filter(Boolean);
       if (prefetchCandidates.length) {
         prefetchImages(prefetchCandidates);
@@ -849,6 +852,8 @@ const App = () => {
       setSelectedBasketballBackground,
       setSelectedEsportsBackground,
       prefetchImages,
+      DEFAULT_RAFFLE_FOOTER,
+      isRaffleMode,
     ]
   );
 
@@ -1076,6 +1081,7 @@ const App = () => {
               onTogelDigitChange={handleTogelDigitChange}
               togelDrawTime={togelDrawTime}
               onTogelDrawTimeChange={setTogelDrawTime}
+              modeFeatures={modeFeatures}
               showTitleFieldOverride={shouldShowTitleInput}
               leagueLogoSrc={leagueLogoSrc}
               onLeagueLogoChange={setLeagueLogoSrc}

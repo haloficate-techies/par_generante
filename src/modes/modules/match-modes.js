@@ -13,6 +13,7 @@ const registerModeModules = () => {
     includeMiniBanner: false,
     showGameOptions: false,
     showTogelControls: false,
+    showMatches: true,
   };
 
   const createMatchModule = (modeId, featureOverrides = {}) => ({
@@ -30,6 +31,13 @@ const registerModeModules = () => {
       skipHeader: true,
       includeMiniBanner: true,
       showGameOptions: true,
+    })
+  );
+  register(
+    "raffle",
+    createMatchModule("raffle", {
+      showTitle: false,
+      showMatches: false,
     })
   );
 };

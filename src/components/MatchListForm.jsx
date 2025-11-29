@@ -1040,7 +1040,7 @@ const MatchCountAdjuster = ({
 );
 
 const MatchesSection = ({
-  isTogelMode,
+  shouldShowMatches = true,
   effectiveMatchCount,
   minMatchCount,
   maxMatchCount,
@@ -1056,7 +1056,7 @@ const MatchesSection = ({
   showBigMatchExtras = false,
   disableMatchCountAdjuster = false,
 }) => {
-  if (isTogelMode) {
+  if (!shouldShowMatches) {
     return null;
   }
   return (
@@ -1297,6 +1297,7 @@ const MatchListForm = ({
   const isEsportsMode = resolveFeatureFlag(modeFeatures.showGameOptions, activeMode === "esports");
   const isFootballMode = activeMode === "football";
   const isScoreLayoutActive = isFootballMode && activeSubMenu === "scores";
+  const shouldShowMatches = resolveFeatureFlag(modeFeatures.showMatches, !isTogelMode);
   const effectiveMatchCount =
     typeof matchCount === "number" ? matchCount : matches.length;
   const availableMatchCountOptions =
@@ -1425,7 +1426,7 @@ const MatchListForm = ({
         </section>
       )}
       <MatchesSection
-        isTogelMode={isTogelMode}
+        shouldShowMatches={shouldShowMatches}
         effectiveMatchCount={effectiveMatchCount}
         minMatchCount={minMatchCount}
         maxMatchCount={maxMatchCount}

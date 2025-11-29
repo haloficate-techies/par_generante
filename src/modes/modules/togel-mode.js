@@ -13,6 +13,7 @@ const registerModeModules = () => {
       includeMiniBanner: false,
       showGameOptions: false,
       showTogelControls: true,
+      showMatches: false,
     },
   });
 };
