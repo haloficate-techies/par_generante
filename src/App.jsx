@@ -17,6 +17,7 @@ import "./app/mode-layout-registry";
 import "./app/mode-modules";
 import "./modes/layouts/match-mode";
 import "./modes/layouts/togel-mode";
+import "./modes/layouts/raffle-mode";
 import "./modes/modules/match-modes";
 import "./modes/modules/togel-mode";
 
@@ -769,6 +770,12 @@ const App = () => {
               streamingInfo: streamingInfoForRender,
             }
           : null,
+        raffleData: isRaffleMode
+          ? {
+              winners: Array.isArray(raffleWinners) ? raffleWinners : [],
+              info: raffleInfo || null,
+            }
+          : null,
         scoreInfoLabel: isScoreModeActive ? `Pertandingan • ${scoreDateLabel}` : "",
       };
 
@@ -817,6 +824,9 @@ const App = () => {
     isScoreModeActive,
     scoreDateLabel,
     isBigMatchLayout,
+    isRaffleMode,
+    raffleWinners,
+    raffleInfo,
   ]);
 
   const scheduleRender = useCallback(() => {

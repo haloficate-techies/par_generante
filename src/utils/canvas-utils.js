@@ -1674,6 +1674,137 @@ const drawTogelResult = (
   // Removed "Nomor Keluaran" label for cleaner layout.
 };
 
+const formatRupiah = (value) => {
+  const numeric = typeof value === "number" ? value : Number(value);
+  if (Number.isFinite(numeric)) {
+    try {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0,
+      }).format(numeric);
+    } catch (error) {
+      return `Rp ${numeric.toLocaleString("id-ID")}`;
+    }
+  }
+  if (typeof value === "string" && value.trim()) {
+    return value;
+  }
+  return "Rp -";
+};
+
+const drawRaffleWinnersTable = (
+  ctx,
+  winners = [],
+  { startY = 0, palette = DEFAULT_BRAND_PALETTE, maxRows = 20 } = {}
+) => {
+  if (!ctx) return;
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
+  const panelPaddingX = Math.max(48, canvasWidth * 0.075);
+  const panelWidth = canvasWidth - panelPaddingX * 2;
+  const panelX = panelPaddingX;
+  const topSpacing = startY + 20;
+  const footerGuard = 180;
+  const rawHeight = canvasHeight - topSpacing - footerGuard;
+  const panelHeight = Math.max(320, Math.min(rawHeight, canvasHeight * 0.58));
+  const panelY = topSpacing;
+  const innerPadding = Math.max(28, panelWidth * 0.035);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(15, 23, 42, 0.45)";
+  ctx.shadowBlur = 60;
+  ctx.shadowOffsetY = 22;
+  drawRoundedRectPath(ctx, panelX, panelY, panelWidth, panelHeight, 32);
+  ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  drawRoundedRectPath(ctx, panelX, panelY, panelWidth, panelHeight, 32);
+  const gradient = ctx.createLinearGradient(panelX, panelY, panelX, panelY + panelHeight);
+  gradient.addColorStop(0, palette?.headerStart || DEFAULT_BRAND_PALETTE.headerStart);
+  gradient.addColorStop(1, "#0f172a");
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  ctx.restore();
+
+  const safeWinners = Array.isArray(winners) ? winners.slice(0, Math.max(1, maxRows)) : [];
+  if (!safeWinners.length) {
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#cbd5f5";
+    ctx.font = "500 26px Poppins";
+    ctx.fillText("Data pemenang belum tersedia", panelX + panelWidth / 2, panelY + panelHeight / 2);
+    ctx.restore();
+    return;
+  }
+
+  const chunkSize = 10;
+  const totalColumns = Math.min(2, Math.ceil(safeWinners.length / chunkSize));
+  const columnGap = totalColumns > 1 ? Math.max(36, panelWidth * 0.04) : 0;
+  const columnWidth =
+    (panelWidth - innerPadding * 2 - columnGap * (totalColumns - 1)) / totalColumns;
+  const rowsPerColumn = chunkSize;
+  const availableHeight = panelHeight - innerPadding * 2 - 20;
+  const rowHeight = Math.max(40, Math.min(availableHeight / rowsPerColumn, 90));
+  const rowRadius = Math.min(22, rowHeight / 2.4);
+  const headerFontSize = Math.max(20, rowHeight * 0.38);
+
+  ctx.save();
+  ctx.textBaseline = "middle";
+
+  for (let columnIndex = 0; columnIndex < totalColumns; columnIndex += 1) {
+    const columnX =
+      panelX +
+      innerPadding +
+      columnIndex * (columnWidth + columnGap);
+    const columnHeaderY = panelY + innerPadding;
+
+    ctx.font = `600 ${Math.round(headerFontSize)}px Poppins`;
+    ctx.textAlign = "left";
+    ctx.fillStyle = "rgba(248, 250, 252, 0.78)";
+    ctx.fillText("USERNAME", columnX, columnHeaderY);
+    ctx.textAlign = "right";
+    ctx.fillText("NOMINAL", columnX + columnWidth, columnHeaderY);
+
+    const startIndex = columnIndex * chunkSize;
+    const columnData = safeWinners.slice(startIndex, startIndex + chunkSize);
+    columnData.forEach((winner, rowIndex) => {
+      const rowTop =
+        columnHeaderY + 28 + rowIndex * rowHeight;
+      const centerY = rowTop + rowHeight / 2;
+      ctx.save();
+      ctx.fillStyle =
+        rowIndex % 2 === 0 ? "rgba(15, 23, 42, 0.45)" : "rgba(15, 23, 42, 0.3)";
+      drawRoundedRectPath(
+        ctx,
+        columnX,
+        rowTop,
+        columnWidth,
+        rowHeight - 6,
+        rowRadius
+      );
+      ctx.fill();
+      ctx.restore();
+
+      const username =
+        winner?.username || winner?.ticket_code || `Pemenang ${startIndex + rowIndex + 1}`;
+      ctx.font = `600 ${Math.max(20, rowHeight * 0.42)}px Poppins`;
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#f8fafc";
+      ctx.fillText(username, columnX + 12, centerY);
+
+      ctx.textAlign = "right";
+      ctx.fillStyle = "#6efacf";
+      ctx.fillText(formatRupiah(winner?.prize_amount), columnX + columnWidth - 12, centerY);
+    });
+  }
+
+  ctx.restore();
+};
+
 const drawFooter = (ctx, footerImage, linkTextInput, palette = DEFAULT_BRAND_PALETTE) => {
   ctx.save();
   const footerHeight = 110;
@@ -1816,6 +1947,7 @@ export const CanvasUtils = {
   drawScoreboardMatches,
   drawBigMatchLayout,
   drawTogelResult,
+  drawRaffleWinnersTable,
 };
 
 if (typeof window !== "undefined") {
