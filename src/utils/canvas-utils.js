@@ -431,7 +431,13 @@ const drawEsportsGameSlot = (ctx, x, y, size, { logoImage, label } = {}) => {
   ctx.restore();
 };
 
-const drawHeader = (ctx, title, topOffset = 70, palette = DEFAULT_BRAND_PALETTE) => {
+const drawHeader = (
+  ctx,
+  title,
+  topOffset = 70,
+  palette = DEFAULT_BRAND_PALETTE,
+  options = {}
+) => {
   ctx.save();
   const headerHeight = 88;
   const headerY = topOffset;
@@ -465,33 +471,55 @@ const drawHeader = (ctx, title, topOffset = 70, palette = DEFAULT_BRAND_PALETTE)
   ctx.fillStyle = glossGradient;
   ctx.fillRect(0, headerY, ctx.canvas.width, headerHeight);
 
-  ctx.fillStyle = titleColor;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  applyFittedFont(ctx, titleText, {
-    maxSize: 68,
-    minSize: 26,
-    weight: 800,
-    maxWidth: maxTextWidth,
-    family: '"Montserrat", sans-serif',
-  });
-  ctx.save();
-  ctx.fillStyle = shadowColor;
-  const shadowOffset = 4;
-  ctx.fillText(
-    titleText,
-    ctx.canvas.width / 2 + shadowOffset,
-    headerY + headerHeight / 2 + shadowOffset
-  );
-  ctx.restore();
+  const headerLogoImage = options?.headerLogoImage || null;
+  if (headerLogoImage) {
+    const paddingX = 80;
+    const paddingY = 12;
+    const maxWidth = Math.max(120, ctx.canvas.width - paddingX * 2);
+    const maxHeight = Math.max(32, headerHeight - paddingY * 2);
+    const imageWidth = headerLogoImage.width || maxWidth;
+    const imageHeight = headerLogoImage.height || maxHeight;
+    const scale = Math.min(maxWidth / imageWidth, maxHeight / imageHeight, 1);
+    const renderWidth = imageWidth * scale;
+    const renderHeight = imageHeight * scale;
+    const renderX = ctx.canvas.width / 2 - renderWidth / 2;
+    const renderY = headerY + (headerHeight - renderHeight) / 2;
 
-  ctx.save();
-  ctx.fillStyle = titleColor;
-  ctx.shadowColor = "rgba(15, 23, 42, 0.35)";
-  ctx.shadowBlur = 28;
-  ctx.shadowOffsetY = 6;
-  ctx.fillText(titleText, ctx.canvas.width / 2, headerY + headerHeight / 2);
-  ctx.restore();
+    ctx.save();
+    ctx.shadowColor = "rgba(15, 23, 42, 0.35)";
+    ctx.shadowBlur = 24;
+    ctx.shadowOffsetY = 6;
+    ctx.drawImage(headerLogoImage, renderX, renderY, renderWidth, renderHeight);
+    ctx.restore();
+  } else {
+    ctx.fillStyle = titleColor;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    applyFittedFont(ctx, titleText, {
+      maxSize: 68,
+      minSize: 26,
+      weight: 800,
+      maxWidth: maxTextWidth,
+      family: '"Montserrat", sans-serif',
+    });
+    ctx.save();
+    ctx.fillStyle = shadowColor;
+    const shadowOffset = 4;
+    ctx.fillText(
+      titleText,
+      ctx.canvas.width / 2 + shadowOffset,
+      headerY + headerHeight / 2 + shadowOffset
+    );
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = titleColor;
+    ctx.shadowColor = "rgba(15, 23, 42, 0.35)";
+    ctx.shadowBlur = 28;
+    ctx.shadowOffsetY = 6;
+    ctx.fillText(titleText, ctx.canvas.width / 2, headerY + headerHeight / 2);
+    ctx.restore();
+  }
 
   ctx.restore();
   return headerY + headerHeight;
@@ -1693,6 +1721,65 @@ const formatRupiah = (value) => {
   return "Rp -";
 };
 
+const drawRaffleDateCapsule = (
+  ctx,
+  label,
+  { startY = 0, palette = DEFAULT_BRAND_PALETTE } = {}
+) => {
+  if (!ctx || !label) return 0;
+  const capsuleHeight = 48;
+  const capsuleWidth = Math.min(ctx.canvas.width * 0.75, 560);
+  const capsuleX = (ctx.canvas.width - capsuleWidth) / 2;
+  const capsuleY = startY + 12;
+  const radius = capsuleHeight / 2;
+  const text = `${label}`.trim().toUpperCase();
+
+  ctx.save();
+  ctx.shadowColor = "rgba(15, 23, 42, 0.45)";
+  ctx.shadowBlur = 26;
+  ctx.shadowOffsetY = 10;
+  drawRoundedRectPath(ctx, capsuleX, capsuleY, capsuleWidth, capsuleHeight, radius);
+  const gradient = ctx.createLinearGradient(
+    capsuleX,
+    capsuleY,
+    capsuleX + capsuleWidth,
+    capsuleY + capsuleHeight
+  );
+  gradient.addColorStop(0, palette?.headerStart || "#ea580c");
+  gradient.addColorStop(1, palette?.headerEnd || "#dc2626");
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  drawRoundedRectPath(ctx, capsuleX, capsuleY, capsuleWidth, capsuleHeight, radius);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.clip();
+  const glossGradient = ctx.createLinearGradient(capsuleX, capsuleY, capsuleX, capsuleY + capsuleHeight);
+  glossGradient.addColorStop(0, "rgba(255, 255, 255, 0.4)");
+  glossGradient.addColorStop(0.55, "rgba(255, 255, 255, 0.05)");
+  glossGradient.addColorStop(1, "rgba(0, 0, 0, 0.2)");
+  ctx.fillStyle = glossGradient;
+  ctx.fillRect(capsuleX, capsuleY, capsuleWidth, capsuleHeight);
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = "#f8fafc";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const fontSize = Math.max(20, Math.round(capsuleHeight * 0.45));
+  ctx.font = `900 ${fontSize}px Poppins`;
+  ctx.shadowColor = "rgba(15, 23, 42, 0.55)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 4;
+  ctx.fillText(text, capsuleX + capsuleWidth / 2, capsuleY + capsuleHeight / 2);
+  ctx.restore();
+
+  return capsuleHeight + 32;
+};
+
 const drawRaffleWinnersTable = (
   ctx,
   winners = [],
@@ -1947,6 +2034,7 @@ export const CanvasUtils = {
   drawScoreboardMatches,
   drawBigMatchLayout,
   drawTogelResult,
+  drawRaffleDateCapsule,
   drawRaffleWinnersTable,
 };
 

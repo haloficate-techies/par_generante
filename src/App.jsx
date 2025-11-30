@@ -38,6 +38,7 @@ const BACKGROUND_LOOKUP = AppData.BANNER_BACKGROUND_LOOKUP || {};
 const DEFAULT_BRAND_PALETTE = AppData.DEFAULT_BRAND_PALETTE || FALLBACK_BRAND_PALETTE;
 const MODE_BACKGROUND_DEFAULTS = AppGlobals.MODE_BACKGROUND_DEFAULTS || {};
 const DEFAULT_RAFFLE_FOOTER = AppGlobals.DEFAULT_RAFFLE_FOOTER || "assets/RAFFLE/banner_footer/FOOTER.webp";
+const RAFFLE_HEADER_LOGO_SRC = "assets/RAFFLE/logo_mode/IDNRAFFLE.png";
 const DEFAULT_ESPORT_MINI_BANNER = AppGlobals.DEFAULT_ESPORT_MINI_BANNER || AppData.ESPORT_MINI_BANNER_FOOTER || null;
 const TOGEL_POOL_BACKGROUND_LOOKUP = AppGlobals.TOGEL_POOL_BACKGROUND_LOOKUP || {};
 const MODE_CONFIG = AppGlobals.MODE_CONFIG || [];
@@ -128,6 +129,43 @@ const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
 
 const BIG_MATCH_TITLE = "BIG MATCH";
 const RAFFLE_DETAIL_ENDPOINT = "https://idnraffle.com/api/detail";
+const RAFFLE_DATE_LOCALE_OPTIONS = {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+};
+
+const formatRaffleDateLabel = (rawValue) => {
+  if (!rawValue) return "";
+  const trimmed = `${rawValue}`.trim();
+  if (!trimmed) return "";
+  const normalized = trimmed.replace(" ", "T");
+  let parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) {
+    const isoMatch = trimmed.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoMatch) {
+      parsed = new Date(`${isoMatch[1]}T00:00:00`);
+    }
+  }
+  if (!Number.isNaN(parsed.getTime())) {
+    try {
+      return parsed.toLocaleDateString("id-ID", RAFFLE_DATE_LOCALE_OPTIONS).toUpperCase();
+    } catch (error) {
+      return parsed.toDateString().toUpperCase();
+    }
+  }
+  return trimmed.toUpperCase();
+};
+
+const formatRaffleEventLabel = (info) => {
+  if (!info) return "";
+  const eventName = typeof info.name === "string" ? info.name.trim() : "";
+  if (eventName) {
+    return eventName.toUpperCase();
+  }
+  return formatRaffleDateLabel(info.endDate || info.periode || "");
+};
 
 const extractRaffleSlug = (rawValue) => {
   if (!rawValue) {
@@ -319,6 +357,11 @@ const App = () => {
     setTogelDrawTime,
     togelStreamingInfo,
   } = useTogelControls({ isTogelMode, applyTogelBackgroundPath, streamingTheme });
+
+  const raffleEventLabel = useMemo(() => {
+    if (!raffleInfo) return "";
+    return formatRaffleEventLabel(raffleInfo);
+  }, [raffleInfo]);
 
   // Handles updating a single match field.
   const handleMatchFieldChange = useCallback((index, field, value) => {
@@ -655,11 +698,13 @@ const App = () => {
       const streamingInfoForRender = isTogelMode ? togelStreamingInfo : null;
 
       const miniBannerSrc = includeMiniBanner ? DEFAULT_ESPORT_MINI_BANNER : null;
-      const [backgroundImage, footerImage, brandLogoImage, miniBannerImage] = await Promise.all([
+      const shouldUseRaffleHeaderLogo = isRaffleMode;
+      const [backgroundImage, footerImage, brandLogoImage, miniBannerImage, raffleHeaderLogoImage] = await Promise.all([
         loadCachedOptionalImage(effectiveBackgroundSrc),
         loadCachedOptionalImage(effectiveFooterSrc),
         loadCachedOptionalImage(effectiveBrandLogoSrc),
         miniBannerSrc ? loadCachedOptionalImage(miniBannerSrc) : Promise.resolve(null),
+        shouldUseRaffleHeaderLogo ? loadCachedOptionalImage(RAFFLE_HEADER_LOGO_SRC) : Promise.resolve(null),
       ]);
       const brandPalette =
         brandLogoImage
@@ -740,7 +785,9 @@ const App = () => {
       const brandBottom = drawBrandLogo(ctx, brandLogoImage, brandPalette);
       const headerBottom = shouldSkipHeader
         ? brandBottom
-        : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette);
+        : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette, {
+            headerLogoImage: shouldUseRaffleHeaderLogo ? raffleHeaderLogoImage : null,
+          });
       const matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
 
       const layoutPayload = {
@@ -774,6 +821,7 @@ const App = () => {
           ? {
               winners: Array.isArray(raffleWinners) ? raffleWinners : [],
               info: raffleInfo || null,
+              eventLabel: raffleEventLabel || "",
             }
           : null,
         scoreInfoLabel: isScoreModeActive ? `Pertandingan • ${scoreDateLabel}` : "",
@@ -827,6 +875,7 @@ const App = () => {
     isRaffleMode,
     raffleWinners,
     raffleInfo,
+    raffleEventLabel,
   ]);
 
   const scheduleRender = useCallback(() => {
