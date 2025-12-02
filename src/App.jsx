@@ -93,6 +93,7 @@ const formatMatchTimeLabel =
     return timeString;
   });
 const BASE_LAYER_CACHE_LIMIT = 12;
+const HEADER_LAYER_CACHE_LIMIT = 32;
 
 const SCORE_DATE_MODE_OPTIONS = [
   { value: "today", label: "Hari Ini" },
@@ -184,6 +185,43 @@ const extractRaffleSlug = (rawValue) => {
   }
 };
 
+const formatPrizeAmountLabel = (value) => {
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) {
+    try {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0,
+      }).format(numeric);
+    } catch (error) {
+      return `Rp ${numeric.toLocaleString("id-ID")}`;
+    }
+  }
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+  return "Rp -";
+};
+
+const mapRaffleWinners = (prizes = []) =>
+  prizes.map((winner, index) => {
+    const fallbackLabel = `Pemenang ${index + 1}`;
+    const usernameSource = winner?.username || winner?.ticket_code || fallbackLabel;
+    const displayUsername =
+      typeof usernameSource === "string" ? usernameSource : `${usernameSource ?? fallbackLabel}`;
+    const formattedPrizeAmount =
+      winner?.formattedPrizeAmount ||
+      formatPrizeAmountLabel(
+        winner?.prize_amount ?? winner?.amount ?? winner?.prizeAmount ?? winner?.total ?? 0
+      );
+    return {
+      ...winner,
+      displayUsername,
+      formattedPrizeAmount,
+    };
+  });
+
 const App = () => {
   const canvasRef = useRef(null);
   const [title, setTitle] = useState("");
@@ -267,6 +305,7 @@ const App = () => {
   const [raffleFetchError, setRaffleFetchError] = useState("");
   const renderTimeoutRef = useRef(null);
   const baseLayerCacheRef = useRef(new Map());
+  const headerLayerCacheRef = useRef(new Map());
   const brandPaletteCacheRef = useRef(new Map());
   const yieldToFrame = useCallback(
     () =>
@@ -318,7 +357,8 @@ const App = () => {
         throw new Error(message);
       }
       const prizes = Array.isArray(payload?.prizes) ? payload.prizes : [];
-      setRaffleWinners(prizes);
+      const normalizedWinners = mapRaffleWinners(prizes);
+      setRaffleWinners(normalizedWinners);
       setRaffleInfo({
         name: payload?.name || "",
         totalPrize: payload?.total_prize || "",
@@ -725,7 +765,27 @@ const App = () => {
       const brandPaletteKey = JSON.stringify(brandPalette || {});
       const baseLayerCacheKey = [baseSize, activeMode, effectiveBackgroundSrc || "none", brandPaletteKey].join("|");
       const baseLayerCache = baseLayerCacheRef.current;
-      let baseLayerApplied = false;
+      const headerLayerCache = headerLayerCacheRef.current;
+      const headerLayerCacheKey = [
+        baseLayerCacheKey,
+        effectiveBrandLogoSrc || "no-brand",
+        effectiveTitle || "",
+        shouldSkipHeader ? "skip" : "show",
+        shouldUseRaffleHeaderLogo ? "raffle-header" : "standard-header",
+      ].join("|");
+      let matchesStartY = 0;
+      let headerLayerApplied = false;
+      const cachedHeaderLayer = headerLayerCache.get(headerLayerCacheKey);
+      if (cachedHeaderLayer) {
+        try {
+          ctx.putImageData(cachedHeaderLayer.imageData, 0, 0);
+          matchesStartY = cachedHeaderLayer.matchesStartY;
+          headerLayerApplied = true;
+        } catch (error) {
+          console.warn("Gagal menerapkan cache header layer:", error);
+          headerLayerCache.delete(headerLayerCacheKey);
+        }
+      }
       const miniBannerLayout =
         miniBannerImage && includeMiniBanner
           ? computeMiniBannerLayout(canvas, miniBannerImage)
@@ -758,37 +818,52 @@ const App = () => {
       const bigMatchTimeLabel =
         firstMatchForBigLayout?.time ? formatMatchTimeLabel(firstMatchForBigLayout.time) : "";
 
-      const cachedLayer = baseLayerCache.get(baseLayerCacheKey);
-      if (cachedLayer) {
-        try {
-          ctx.putImageData(cachedLayer, 0, 0);
-          baseLayerApplied = true;
-        } catch (error) {
-          console.warn("Gagal menerapkan cache base layer:", error);
-          baseLayerCache.delete(baseLayerCacheKey);
+      if (!headerLayerApplied) {
+        let baseLayerApplied = false;
+        const cachedLayer = baseLayerCache.get(baseLayerCacheKey);
+        if (cachedLayer) {
+          try {
+            ctx.putImageData(cachedLayer, 0, 0);
+            baseLayerApplied = true;
+          } catch (error) {
+            console.warn("Gagal menerapkan cache base layer:", error);
+            baseLayerCache.delete(baseLayerCacheKey);
+          }
         }
-      }
-      if (!baseLayerApplied) {
-        drawBackground(ctx, backgroundImage);
-        drawOverlay(ctx);
+        if (!baseLayerApplied) {
+          drawBackground(ctx, backgroundImage);
+          drawOverlay(ctx);
+          try {
+            const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            if (baseLayerCache.size >= BASE_LAYER_CACHE_LIMIT) {
+              baseLayerCache.delete(baseLayerCache.keys().next().value);
+            }
+            baseLayerCache.set(baseLayerCacheKey, snapshot);
+          } catch (error) {
+            console.warn("Gagal menyimpan cache base layer:", error);
+          }
+        }
+
+        const brandBottom = drawBrandLogo(ctx, brandLogoImage, brandPalette);
+        const headerBottom = shouldSkipHeader
+          ? brandBottom
+          : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette, {
+              headerLogoImage: shouldUseRaffleHeaderLogo ? raffleHeaderLogoImage : null,
+            });
+        matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
         try {
           const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          if (baseLayerCache.size >= BASE_LAYER_CACHE_LIMIT) {
-            baseLayerCache.delete(baseLayerCache.keys().next().value);
+          if (headerLayerCache.size >= HEADER_LAYER_CACHE_LIMIT) {
+            headerLayerCache.delete(headerLayerCache.keys().next().value);
           }
-          baseLayerCache.set(baseLayerCacheKey, snapshot);
+          headerLayerCache.set(headerLayerCacheKey, {
+            imageData: snapshot,
+            matchesStartY,
+          });
         } catch (error) {
-          console.warn("Gagal menyimpan cache base layer:", error);
+          console.warn("Gagal menyimpan cache header layer:", error);
         }
       }
-
-      const brandBottom = drawBrandLogo(ctx, brandLogoImage, brandPalette);
-      const headerBottom = shouldSkipHeader
-        ? brandBottom
-        : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette, {
-            headerLogoImage: shouldUseRaffleHeaderLogo ? raffleHeaderLogoImage : null,
-          });
-      const matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
 
       const layoutPayload = {
         ctx,

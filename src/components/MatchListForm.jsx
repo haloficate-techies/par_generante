@@ -897,7 +897,7 @@ const RaffleWinnersSection = ({
                   <td className="px-4 py-2">{winner.username || "-"}</td>
                   <td className="px-4 py-2">x{winner.prize || "-"}</td>
                   <td className="px-4 py-2 font-semibold text-emerald-200">
-                    {formatPrizeCurrency(winner.prize_amount)}
+                    {winner.formattedPrizeAmount || formatPrizeCurrency(winner.prize_amount)}
                   </td>
                 </tr>
               ))

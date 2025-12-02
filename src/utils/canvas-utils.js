@@ -383,6 +383,49 @@ function drawRoundedRectPath(ctx, x, y, width, height, radius) {
   ctx.closePath();
 }
 
+const PATH2D_SUPPORTED = typeof Path2D === "function";
+const ROUNDED_RECT_PATH_CACHE_LIMIT = 64;
+const roundedRectPathCache = new Map();
+
+const getRoundedRectPath = (width, height, radius) => {
+  if (!PATH2D_SUPPORTED) return null;
+  const safeRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+  const key = `${width.toFixed(2)}|${height.toFixed(2)}|${safeRadius.toFixed(2)}`;
+  if (roundedRectPathCache.has(key)) {
+    return roundedRectPathCache.get(key);
+  }
+  const path = new Path2D();
+  path.moveTo(safeRadius, 0);
+  path.lineTo(width - safeRadius, 0);
+  path.quadraticCurveTo(width, 0, width, safeRadius);
+  path.lineTo(width, height - safeRadius);
+  path.quadraticCurveTo(width, height, width - safeRadius, height);
+  path.lineTo(safeRadius, height);
+  path.quadraticCurveTo(0, height, 0, height - safeRadius);
+  path.lineTo(0, safeRadius);
+  path.quadraticCurveTo(0, 0, safeRadius, 0);
+  path.closePath();
+  if (roundedRectPathCache.size >= ROUNDED_RECT_PATH_CACHE_LIMIT) {
+    const oldestKey = roundedRectPathCache.keys().next().value;
+    roundedRectPathCache.delete(oldestKey);
+  }
+  roundedRectPathCache.set(key, path);
+  return path;
+};
+
+const fillRoundedRectCached = (ctx, x, y, width, height, radius) => {
+  const path = getRoundedRectPath(width, height, radius);
+  if (!path) {
+    drawRoundedRectPath(ctx, x, y, width, height, radius);
+    ctx.fill();
+    return;
+  }
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fill(path);
+  ctx.restore();
+};
+
 const drawEsportsGameSlot = (ctx, x, y, size, { logoImage, label } = {}) => {
   const clampedSize = Math.max(48, size);
   const badgeRadius = clampedSize * 0.32;
@@ -1913,19 +1956,18 @@ const drawRaffleWinnersTable = (
       ctx.save();
       ctx.fillStyle =
         rowIndex % 2 === 0 ? "rgba(15, 23, 42, 0.45)" : "rgba(15, 23, 42, 0.3)";
-      drawRoundedRectPath(
-        ctx,
-        columnX,
-        rowTop,
-        columnWidth,
-        rowHeight - 6,
-        rowRadius
-      );
-      ctx.fill();
+      fillRoundedRectCached(ctx, columnX, rowTop, columnWidth, rowHeight - 6, rowRadius);
       ctx.restore();
 
       const username =
-        winner?.username || winner?.ticket_code || `Pemenang ${startIndex + rowIndex + 1}`;
+        winner?.displayUsername ||
+        winner?.username ||
+        winner?.ticket_code ||
+        `Pemenang ${startIndex + rowIndex + 1}`;
+      const prizeAmountLabel =
+        winner?.formattedPrizeAmount ||
+        winner?.displayPrizeAmount ||
+        formatRupiah(winner?.prize_amount);
       ctx.font = `600 ${Math.max(20, rowHeight * 0.42)}px Poppins`;
       ctx.textAlign = "left";
       ctx.fillStyle = "#f8fafc";
@@ -1933,7 +1975,7 @@ const drawRaffleWinnersTable = (
 
       ctx.textAlign = "right";
       ctx.fillStyle = "#6efacf";
-      ctx.fillText(formatRupiah(winner?.prize_amount), columnX + columnWidth - 12, centerY);
+      ctx.fillText(prizeAmountLabel, columnX + columnWidth - 12, centerY);
     });
   }
 
