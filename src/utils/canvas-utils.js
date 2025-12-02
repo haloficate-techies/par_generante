@@ -1791,12 +1791,12 @@ const drawRaffleWinnersTable = (
   const panelPaddingX = Math.max(48, canvasWidth * 0.075);
   const panelWidth = canvasWidth - panelPaddingX * 2;
   const panelX = panelPaddingX;
-  const topSpacing = startY + 20;
-  const footerGuard = 180;
+  const topSpacing = startY + 12;
+  const footerGuard = 130;
   const rawHeight = canvasHeight - topSpacing - footerGuard;
-  const panelHeight = Math.max(320, Math.min(rawHeight, canvasHeight * 0.65));
+  const panelHeight = Math.max(320, rawHeight);
   const panelY = topSpacing;
-  const innerPadding = Math.max(28, panelWidth * 0.035);
+  const innerPadding = Math.max(24, panelWidth * 0.03);
 
   ctx.save();
   ctx.shadowColor = "rgba(15, 23, 42, 0.45)";
@@ -1834,17 +1834,25 @@ const drawRaffleWinnersTable = (
   const columnWidth =
     (panelWidth - innerPadding * 2 - columnGap * (totalColumns - 1)) / totalColumns;
   const rowsPerColumn = chunkSize;
-  const headerBarHeight = Math.max(32, Math.min(panelHeight * 0.10, 50));
-  const availableHeight = panelHeight - innerPadding * 2 - 20 - headerBarHeight;
-  const rowHeight = Math.max(40, Math.min(availableHeight / rowsPerColumn, 90));
+  const headerBarHeight = Math.max(32, Math.min(panelHeight * 0.11, 58));
+  const availableHeight = panelHeight - innerPadding * 2;
+  const headerSpacing = Math.max(18, headerBarHeight * 0.35);
+  const preferredRowHeight = Math.min(78, Math.max(56, panelHeight * 0.055));
+  let rowHeight = preferredRowHeight;
+  let contentHeight = headerBarHeight + headerSpacing + rowHeight * rowsPerColumn;
+  if (contentHeight > availableHeight) {
+    rowHeight = Math.max(40, (availableHeight - headerBarHeight - headerSpacing) / rowsPerColumn);
+    contentHeight = headerBarHeight + headerSpacing + rowHeight * rowsPerColumn;
+  }
+  const contentOffset = Math.max(0, (availableHeight - contentHeight) / 2);
   const rowRadius = Math.min(22, rowHeight / 2.4);
   const headerFontSize = Math.max(20, rowHeight * 0.38);
   const usernameTextColor = "#f8fafc";
   const headerBarX = panelX + innerPadding;
   const headerBarWidth = panelWidth - innerPadding * 2;
-  const headerBarY = panelY + innerPadding - headerBarHeight * 0.4;
+  const headerBarY = panelY + innerPadding + contentOffset;
   const headerBarRadius = Math.min(20, headerBarHeight / 2.4);
-  const rowsStartY = headerBarY + headerBarHeight + Math.max(14, rowHeight * 0.25);
+  const rowsStartY = headerBarY + headerBarHeight + headerSpacing;
 
   ctx.save();
   ctx.shadowColor = "rgba(15, 23, 42, 0.3)";
