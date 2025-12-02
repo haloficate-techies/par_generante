@@ -1794,7 +1794,7 @@ const drawRaffleWinnersTable = (
   const topSpacing = startY + 20;
   const footerGuard = 180;
   const rawHeight = canvasHeight - topSpacing - footerGuard;
-  const panelHeight = Math.max(320, Math.min(rawHeight, canvasHeight * 0.58));
+  const panelHeight = Math.max(360, Math.min(rawHeight, canvasHeight * 0.72));
   const panelY = topSpacing;
   const innerPadding = Math.max(28, panelWidth * 0.035);
 
@@ -1834,10 +1834,51 @@ const drawRaffleWinnersTable = (
   const columnWidth =
     (panelWidth - innerPadding * 2 - columnGap * (totalColumns - 1)) / totalColumns;
   const rowsPerColumn = chunkSize;
-  const availableHeight = panelHeight - innerPadding * 2 - 20;
+  const headerBarHeight = Math.max(32, Math.min(panelHeight * 0.10, 50));
+  const availableHeight = panelHeight - innerPadding * 2 - 20 - headerBarHeight;
   const rowHeight = Math.max(40, Math.min(availableHeight / rowsPerColumn, 90));
   const rowRadius = Math.min(22, rowHeight / 2.4);
   const headerFontSize = Math.max(20, rowHeight * 0.38);
+  const usernameTextColor = "#f8fafc";
+  const headerBarX = panelX + innerPadding;
+  const headerBarWidth = panelWidth - innerPadding * 2;
+  const headerBarY = panelY + innerPadding - headerBarHeight * 0.4;
+  const headerBarRadius = Math.min(20, headerBarHeight / 2.4);
+  const rowsStartY = headerBarY + headerBarHeight + Math.max(14, rowHeight * 0.25);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(15, 23, 42, 0.3)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 6;
+  drawRoundedRectPath(ctx, headerBarX, headerBarY, headerBarWidth, headerBarHeight, headerBarRadius);
+  const headerGradient = ctx.createLinearGradient(
+    headerBarX,
+    headerBarY,
+    headerBarX,
+    headerBarY + headerBarHeight
+  );
+  headerGradient.addColorStop(0, palette?.headerStart || "#fcd34d");
+  headerGradient.addColorStop(1, palette?.headerEnd || "#d97706");
+  ctx.fillStyle = headerGradient;
+  ctx.fill();
+  ctx.save();
+  drawRoundedRectPath(ctx, headerBarX, headerBarY, headerBarWidth, headerBarHeight, headerBarRadius);
+  ctx.clip();
+  const bevelGradient = ctx.createLinearGradient(
+    headerBarX,
+    headerBarY,
+    headerBarX,
+    headerBarY + headerBarHeight
+  );
+  bevelGradient.addColorStop(0, "rgba(255,255,255,0.65)");
+  bevelGradient.addColorStop(0.4, "rgba(255,255,255,0.12)");
+  bevelGradient.addColorStop(0.6, "rgba(0,0,0,0.08)");
+  bevelGradient.addColorStop(1, "rgba(0,0,0,0.25)");
+  ctx.fillStyle = bevelGradient;
+  ctx.fillRect(headerBarX, headerBarY, headerBarWidth, headerBarHeight);
+  ctx.restore();
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
 
   ctx.save();
   ctx.textBaseline = "middle";
@@ -1847,20 +1888,19 @@ const drawRaffleWinnersTable = (
       panelX +
       innerPadding +
       columnIndex * (columnWidth + columnGap);
-    const columnHeaderY = panelY + innerPadding;
+    const columnHeaderY = headerBarY + headerBarHeight / 2;
 
     ctx.font = `600 ${Math.round(headerFontSize)}px Poppins`;
     ctx.textAlign = "left";
-    ctx.fillStyle = "rgba(248, 250, 252, 0.78)";
-    ctx.fillText("USERNAME", columnX, columnHeaderY);
+    ctx.fillStyle = usernameTextColor;
+    ctx.fillText("USERNAME", columnX + 16, columnHeaderY);
     ctx.textAlign = "right";
-    ctx.fillText("NOMINAL", columnX + columnWidth, columnHeaderY);
+    ctx.fillText("NOMINAL", columnX + columnWidth - 16, columnHeaderY);
 
     const startIndex = columnIndex * chunkSize;
     const columnData = safeWinners.slice(startIndex, startIndex + chunkSize);
     columnData.forEach((winner, rowIndex) => {
-      const rowTop =
-        columnHeaderY + 28 + rowIndex * rowHeight;
+      const rowTop = rowsStartY + rowIndex * rowHeight;
       const centerY = rowTop + rowHeight / 2;
       ctx.save();
       ctx.fillStyle =
