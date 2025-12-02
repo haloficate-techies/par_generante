@@ -19,7 +19,7 @@ const MODE_BACKGROUND_DEFAULTS = {
   basketball: "assets/BASKET/banner_background/BACKGROUND.webp",
   esports: "assets/ESPORT/banner_background/BACKGROUND.webp",
   togel: "assets/TOTO/banner_background/BACKGROUND.webp",
-  raffle: "assets/RAFFLE/banner_background/BACKGROUND.jpg",
+  raffle: "assets/RAFFLE/banner_background/BACKGROUND.webp",
 };
 const DEFAULT_ESPORT_MINI_BANNER = AppData.ESPORT_MINI_BANNER_FOOTER || null;
 
@@ -410,12 +410,13 @@ const FOOTER_DIRECTORY_BY_MODE = {
 const DEFAULT_RAFFLE_FOOTER = "assets/RAFFLE/banner_footer/FOOTER.webp";
 
 const resolveModeFooterPath = (brandName, mode) => {
-  if (mode === "raffle") {
-    return DEFAULT_RAFFLE_FOOTER;
-  }
-  if (!brandName) return "";
   const directory = FOOTER_DIRECTORY_BY_MODE[mode];
-  if (!directory) return "";
+  if (!directory) {
+    return mode === "raffle" ? DEFAULT_RAFFLE_FOOTER : "";
+  }
+  if (!brandName) {
+    return mode === "raffle" ? DEFAULT_RAFFLE_FOOTER : "";
+  }
   return `${directory}/${brandName}.webp`;
 };
 

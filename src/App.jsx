@@ -903,17 +903,20 @@ const App = () => {
   );
 
   useEffect(() => {
-    if (activeMode === "raffle") {
-      setFooterSrc(DEFAULT_RAFFLE_FOOTER);
+    if (!brandLogoSrc) {
+      setFooterSrc(activeMode === "raffle" ? DEFAULT_RAFFLE_FOOTER : "");
       return;
     }
-    if (!brandLogoSrc) return;
     const matchedBrandOption = AVAILABLE_BRAND_LOGOS.find(
       (option) => option && option.value === brandLogoSrc
     );
     const brandName = matchedBrandOption?.brand ?? null;
     const nextFooterSrc = resolveFooterSrcForBrand(brandName, brandLogoSrc, activeMode);
-    setFooterSrc(nextFooterSrc);
+    if (nextFooterSrc) {
+      setFooterSrc(nextFooterSrc);
+    } else {
+      setFooterSrc(activeMode === "raffle" ? DEFAULT_RAFFLE_FOOTER : "");
+    }
   }, [activeMode, AVAILABLE_BRAND_LOGOS, brandLogoSrc, DEFAULT_RAFFLE_FOOTER]);
 
   const handleBrandLogoSelection = useCallback(
@@ -932,6 +935,7 @@ const App = () => {
       const matchedBrandOption = AVAILABLE_BRAND_LOGOS.find(
         (option) => option && option.value === newValue
       );
+      let resolvedFooterForPrefetch = null;
       if (matchedBrandOption && matchedBrandOption.brand) {
         const modeAwareFooter = resolveFooterSrcForBrand(
           matchedBrandOption.brand,
@@ -939,6 +943,7 @@ const App = () => {
           activeMode
         );
         setFooterSrc(modeAwareFooter);
+        resolvedFooterForPrefetch = modeAwareFooter;
 
         const footballBrandBackground =
           (matchedBrandOption.backgroundByMode &&
@@ -961,7 +966,9 @@ const App = () => {
         });
         setFooterLink(brandSlug ? `INDO.SKIN/${brandSlug}` : "");
       } else {
-        setFooterSrc(resolveFooterSrcForBrand(null, newValue, activeMode));
+        const fallbackFooter = resolveFooterSrcForBrand(null, newValue, activeMode);
+        setFooterSrc(fallbackFooter);
+        resolvedFooterForPrefetch = fallbackFooter;
         setFooterLink("");
         setSelectedFootballBackground(footballDefaultBackground);
         setSelectedBasketballBackground(MODE_BACKGROUND_DEFAULTS.basketball);
@@ -970,13 +977,14 @@ const App = () => {
 
       const prefetchCandidates = [
         newValue,
+        resolvedFooterForPrefetch,
         matchedBrandOption?.backgroundByMode?.[activeMode],
         matchedBrandOption?.backgroundValue,
         activeMode === "football" ? footballDefaultBackground : null,
         activeMode === "esports" ? MODE_BACKGROUND_DEFAULTS.esports : null,
         activeMode === "basketball" ? MODE_BACKGROUND_DEFAULTS.basketball : null,
         activeMode === "raffle" ? MODE_BACKGROUND_DEFAULTS.raffle : null,
-        activeMode === "raffle" ? DEFAULT_RAFFLE_FOOTER : null,
+        activeMode === "raffle" && !resolvedFooterForPrefetch ? DEFAULT_RAFFLE_FOOTER : null,
       ].filter(Boolean);
       if (prefetchCandidates.length) {
         prefetchImages(prefetchCandidates);

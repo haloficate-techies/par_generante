@@ -1794,7 +1794,7 @@ const drawRaffleWinnersTable = (
   const topSpacing = startY + 20;
   const footerGuard = 180;
   const rawHeight = canvasHeight - topSpacing - footerGuard;
-  const panelHeight = Math.max(360, Math.min(rawHeight, canvasHeight * 0.72));
+  const panelHeight = Math.max(320, Math.min(rawHeight, canvasHeight * 0.65));
   const panelY = topSpacing;
   const innerPadding = Math.max(28, panelWidth * 0.035);
 
