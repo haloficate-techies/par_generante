@@ -42,6 +42,7 @@ const RAFFLE_HEADER_LOGO_SRC = "assets/RAFFLE/logo_mode/IDNRAFFLE.png";
 const DEFAULT_ESPORT_MINI_BANNER = AppGlobals.DEFAULT_ESPORT_MINI_BANNER || AppData.ESPORT_MINI_BANNER_FOOTER || null;
 const TOGEL_POOL_BACKGROUND_LOOKUP = AppGlobals.TOGEL_POOL_BACKGROUND_LOOKUP || {};
 const MODE_CONFIG = AppGlobals.MODE_CONFIG || [];
+const LEAGUE_LOGO_OPTIONS = AppGlobals.LEAGUE_LOGO_OPTIONS || [];
 const MATCH_COUNT_OPTIONS = AppGlobals.MATCH_COUNT_OPTIONS || [1, 2, 3, 4, 5];
 const MAX_MATCHES = AppGlobals.MAX_MATCHES || MATCH_COUNT_OPTIONS[MATCH_COUNT_OPTIONS.length - 1];
 const computeMiniBannerLayout = AppGlobals.computeMiniBannerLayout || (() => null);
@@ -723,12 +724,17 @@ const App = () => {
       const isBigMatchLayoutActive = activeMode === "football" && layoutSubMenu === "big_match";
       const isScoreLayoutActive = activeMode === "football" && layoutSubMenu === "scores";
       const poolLabel = resolveTogelPoolLabel(effectiveTogelPool);
+      const selectedLeagueLogoOption =
+        isBigMatchLayoutActive && LEAGUE_LOGO_OPTIONS.length
+          ? LEAGUE_LOGO_OPTIONS.find((option) => option.value === effectiveLeagueLogoSrc) || null
+          : null;
+      const dynamicBigMatchTitle = selectedLeagueLogoOption?.label?.trim() || BIG_MATCH_TITLE;
       const baseTitleInput =
         overrideTitle ??
         (isScoreLayoutActive
           ? SCORE_MODE_TITLE
           : isBigMatchLayoutActive
-          ? BIG_MATCH_TITLE
+          ? dynamicBigMatchTitle
           : allowCustomTitle
           ? title
           : "");
