@@ -167,6 +167,8 @@ const DigitStepperInput = ({ label, value = "0", onChange }) => {
   );
 };
 
+const buildPlayerSlotKey = (index, side) => `${index}-${side}`;
+
 const MatchFieldset = ({
   match,
   index,
@@ -178,6 +180,9 @@ const MatchFieldset = ({
   gameOptions = [],
   showScoreInputs = false,
   showBigMatchExtras = false,
+  onRemoveBackground,
+  playerBackgroundRemovalState = {},
+  canUseBackgroundRemoval = false,
 }) => {
   const gameSlotPreviewStyle = {
     backgroundImage: "linear-gradient(135deg, #0d1829, #050912)",
@@ -212,6 +217,11 @@ const MatchFieldset = ({
     },
     [index, onFieldChange]
   );
+
+  const homeRemovalKey = buildPlayerSlotKey(index, "home");
+  const awayRemovalKey = buildPlayerSlotKey(index, "away");
+  const homeRemovalState = playerBackgroundRemovalState[homeRemovalKey] || {};
+  const awayRemovalState = playerBackgroundRemovalState[awayRemovalKey] || {};
 
   return (
     <fieldset className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
@@ -392,6 +402,12 @@ const MatchFieldset = ({
           offsetX={match.teamHomePlayerOffsetX}
           offsetY={match.teamHomePlayerOffsetY}
           onAdjust={(adjustments) => onPlayerImageAdjust?.(index, "home", adjustments)}
+          canRemoveBackground={canUseBackgroundRemoval}
+          onRemoveBackground={() =>
+            onRemoveBackground?.(index, "home", match.teamHomePlayerImage)
+          }
+          isRemovingBackground={Boolean(homeRemovalState.loading)}
+          removeBackgroundError={homeRemovalState.error || ""}
         />
         <ImageUploadPreview
           label="Foto Pemain Tim Tandang"
@@ -405,6 +421,12 @@ const MatchFieldset = ({
           offsetX={match.teamAwayPlayerOffsetX}
           offsetY={match.teamAwayPlayerOffsetY}
           onAdjust={(adjustments) => onPlayerImageAdjust?.(index, "away", adjustments)}
+          canRemoveBackground={canUseBackgroundRemoval}
+          onRemoveBackground={() =>
+            onRemoveBackground?.(index, "away", match.teamAwayPlayerImage)
+          }
+          isRemovingBackground={Boolean(awayRemovalState.loading)}
+          removeBackgroundError={awayRemovalState.error || ""}
         />
       </div>
     )}
@@ -428,6 +450,10 @@ const ImageUploadPreview = ({
   offsetX = 0,
   offsetY = 0,
   onAdjust,
+  canRemoveBackground = false,
+  onRemoveBackground,
+  isRemovingBackground = false,
+  removeBackgroundError = "",
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [manualInput, setManualInput] = useState("");
@@ -620,6 +646,16 @@ const ImageUploadPreview = ({
               Reset
             </button>
           )}
+          {previewSrc && canRemoveBackground && (
+            <button
+              type="button"
+              className="rounded-full border border-brand-yellow/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand-yellow transition hover:border-brand-yellow hover:text-amber-200 disabled:opacity-60"
+              onClick={onRemoveBackground}
+              disabled={isRemovingBackground || isLoading}
+            >
+              {isRemovingBackground ? "Menghapus..." : "Hapus Background"}
+            </button>
+          )}
         </div>
       </div>
       <label
@@ -668,6 +704,9 @@ const ImageUploadPreview = ({
         </p>
         {inputStatus && (
           <p className="text-[11px] text-emerald-300">{inputStatus}</p>
+        )}
+        {!isRemovingBackground && removeBackgroundError && (
+          <p className="text-[11px] text-rose-300">{removeBackgroundError}</p>
         )}
       </div>
       {hasAdjustments && previewSrc && (
@@ -1172,6 +1211,9 @@ const MatchesSection = ({
   showScoreInputs = false,
   showBigMatchExtras = false,
   disableMatchCountAdjuster = false,
+  onRemovePlayerBackground,
+  playerBackgroundRemovalState = {},
+  canUseBackgroundRemoval = false,
 }) => {
   if (!shouldShowMatches) {
     return null;
@@ -1206,6 +1248,9 @@ const MatchesSection = ({
           gameOptions={availableGameOptions}
           showScoreInputs={showScoreInputs}
           showBigMatchExtras={showBigMatchExtras}
+          onRemoveBackground={onRemovePlayerBackground}
+          playerBackgroundRemovalState={playerBackgroundRemovalState}
+          canUseBackgroundRemoval={canUseBackgroundRemoval}
         />
       ))}
     </section>
@@ -1407,6 +1452,9 @@ const MatchListForm = ({
   onLeagueLogoChange,
   isBigMatchLayout = false,
   leagueLogoOptions = AVAILABLE_LEAGUE_LOGO_OPTIONS,
+  onRemovePlayerBackground,
+  playerBackgroundRemovalState = {},
+  isBackgroundRemovalAvailable = false,
   raffleSlug = "",
   onRaffleSlugChange,
   onFetchRaffleData,
@@ -1577,6 +1625,9 @@ const MatchListForm = ({
         showScoreInputs={isScoreLayoutActive}
         showBigMatchExtras={isBigMatchLayoutActive}
         disableMatchCountAdjuster={isBigMatchLayoutActive}
+        onRemovePlayerBackground={onRemovePlayerBackground}
+        playerBackgroundRemovalState={playerBackgroundRemovalState}
+        canUseBackgroundRemoval={isBackgroundRemovalAvailable}
       />
       <TogelControlsSection
         isTogelMode={isTogelMode}

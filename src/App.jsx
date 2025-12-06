@@ -13,6 +13,10 @@ import BannerPreviewPanel from "./components/layout/BannerPreviewPanel";
 import PreviewModal from "./components/layout/PreviewModal";
 import MatchListForm from "./components/MatchListForm";
 import { CanvasUtils } from "./utils/canvas-utils";
+import {
+  removePlayerBackground,
+  isBackgroundRemovalConfigured,
+} from "./services/background-removal";
 import "./app/mode-layout-registry";
 import "./app/mode-modules";
 import "./modes/layouts/match-mode";
@@ -223,6 +227,8 @@ const mapRaffleWinners = (prizes = []) =>
     };
   });
 
+const buildPlayerSlotKey = (index, side) => `${index}-${side}`;
+
 const App = () => {
   const canvasRef = useRef(null);
   const [title, setTitle] = useState("");
@@ -304,6 +310,11 @@ const App = () => {
   const [raffleInfo, setRaffleInfo] = useState(null);
   const [isFetchingRaffle, setIsFetchingRaffle] = useState(false);
   const [raffleFetchError, setRaffleFetchError] = useState("");
+  const [playerBgRemovalStatus, setPlayerBgRemovalStatus] = useState({});
+  const backgroundRemovalAvailable = useMemo(
+    () => isBackgroundRemovalConfigured(),
+    []
+  );
   const renderTimeoutRef = useRef(null);
   const baseLayerCacheRef = useRef(new Map());
   const headerLayerCacheRef = useRef(new Map());
@@ -481,7 +492,21 @@ const App = () => {
         return updatedMatch;
       })
     );
-  }, []);
+    if (field === "teamHomePlayerImage" || field === "teamAwayPlayerImage") {
+      const slotKey = buildPlayerSlotKey(
+        index,
+        field === "teamHomePlayerImage" ? "home" : "away"
+      );
+      setPlayerBgRemovalStatus((prev) => {
+        if (!prev[slotKey]) {
+          return prev;
+        }
+        const nextState = { ...prev };
+        delete nextState[slotKey];
+        return nextState;
+      });
+    }
+  }, [setPlayerBgRemovalStatus]);
 
   const handleAutoLogoRequest = useCallback((index, side) => {
     setMatches((prevMatches) =>
@@ -628,6 +653,50 @@ const App = () => {
       })
     );
   }, []);
+
+  const updatePlayerBgRemovalState = useCallback((key, updates) => {
+    if (!key) return;
+    setPlayerBgRemovalStatus((prev) => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || { loading: false, error: "" }),
+        ...updates,
+      },
+    }));
+  }, [setPlayerBgRemovalStatus]);
+
+  const handleRemovePlayerBackground = useCallback(
+    async (matchIndex, side, imageSrc) => {
+      if (!backgroundRemovalAvailable) {
+        window.alert("Fitur hapus background belum dikonfigurasi.");
+        return;
+      }
+      if (!imageSrc) {
+        window.alert("Unggah gambar pemain terlebih dahulu sebelum menghapus background.");
+        return;
+      }
+      const slotKey = buildPlayerSlotKey(matchIndex, side);
+      updatePlayerBgRemovalState(slotKey, { loading: true, error: "" });
+      try {
+        const cleanedImage = await removePlayerBackground(imageSrc);
+        const fieldName =
+          side === "home" ? "teamHomePlayerImage" : "teamAwayPlayerImage";
+        handleMatchFieldChange(matchIndex, fieldName, cleanedImage);
+        updatePlayerBgRemovalState(slotKey, { loading: false, error: "" });
+      } catch (error) {
+        console.error("Gagal menghapus background pemain:", error);
+        const message =
+          error?.message || "Gagal menghapus background. Coba lagi.";
+        updatePlayerBgRemovalState(slotKey, { loading: false, error: message });
+        window.alert(message);
+      }
+    },
+    [
+      backgroundRemovalAvailable,
+      handleMatchFieldChange,
+      updatePlayerBgRemovalState,
+    ]
+  );
 
   const handleMatchCountChange = useCallback((nextCount) => {
     const normalizedCount = Math.min(
@@ -1316,6 +1385,9 @@ const App = () => {
               leagueLogoSrc={leagueLogoSrc}
               onLeagueLogoChange={setLeagueLogoSrc}
               isBigMatchLayout={isBigMatchLayout}
+              onRemovePlayerBackground={handleRemovePlayerBackground}
+              playerBackgroundRemovalState={playerBgRemovalStatus}
+              isBackgroundRemovalAvailable={backgroundRemovalAvailable}
               raffleSlug={raffleSlug}
               onRaffleSlugChange={handleRaffleSlugChange}
               onFetchRaffleData={handleFetchRaffleData}

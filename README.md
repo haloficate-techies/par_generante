@@ -26,6 +26,17 @@ Visit the URL displayed by Vite (default `http://localhost:5173`) to access the 
 | `npm run lint`   | Run ESLint on all `src/**/*.{js,jsx}` files.        |
 | `npm run test`   | Execute Vitest + Testing Library smoke tests.       |
 
+## Background Removal Service
+
+Fitur hapus background untuk foto pemain bergantung pada layanan eksternal yang Anda jalankan sendiri (mis. VPS dengan `rembg`). Konfigurasikan endpoint tersebut melalui environment variables Vite:
+
+```bash
+VITE_REMOVE_BG_ENDPOINT=https://your-vps.example.com/remove-bg
+VITE_REMOVE_BG_TOKEN=optionalBearerToken
+```
+
+Jika `VITE_REMOVE_BG_ENDPOINT` terisi, setiap slot foto pemain akan menampilkan tombol **Hapus Background** setelah gambar dipilih. Aplikasi akan mengirim data URL gambar ke endpoint tersebut dan mengganti preview dengan hasil PNG transparan yang dikembalikan layanan.
+
 ## Tests
 
 Tests live under `src/__tests__` and rely on Vitest with React Testing Library. They cover smoke rendering of the main app and BannerHeader component to avoid regressions.
