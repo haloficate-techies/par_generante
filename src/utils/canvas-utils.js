@@ -642,10 +642,12 @@ const drawMatches = (
   const isFootballMode = options?.mode === "football";
   const isFootballScheduleLayout =
     isFootballMode && (options?.activeSubMenu || "schedule") === "schedule";
+  const isFootballScoresLayout =
+    isFootballMode && options?.activeSubMenu === "scores";
 
-  if (isFootballScheduleLayout) {
+  if (isFootballScheduleLayout || isFootballScoresLayout) {
     const baseRowHeight = 118;
-    const baseRowGap = 22;
+    const baseRowGap = isFootballScoresLayout ? 36 : 22;
     const baseTotal =
       matchCount * baseRowHeight + Math.max(matchCount - 1, 0) * baseRowGap;
     const scheduleScale =
@@ -659,7 +661,7 @@ const drawMatches = (
         ? (availableHeight - layoutHeight) / 2
         : 0;
     const marginX = Math.max(56, ctx.canvas.width * 0.08);
-    const badgeScale = 1.5;
+    const badgeScale = isFootballScoresLayout ? 1.35 : 1.5;
     const baseCircleRadius = Math.max(rowHeight * 0.34, 34);
     const circleRadius = baseCircleRadius * badgeScale;
     const barHeight = Math.max(rowHeight * 0.6, 50);
@@ -729,13 +731,67 @@ const drawMatches = (
     };
 
     matches.forEach((match, index) => {
-      const rowTop = startY + verticalOffset + index * (rowHeight + rowGap);
+      const rowTop =
+        startY + verticalOffset + index * (rowHeight + rowGap);
       const centerY = rowTop + rowHeight / 2;
       const leftCircleCenterX = marginX + circleRadius;
       const rightCircleCenterX = ctx.canvas.width - marginX - circleRadius;
       const barX = leftCircleCenterX;
       const barWidth = rightCircleCenterX - leftCircleCenterX;
       const barY = centerY - barHeight / 2;
+      if (isFootballScoresLayout) {
+        const scoreDateLabel = (formatDate(match.date) || "").toUpperCase();
+        if (scoreDateLabel) {
+          const pillFontSize = Math.max(18, 20 * scheduleScale);
+          const pillHeight = Math.max(30, 36 * scheduleScale);
+          const pillPaddingX = Math.max(24, 34 * scheduleScale);
+          ctx.save();
+          ctx.font = `700 ${Math.round(pillFontSize)}px "Poppins", sans-serif`;
+          const measuredWidth = ctx.measureText(scoreDateLabel).width;
+          const pillWidth = Math.min(
+            barWidth * 0.75,
+            Math.max(180, measuredWidth + pillPaddingX * 2)
+          );
+          const pillX = ctx.canvas.width / 2 - pillWidth / 2;
+          const pillY =
+            barY -
+            pillHeight -
+            Math.max(6, 10 * scheduleScale) +
+            (index === 0 ? Math.max(10, 14 * scheduleScale) : 0);
+          const pillRadius = pillHeight / 2;
+          ctx.beginPath();
+          drawRoundedRectPath(ctx, pillX, pillY, pillWidth, pillHeight, pillRadius);
+          const pillGradient = ctx.createLinearGradient(
+            pillX,
+            pillY,
+            pillX + pillWidth,
+            pillY + pillHeight
+          );
+          pillGradient.addColorStop(
+            0,
+            ensureSubduedGradientColor(
+              paletteSafe?.footerEnd,
+              DEFAULT_BRAND_PALETTE.footerEnd,
+              0.4
+            )
+          );
+          pillGradient.addColorStop(
+            1,
+            ensureSubduedGradientColor(
+              paletteSafe?.footerStart,
+              DEFAULT_BRAND_PALETTE.footerStart,
+              0.35
+            )
+          );
+          ctx.fillStyle = pillGradient;
+          ctx.fill();
+          ctx.fillStyle = "#f8fafc";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(scoreDateLabel, pillX + pillWidth / 2, pillY + pillHeight / 2);
+          ctx.restore();
+        }
+      }
       ctx.save();
       drawRoundedRectPath(ctx, barX, barY, barWidth, barHeight, barHeight / 2);
       ctx.fillStyle = "rgba(248, 250, 252, 0.96)";
@@ -788,23 +844,51 @@ const drawMatches = (
       ctx.fill();
       ctx.restore();
 
-      const dateLabel = (formatDate(match.date) || "JADWAL TBD").toUpperCase();
-      const timeLabel = (match.time ? formatTime(match.time) : "WAKTU TBD").toUpperCase();
-      const dateFont = Math.max(18, 24 * scheduleScale);
-      const timeFont = Math.max(24, 28 * scheduleScale);
+      const fallbackScore = (value) => {
+        if (typeof value === "number" && Number.isFinite(value)) {
+          return value;
+        }
+        if (value === null || value === undefined || value === "") {
+          return 0;
+        }
+        const numeric = Number(value);
+        return Number.isFinite(numeric) ? numeric : 0;
+      };
+      const dateLabel = isFootballScoresLayout
+        ? `${fallbackScore(match.scoreHome)} - ${fallbackScore(match.scoreAway)}`
+        : (formatDate(match.date) || "JADWAL TBD").toUpperCase();
+      const timeLabel = isFootballScoresLayout
+        ? ""
+        : (match.time ? formatTime(match.time) : "WAKTU TBD").toUpperCase();
+      const dateFont = Math.max(
+        18,
+        (isFootballScoresLayout ? 28 : 24) * scheduleScale
+      );
+      const timeFont = Math.max(
+        24,
+        (isFootballScoresLayout ? 32 : 28) * scheduleScale
+      );
       const centerTextX = centerX + centerWidth / 2;
-      const centerBandHeight = barHeight * 0.5;
+      const centerBandHeight = barHeight * (isFootballScoresLayout ? 0.8 : 0.5);
       const centerBandPadding = Math.max(8, 10 * scheduleScale);
-      const dateAreaHeight = centerBandHeight * 0.45;
-      const timeAreaHeight = centerBandHeight * 0.55;
-      const dateCenterY = barY + centerBandPadding + dateAreaHeight / 2;
-      const timeCenterY =
-        barY + barHeight - centerBandPadding - timeAreaHeight / 2;
+      const dateAreaHeight = centerBandHeight * (isFootballScoresLayout ? 1 : 0.45);
+      const timeAreaHeight = isFootballScoresLayout
+        ? 0
+        : centerBandHeight * 0.55;
+      const dateCenterY = isFootballScoresLayout
+        ? centerY
+        : barY + centerBandPadding + dateAreaHeight / 2;
+      const timeCenterY = isFootballScoresLayout
+        ? null
+        : barY + barHeight - centerBandPadding - timeAreaHeight / 2;
+      const gradientEndY = isFootballScoresLayout
+        ? dateCenterY + dateFont
+        : timeCenterY + timeFont;
       const textGradient = ctx.createLinearGradient(
         centerTextX,
         dateCenterY - dateFont,
         centerTextX,
-        timeCenterY + timeFont
+        gradientEndY
       );
       textGradient.addColorStop(0, "#f8fafc");
       textGradient.addColorStop(0.55, "#d1d5db");
@@ -832,7 +916,9 @@ const drawMatches = (
         ctx.restore();
       };
       drawBeveledText(dateLabel, dateFont, dateCenterY, 700);
-      drawBeveledText(timeLabel, timeFont, timeCenterY, 800);
+      if (!isFootballScoresLayout && timeLabel) {
+        drawBeveledText(timeLabel, timeFont, timeCenterY, 800);
+      }
 
       const leftTextX = leftCircleCenterX + circleRadius + textGap;
       const leftTextWidth = Math.max(
@@ -931,10 +1017,10 @@ const drawMatches = (
   const detailScale = Math.min(scale, rowTotal / baseRowTotal);
   const spacingScale = Math.min(scale, rowGap / baseRowGap || scale);
 
-  const verticalOffset =
-    adjustedHeight < availableHeight
-      ? (availableHeight - adjustedHeight) / 2
-      : 0;
+    const verticalOffset =
+      adjustedHeight < availableHeight
+        ? (availableHeight - adjustedHeight) / 2
+        : 0;
 
   const isEsportsMode = options?.mode === "esports";
   const isBasketballMode = options?.mode === "basketball";
