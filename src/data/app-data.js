@@ -1282,7 +1282,6 @@ const loadTeamLogoImage = async (src, { applyAutoProcessing = false } = {}) => {
 };
 
 const MATCH_DATE_FORMATTER = new Intl.DateTimeFormat("id-ID", {
-  weekday: "long",
   day: "numeric",
   month: "short",
   year: "numeric",

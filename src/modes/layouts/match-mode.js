@@ -37,6 +37,7 @@ const renderMatchModeLayout = ({
   } else {
     drawMatches(ctx, matchesWithImages, matchesStartY, brandPalette, {
       mode: activeMode,
+      activeSubMenu,
       extraBottomSpacing: miniBannerLayout?.totalHeight ?? 0,
     });
   }

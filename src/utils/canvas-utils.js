@@ -25,6 +25,30 @@ const hexToRgb = hexToRgbHelper;
 const rgbToHex = rgbToHexHelper;
 const drawLogoTile = drawLogoTileHelper;
 
+const blendHexColors = (sourceHex, targetHex, ratio = 0.4) => {
+  if (!sourceHex || !targetHex) {
+    return sourceHex || targetHex || "#0f172a";
+  }
+  const source = hexToRgb(sourceHex);
+  const target = hexToRgb(targetHex);
+  if (!source || !target) {
+    return sourceHex || targetHex;
+  }
+  const mixChannel = (a, b) => Math.round(a * (1 - ratio) + b * ratio);
+  return rgbToHex(
+    mixChannel(source.r, target.r),
+    mixChannel(source.g, target.g),
+    mixChannel(source.b, target.b)
+  );
+};
+
+const ensureSubduedGradientColor = (color, fallback, ratio = 0.35) => {
+  const base = "#0f172a";
+  const source = typeof color === "string" && color ? color : fallback;
+  if (!source) return base;
+  return blendHexColors(source, base, ratio);
+};
+
 const srgbChannelToLinear = (value) => {
   const normalized = value / 255;
   return normalized <= 0.03928
@@ -516,8 +540,8 @@ const drawHeader = (
     (title && title.trim().toUpperCase()) || "JUDUL LIGA / KOMPETISI";
   const maxTextWidth = ctx.canvas.width - 140;
 
-  const gradientStart = palette?.headerStart ?? "#6366f1";
-  const gradientEnd = palette?.headerEnd ?? "#ec4899";
+  const gradientStart = ensureSubduedGradientColor(palette?.headerStart, "#6366f1");
+  const gradientEnd = ensureSubduedGradientColor(palette?.headerEnd, "#ec4899");
 
   const titleColor = "#f8fafc";
   const shadowColor = "rgba(15, 23, 42, 0.55)";
@@ -603,6 +627,10 @@ const drawMatches = (
   const footerEnd = paletteSafe?.footerEnd ?? DEFAULT_BRAND_PALETTE.footerEnd;
   const dateTextColor = pickReadableTextColor(headerStart, headerEnd, { preferLight: true });
   const timeTextColor = pickReadableTextColor(footerStart, footerEnd, { preferLight: true });
+  const darkerGradientColor =
+    getRelativeLuminanceSafe(headerStart) <= getRelativeLuminanceSafe(headerEnd)
+      ? headerStart
+      : headerEnd;
   const extraBottomSpacing = clampMin(options?.extraBottomSpacing ?? 0, 0);
   const FOOTER_HEIGHT = 110;
   const FOOTER_SPACING = 60 + extraBottomSpacing;
@@ -610,6 +638,252 @@ const drawMatches = (
   const bottomLimit = ctx.canvas.height - footerGuard;
   const availableHeight = Math.max(bottomLimit - startY, 240);
   const matchCount = Math.max(matches.length, 1);
+
+  const isFootballMode = options?.mode === "football";
+  const isFootballScheduleLayout =
+    isFootballMode && (options?.activeSubMenu || "schedule") === "schedule";
+
+  if (isFootballScheduleLayout) {
+    const baseRowHeight = 118;
+    const baseRowGap = 22;
+    const baseTotal =
+      matchCount * baseRowHeight + Math.max(matchCount - 1, 0) * baseRowGap;
+    const scheduleScale =
+      baseTotal > availableHeight ? availableHeight / baseTotal : 1;
+    const rowHeight = clampMin(baseRowHeight * scheduleScale, 76);
+    const rowGap = clampMin(baseRowGap * scheduleScale, 28);
+    const layoutHeight =
+      matchCount * rowHeight + Math.max(matchCount - 1, 0) * rowGap;
+    const verticalOffset =
+      layoutHeight < availableHeight
+        ? (availableHeight - layoutHeight) / 2
+        : 0;
+    const marginX = Math.max(56, ctx.canvas.width * 0.08);
+    const badgeScale = 1.5;
+    const baseCircleRadius = Math.max(rowHeight * 0.34, 34);
+    const circleRadius = baseCircleRadius * badgeScale;
+    const barHeight = Math.max(rowHeight * 0.6, 50);
+    const textGap = Math.max(18, 28 * scheduleScale);
+
+    const drawTeamBadge = (image, centerX, centerY, radius, fallbackLetter) => {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = "#0f172a";
+      ctx.fill();
+      ctx.clip();
+      if (image) {
+        drawImageCover(
+          ctx,
+          image,
+          centerX - radius,
+          centerY - radius,
+          radius * 2,
+          radius * 2,
+          { scale: 0.9 }
+        );
+      } else {
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = `700 ${Math.round(radius * 0.85)}px "Poppins", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(fallbackLetter, centerX, centerY);
+      }
+      ctx.restore();
+      ctx.save();
+      ctx.lineWidth = Math.max(4, radius * 0.2);
+      ctx.strokeStyle = darkerGradientColor || "#ef4444";
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    const drawTeamBlock = (label, fallback, areaX, areaWidth, centerY) => {
+      if (areaWidth <= 0) return;
+      const baseText = (label && label.trim()) || fallback;
+      const upper = baseText.toUpperCase();
+      const layout = layoutTeamName(ctx, upper, {
+        maxWidth: areaWidth,
+        maxFontSize: Math.max(28 * scheduleScale, 16),
+        minFontSize: 12,
+        fontWeight: 700,
+        fontFamily: '"Poppins", sans-serif',
+      });
+      const lines =
+        layout.lines && layout.lines.length ? layout.lines : [upper];
+      const lineHeight = layout.fontSize * (lines.length > 1 ? 1.05 : 1);
+      const firstLineY = centerY - ((lines.length - 1) * lineHeight) / 2;
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#0f172a";
+      ctx.font = `700 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, areaX + areaWidth / 2, firstLineY + idx * lineHeight);
+      });
+      ctx.restore();
+    };
+
+    matches.forEach((match, index) => {
+      const rowTop = startY + verticalOffset + index * (rowHeight + rowGap);
+      const centerY = rowTop + rowHeight / 2;
+      const leftCircleCenterX = marginX + circleRadius;
+      const rightCircleCenterX = ctx.canvas.width - marginX - circleRadius;
+      const barX = leftCircleCenterX;
+      const barWidth = rightCircleCenterX - leftCircleCenterX;
+      const barY = centerY - barHeight / 2;
+      ctx.save();
+      drawRoundedRectPath(ctx, barX, barY, barWidth, barHeight, barHeight / 2);
+      ctx.fillStyle = "rgba(248, 250, 252, 0.96)";
+      ctx.fill();
+      ctx.strokeStyle = darkerGradientColor || "#ef4444";
+      ctx.lineWidth = Math.max(4, barHeight * 0.06);
+      ctx.stroke();
+      ctx.restore();
+
+      const targetCenterWidth = 200 * scheduleScale;
+      const centerWidth = clamp(
+        targetCenterWidth,
+        160 * scheduleScale,
+        240 * scheduleScale
+      );
+      const centerX = ctx.canvas.width / 2 - centerWidth / 2;
+      const centerTopInset = Math.max(centerWidth * 0.12, 18 * scheduleScale);
+      const centerBottom = barY + barHeight;
+      const centerGradient = ctx.createLinearGradient(
+        centerX,
+        barY,
+        centerX + centerWidth,
+        centerBottom
+      );
+      const trapezoidStartColor = ensureSubduedGradientColor(
+        headerStart,
+        DEFAULT_BRAND_PALETTE.headerStart
+      );
+      const trapezoidMidColor = ensureSubduedGradientColor(
+        headerEnd,
+        DEFAULT_BRAND_PALETTE.headerEnd
+      );
+      const trapezoidEndColor = ensureSubduedGradientColor(
+        paletteSafe?.footerStart ?? DEFAULT_BRAND_PALETTE.footerStart,
+        DEFAULT_BRAND_PALETTE.footerStart,
+        0.45
+      );
+      centerGradient.addColorStop(0, trapezoidStartColor);
+      centerGradient.addColorStop(0.6, trapezoidMidColor);
+      centerGradient.addColorStop(1, trapezoidEndColor);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerBottom);
+      ctx.lineTo(centerX + centerWidth, centerBottom);
+      ctx.lineTo(centerX + centerWidth + centerTopInset, barY);
+      ctx.lineTo(centerX - centerTopInset, barY);
+      ctx.closePath();
+      ctx.fillStyle = centerGradient;
+      ctx.fill();
+      ctx.restore();
+
+      const dateLabel = (formatDate(match.date) || "JADWAL TBD").toUpperCase();
+      const timeLabel = (match.time ? formatTime(match.time) : "WAKTU TBD").toUpperCase();
+      const dateFont = Math.max(18, 24 * scheduleScale);
+      const timeFont = Math.max(24, 28 * scheduleScale);
+      const centerTextX = centerX + centerWidth / 2;
+      const centerBandHeight = barHeight * 0.5;
+      const centerBandPadding = Math.max(8, 10 * scheduleScale);
+      const dateAreaHeight = centerBandHeight * 0.45;
+      const timeAreaHeight = centerBandHeight * 0.55;
+      const dateCenterY = barY + centerBandPadding + dateAreaHeight / 2;
+      const timeCenterY =
+        barY + barHeight - centerBandPadding - timeAreaHeight / 2;
+      const textGradient = ctx.createLinearGradient(
+        centerTextX,
+        dateCenterY - dateFont,
+        centerTextX,
+        timeCenterY + timeFont
+      );
+      textGradient.addColorStop(0, "#f8fafc");
+      textGradient.addColorStop(0.55, "#d1d5db");
+      textGradient.addColorStop(1, "#4b5563");
+      const drawBeveledText = (text, fontSize, centerY, fontWeight = 700) => {
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `${fontWeight} ${Math.round(fontSize)}px "Poppins", sans-serif`;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 3;
+        ctx.fillStyle = "#111827";
+        ctx.fillText(text, centerTextX, centerY + 1);
+        ctx.restore();
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = `${fontWeight} ${Math.round(fontSize)}px "Poppins", sans-serif`;
+        ctx.fillStyle = textGradient;
+        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        ctx.lineWidth = Math.max(1, fontSize * 0.05);
+        ctx.fillText(text, centerTextX, centerY - 1);
+        ctx.strokeText(text, centerTextX, centerY - 1);
+        ctx.restore();
+      };
+      drawBeveledText(dateLabel, dateFont, dateCenterY, 700);
+      drawBeveledText(timeLabel, timeFont, timeCenterY, 800);
+
+      const leftTextX = leftCircleCenterX + circleRadius + textGap;
+      const leftTextWidth = Math.max(
+        60,
+        centerX - textGap - leftTextX
+      );
+      const rightTextX = centerX + centerWidth + textGap;
+      const rightTextWidth = Math.max(
+        60,
+        rightCircleCenterX - circleRadius - textGap - rightTextX
+      );
+
+      drawTeamBlock(
+        match.teamHome,
+        "Tuan Rumah",
+        leftTextX,
+        leftTextWidth,
+        centerY
+      );
+      drawTeamBlock(
+        match.teamAway,
+        "Tim Tamu",
+        rightTextX,
+        rightTextWidth,
+        centerY
+      );
+
+      const homeBadgeLetter =
+        (match.teamHome && match.teamHome.trim()[0]?.toUpperCase()) || "H";
+      const awayBadgeLetter =
+        (match.teamAway && match.teamAway.trim()[0]?.toUpperCase()) || "A";
+
+      drawTeamBadge(
+        match.homeLogoImage,
+        leftCircleCenterX,
+        centerY,
+        circleRadius,
+        homeBadgeLetter
+      );
+      drawTeamBadge(
+        match.awayLogoImage,
+        rightCircleCenterX,
+        centerY,
+        circleRadius,
+        awayBadgeLetter
+      );
+    });
+
+    ctx.restore();
+    return;
+  }
 
   const baseDateHeight = 36;
   const baseCardHeight = 132;
@@ -664,7 +938,6 @@ const drawMatches = (
 
   const isEsportsMode = options?.mode === "esports";
   const isBasketballMode = options?.mode === "basketball";
-  const isFootballMode = options?.mode === "football";
   const baseInset = isEsportsMode ? 130 : 90;
   const cardWidth = ctx.canvas.width - baseInset * 2;
   const dateTimeGap = Math.max(16, 26 * spacingScale);
@@ -1930,8 +2203,14 @@ const drawRaffleWinnersTable = (
     headerBarX,
     headerBarY + headerBarHeight
   );
-  headerGradient.addColorStop(0, palette?.headerStart || "#fcd34d");
-  headerGradient.addColorStop(1, palette?.headerEnd || "#d97706");
+  headerGradient.addColorStop(
+    0,
+    ensureSubduedGradientColor(palette?.headerStart, "#fcd34d", 0.45)
+  );
+  headerGradient.addColorStop(
+    1,
+    ensureSubduedGradientColor(palette?.headerEnd, "#d97706", 0.45)
+  );
   ctx.fillStyle = headerGradient;
   ctx.fill();
   ctx.save();
@@ -2061,8 +2340,14 @@ const drawFooter = (ctx, footerImage, linkTextInput, palette = DEFAULT_BRAND_PAL
     ctx.canvas.width,
     footerY + footerHeight
   );
-  panelGradient.addColorStop(0, palette?.footerStart ?? "#22c55e");
-  panelGradient.addColorStop(1, palette?.footerEnd ?? "#0d9488");
+  panelGradient.addColorStop(
+    0,
+    ensureSubduedGradientColor(palette?.footerStart, "#22c55e", 0.5)
+  );
+  panelGradient.addColorStop(
+    1,
+    ensureSubduedGradientColor(palette?.footerEnd, "#0d9488", 0.5)
+  );
   ctx.fillStyle = panelGradient;
   ctx.fillRect(linkX, footerY, Math.max(ctx.canvas.width - linkX, 0), footerHeight);
 
