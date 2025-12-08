@@ -487,6 +487,7 @@ const App = () => {
           updatedMatch[`${baseKey}Scale`] = 1;
           updatedMatch[`${baseKey}OffsetX`] = 0;
           updatedMatch[`${baseKey}OffsetY`] = 0;
+          updatedMatch[`${baseKey}Flip`] = false;
         }
 
         return updatedMatch;
@@ -650,6 +651,23 @@ const App = () => {
           }
         }
         return nextMatch;
+      })
+    );
+  }, []);
+
+  const handlePlayerImageFlipToggle = useCallback((index, side) => {
+    setMatches((prevMatches) =>
+      prevMatches.map((match, idx) => {
+        if (idx !== index) return match;
+        const imageKey = side === "home" ? "teamHomePlayerImage" : "teamAwayPlayerImage";
+        const flipKey = side === "home" ? "teamHomePlayerFlip" : "teamAwayPlayerFlip";
+        if (!match[imageKey]) {
+          return match;
+        }
+        return {
+          ...match,
+          [flipKey]: !match[flipKey],
+        };
       })
     );
   }, []);
@@ -1359,6 +1377,7 @@ const App = () => {
                 onAutoLogoRequest={handleAutoLogoRequest}
               onLogoAdjust={handleLogoAdjust}
               onPlayerImageAdjust={handlePlayerImageAdjust}
+              onPlayerImageFlipToggle={handlePlayerImageFlipToggle}
               brandLogoSrc={brandLogoSrc}
               onBrandLogoChange={handleBrandLogoSelection}
               brandOptions={AVAILABLE_BRAND_LOGOS}

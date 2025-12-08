@@ -176,6 +176,7 @@ const MatchFieldset = ({
   onRequestAutoLogo,
   onLogoAdjust,
   onPlayerImageAdjust,
+  onPlayerImageFlipToggle,
   isEsportsMode = false,
   gameOptions = [],
   showScoreInputs = false,
@@ -402,6 +403,8 @@ const MatchFieldset = ({
           offsetX={match.teamHomePlayerOffsetX}
           offsetY={match.teamHomePlayerOffsetY}
           onAdjust={(adjustments) => onPlayerImageAdjust?.(index, "home", adjustments)}
+          onToggleFlip={() => onPlayerImageFlipToggle?.(index, "home")}
+          isFlipped={Boolean(match.teamHomePlayerFlip)}
           canRemoveBackground={canUseBackgroundRemoval}
           onRemoveBackground={() =>
             onRemoveBackground?.(index, "home", match.teamHomePlayerImage)
@@ -421,6 +424,8 @@ const MatchFieldset = ({
           offsetX={match.teamAwayPlayerOffsetX}
           offsetY={match.teamAwayPlayerOffsetY}
           onAdjust={(adjustments) => onPlayerImageAdjust?.(index, "away", adjustments)}
+          onToggleFlip={() => onPlayerImageFlipToggle?.(index, "away")}
+          isFlipped={Boolean(match.teamAwayPlayerFlip)}
           canRemoveBackground={canUseBackgroundRemoval}
           onRemoveBackground={() =>
             onRemoveBackground?.(index, "away", match.teamAwayPlayerImage)
@@ -450,6 +455,8 @@ const ImageUploadPreview = ({
   offsetX = 0,
   offsetY = 0,
   onAdjust,
+  onToggleFlip,
+  isFlipped = false,
   canRemoveBackground = false,
   onRemoveBackground,
   isRemovingBackground = false,
@@ -604,9 +611,11 @@ const ImageUploadPreview = ({
   const clampedScale = clampValue(scale ?? 1, 0.7, 1.5);
   const clampedOffsetX = clampValue(offsetX ?? 0, -0.75, 0.75);
   const clampedOffsetY = clampValue(offsetY ?? 0, -0.75, 0.75);
+  const previewOffsetX = isFlipped ? -clampedOffsetX : clampedOffsetX;
   const transformStyle = {
-    transform: `translate(${clampedOffsetX * 50}%, ${clampedOffsetY * 50}%) scale(${clampedScale})`,
+    transform: `translate(${previewOffsetX * 50}%, ${clampedOffsetY * 50}%) scale(${clampedScale})`,
   };
+  const mirrorWrapperStyle = isFlipped ? { transform: "scaleX(-1)" } : undefined;
   const hasAdjustments = Boolean(onAdjust);
 
   return (
@@ -637,20 +646,29 @@ const ImageUploadPreview = ({
               Muat otomatis
             </button>
           )}
-          {previewSrc && (
-            <button
-              type="button"
-              className="text-xs font-medium text-rose-300 hover:text-rose-200"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-          )}
-          {previewSrc && canRemoveBackground && (
-            <button
-              type="button"
-              className="rounded-full border border-brand-yellow/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand-yellow transition hover:border-brand-yellow hover:text-amber-200 disabled:opacity-60"
-              onClick={onRemoveBackground}
+            {previewSrc && (
+              <button
+                type="button"
+                className="text-xs font-medium text-rose-300 hover:text-rose-200"
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+            )}
+            {previewSrc && onToggleFlip && (
+              <button
+                type="button"
+                className="rounded-full border border-slate-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-200 transition hover:border-brand-yellow/60 hover:text-white"
+                onClick={onToggleFlip}
+              >
+                {isFlipped ? "Normalkan Foto" : "Mirror Foto"}
+              </button>
+            )}
+            {previewSrc && canRemoveBackground && (
+              <button
+                type="button"
+                className="rounded-full border border-brand-yellow/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand-yellow transition hover:border-brand-yellow hover:text-amber-200 disabled:opacity-60"
+                onClick={onRemoveBackground}
               disabled={isRemovingBackground || isLoading}
             >
               {isRemovingBackground ? "Menghapus..." : "Hapus Background"}
@@ -664,18 +682,20 @@ const ImageUploadPreview = ({
       >
         {isLoading ? (
           <span>Memuat...</span>
-        ) : previewSrc ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <div className="relative flex aspect-square w-28 max-w-[85%] items-center justify-center overflow-hidden rounded-full border border-slate-300 bg-white shadow-inner shadow-black/10">
-              <img
-                src={previewSrc}
-                alt={`${label} preview`}
-                className="h-full w-full origin-center object-contain transition-transform duration-150"
-                style={transformStyle}
-              />
-              <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-white/30" />
+          ) : previewSrc ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="relative flex aspect-square w-28 max-w-[85%] items-center justify-center overflow-hidden rounded-full border border-slate-300 bg-white shadow-inner shadow-black/10">
+                <div className="h-full w-full" style={mirrorWrapperStyle}>
+                  <img
+                    src={previewSrc}
+                    alt={`${label} preview`}
+                    className="h-full w-full origin-center object-contain transition-transform duration-150"
+                    style={transformStyle}
+                  />
+                </div>
+                <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-white/30" />
+              </div>
             </div>
-          </div>
         ) : (
           <span>Klik untuk memilih gambar</span>
         )}
@@ -1206,6 +1226,7 @@ const MatchesSection = ({
   onAutoLogoRequest,
   onLogoAdjust,
   onPlayerImageAdjust,
+  onPlayerImageFlipToggle,
   isEsportsMode,
   availableGameOptions,
   showScoreInputs = false,
@@ -1235,16 +1256,17 @@ const MatchesSection = ({
           onChange={adjustMatchCount}
         />
       )}
-      {(disableMatchCountAdjuster ? matches.slice(0, 1) : matches).map((match, index) => (
-        <MatchFieldset
-          key={index}
-          match={match}
-          index={index}
-          onFieldChange={onMatchFieldChange}
-          onRequestAutoLogo={onAutoLogoRequest}
-          onLogoAdjust={onLogoAdjust}
-          onPlayerImageAdjust={onPlayerImageAdjust}
-          isEsportsMode={isEsportsMode}
+        {(disableMatchCountAdjuster ? matches.slice(0, 1) : matches).map((match, index) => (
+          <MatchFieldset
+            key={index}
+            match={match}
+            index={index}
+            onFieldChange={onMatchFieldChange}
+            onRequestAutoLogo={onAutoLogoRequest}
+            onLogoAdjust={onLogoAdjust}
+            onPlayerImageAdjust={onPlayerImageAdjust}
+            onPlayerImageFlipToggle={onPlayerImageFlipToggle}
+            isEsportsMode={isEsportsMode}
           gameOptions={availableGameOptions}
           showScoreInputs={showScoreInputs}
           showBigMatchExtras={showBigMatchExtras}
@@ -1425,6 +1447,7 @@ const MatchListForm = ({
   onAutoLogoRequest,
   onLogoAdjust,
   onPlayerImageAdjust,
+  onPlayerImageFlipToggle,
   brandLogoSrc,
   onBrandLogoChange,
   brandOptions,
@@ -1620,6 +1643,7 @@ const MatchListForm = ({
         onAutoLogoRequest={onAutoLogoRequest}
         onLogoAdjust={onLogoAdjust}
         onPlayerImageAdjust={onPlayerImageAdjust}
+        onPlayerImageFlipToggle={onPlayerImageFlipToggle}
         isEsportsMode={isEsportsMode}
         availableGameOptions={availableGameOptions}
         showScoreInputs={isScoreLayoutActive}
