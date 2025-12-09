@@ -15,7 +15,6 @@ const renderMatchModeLayout = ({
   miniBannerLayout,
   miniBannerImage,
   bigMatchDetails,
-  scoreInfoLabel,
 }) => {
   if (!ctx) return;
   const shouldUseBigMatchLayout =
@@ -32,7 +31,6 @@ const renderMatchModeLayout = ({
       mode: activeMode,
       activeSubMenu,
       extraBottomSpacing: miniBannerLayout?.totalHeight ?? 0,
-      scoreInfoLabel,
     });
   }
   if (miniBannerLayout && miniBannerImage) {

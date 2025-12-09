@@ -100,37 +100,6 @@ const formatMatchTimeLabel =
 const BASE_LAYER_CACHE_LIMIT = 12;
 const HEADER_LAYER_CACHE_LIMIT = 32;
 
-const SCORE_DATE_MODE_OPTIONS = [
-  { value: "today", label: "Hari Ini" },
-  { value: "yesterday", label: "Kemarin" },
-  { value: "yesterday_today", label: "Kemarin & Hari Ini" },
-];
-
-const formatScoreDateDisplay = (date) => {
-  try {
-    return date.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  } catch (error) {
-    return "";
-  }
-};
-
-const resolveScoreDateText = (mode = "today") => {
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-  if (mode === "yesterday") {
-    return formatScoreDateDisplay(yesterday);
-  }
-  if (mode === "yesterday_today") {
-    return `${formatScoreDateDisplay(yesterday)} & ${formatScoreDateDisplay(today)}`;
-  }
-  return formatScoreDateDisplay(today);
-};
-
 const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
 
 const BIG_MATCH_TITLE = "BIG MATCH";
@@ -238,7 +207,6 @@ const App = () => {
   const [leagueLogoSrc, setLeagueLogoSrc] = useState("");
   const [activeMode, setActiveMode] = useState("football");
   const [activeSubMenu, setActiveSubMenu] = useState("");
-  const [scoreDateMode, setScoreDateMode] = useState("today");
   const isTogelMode = activeMode === "togel";
   const isEsportsMode = activeMode === "esports";
   const isRaffleMode = activeMode === "raffle";
@@ -282,7 +250,6 @@ const App = () => {
     setActiveSubMenu(defaultSubMenuId);
     }, [activeModeConfig]);
     const pageBackgroundClass = activeModeConfig.pageBackgroundClass || "bg-slate-950";
-    const scoreDateLabel = useMemo(() => resolveScoreDateText(scoreDateMode), [scoreDateMode]);
     useEffect(() => {
       if (isBigMatchLayout && activeMatchCount !== 1) {
         setActiveMatchCount(1);
@@ -865,14 +832,17 @@ const App = () => {
         effectiveTitle || "",
         shouldSkipHeader ? "skip" : "show",
         shouldUseRaffleHeaderLogo ? "raffle-header" : "standard-header",
+        isBigMatchLayoutActive ? effectiveLeagueLogoSrc || "league-none" : "league-none",
       ].join("|");
       let matchesStartY = 0;
+      let headerBottom = 0;
       let headerLayerApplied = false;
       const cachedHeaderLayer = headerLayerCache.get(headerLayerCacheKey);
       if (cachedHeaderLayer) {
         try {
           ctx.putImageData(cachedHeaderLayer.imageData, 0, 0);
           matchesStartY = cachedHeaderLayer.matchesStartY;
+          headerBottom = matchesStartY - (shouldSkipHeader ? 12 : 28);
           headerLayerApplied = true;
         } catch (error) {
           console.warn("Gagal menerapkan cache header layer:", error);
@@ -938,10 +908,12 @@ const App = () => {
         }
 
         const brandBottom = drawBrandLogo(ctx, brandLogoImage, brandPalette);
-        const headerBottom = shouldSkipHeader
+        headerBottom = shouldSkipHeader
           ? brandBottom
           : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette, {
               headerLogoImage: shouldUseRaffleHeaderLogo ? raffleHeaderLogoImage : null,
+              leftLogoImage: isBigMatchLayoutActive ? leagueLogoImage : null,
+              showLeagueLogoSlot: isBigMatchLayoutActive,
             });
         matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
         try {
@@ -992,7 +964,6 @@ const App = () => {
               eventLabel: raffleEventLabel || "",
             }
           : null,
-        scoreInfoLabel: isScoreModeActive ? `Pertandingan • ${scoreDateLabel}` : "",
       };
 
       const layoutConfig =
@@ -1038,7 +1009,6 @@ const App = () => {
     shouldRenderMatches,
     activeSubMenu,
     isScoreModeActive,
-    scoreDateLabel,
     isBigMatchLayout,
     isRaffleMode,
     raffleWinners,
@@ -1384,9 +1354,6 @@ const App = () => {
               backgroundSrc={backgroundSrc}
               footerSrc={footerSrc}
               activeSubMenu={activeSubMenu}
-              scoreDateModeOptions={SCORE_DATE_MODE_OPTIONS}
-              scoreDateMode={scoreDateMode}
-              onScoreDateModeChange={setScoreDateMode}
               matchCount={activeMatchCount}
               onMatchCountChange={handleMatchCountChange}
               matchCountOptions={MATCH_COUNT_OPTIONS}

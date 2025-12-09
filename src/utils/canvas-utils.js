@@ -322,6 +322,102 @@ const drawImageCover = (ctx, image, x, y, width, height, options = {}) => {
   ctx.drawImage(image, renderX, renderY, drawWidth, drawHeight);
 };
 
+const drawPlayerPortraitCard = (
+  ctx,
+  image,
+  {
+    x = 0,
+    y = 0,
+    width,
+    height,
+    palette = DEFAULT_BRAND_PALETTE,
+    label = "",
+    adjustments = {},
+    align = "left",
+  } = {}
+) => {
+  if (!width || !height) {
+    return;
+  }
+  const radius = Math.min(width, height) * 0.16;
+  const shadowBlur = Math.max(18, width * 0.15);
+  const shadowOffsetY = Math.max(8, height * 0.05);
+  const gradientStart = ensureSubduedGradientColor(
+    palette?.headerStart,
+    DEFAULT_BRAND_PALETTE.headerStart,
+    0.35
+  );
+  const gradientEnd = ensureSubduedGradientColor(
+    palette?.footerEnd,
+    DEFAULT_BRAND_PALETTE.footerEnd,
+    0.35
+  );
+
+  ctx.save();
+  ctx.shadowColor = "rgba(15, 23, 42, 0.55)";
+  ctx.shadowBlur = shadowBlur;
+  ctx.shadowOffsetY = shadowOffsetY;
+  drawRoundedRectPath(ctx, x, y, width, height, radius);
+  ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  drawRoundedRectPath(ctx, x, y, width, height, radius);
+  ctx.clip();
+  if (image) {
+    drawImageCover(ctx, image, x, y, width, height, {
+      scale: clamp(adjustments.scale ?? 1, 0.6, 1.6),
+      offsetX: clamp(adjustments.offsetX ?? 0, -1.1, 1.1),
+      offsetY: clamp(adjustments.offsetY ?? 0, -1.1, 1.1),
+      flipHorizontal: Boolean(adjustments.flip),
+    });
+  } else {
+    const placeholderGradient = ctx.createLinearGradient(x, y, x + width, y + height);
+    placeholderGradient.addColorStop(0, "#111827");
+    placeholderGradient.addColorStop(1, "#1f2937");
+    ctx.fillStyle = placeholderGradient;
+    ctx.fillRect(x, y, width, height);
+  }
+  const overlayGradient = ctx.createLinearGradient(x, y + height * 0.45, x, y + height);
+  overlayGradient.addColorStop(0, "rgba(15, 23, 42, 0)");
+  overlayGradient.addColorStop(0.55, "rgba(15, 23, 42, 0.45)");
+  overlayGradient.addColorStop(1, "rgba(15, 23, 42, 0.9)");
+  ctx.fillStyle = overlayGradient;
+  ctx.fillRect(x, y, width, height);
+  ctx.restore();
+
+  const safeLabel = typeof label === "string" ? label.trim() : "";
+  if (safeLabel) {
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    const fontSize = Math.round(Math.min(40, width * 0.16));
+    ctx.font = `800 ${fontSize}px "Poppins", sans-serif`;
+    ctx.fillStyle = "#f8fafc";
+    ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 4;
+    ctx.fillText(safeLabel.toUpperCase(), x + width / 2, y + height - 18);
+    ctx.restore();
+  }
+
+  ctx.save();
+  drawRoundedRectPath(ctx, x, y, width, height, radius);
+  const borderGradient = ctx.createLinearGradient(
+    align === "right" ? x + width : x,
+    y,
+    align === "right" ? x : x + width,
+    y + height
+  );
+  borderGradient.addColorStop(0, gradientStart);
+  borderGradient.addColorStop(1, gradientEnd);
+  ctx.strokeStyle = borderGradient;
+  ctx.lineWidth = Math.max(3, width * 0.015);
+  ctx.stroke();
+  ctx.restore();
+};
+
 const drawVsBadge = (ctx, centerX, centerY, radius, detailScale = 1) => {
   const r = Math.max(radius, 32);
   const strokeWidth = Math.max(2, 3 * detailScale);
@@ -559,7 +655,9 @@ const drawHeader = (
   ctx.fillRect(0, headerY, ctx.canvas.width, headerHeight);
 
   const headerLogoImage = options?.headerLogoImage || null;
-  if (headerLogoImage) {
+  const leftLogoImage = options?.leftLogoImage || null;
+  const showLeagueLogoSlot = Boolean(options?.showLeagueLogoSlot);
+  if (headerLogoImage && !leftLogoImage) {
     const paddingX = 80;
     const paddingY = 12;
     const maxWidth = Math.max(120, ctx.canvas.width - paddingX * 2);
@@ -608,6 +706,48 @@ const drawHeader = (
     ctx.restore();
   }
 
+  const shouldRenderLeagueSlot = showLeagueLogoSlot || Boolean(leftLogoImage);
+
+  if (shouldRenderLeagueSlot) {
+    const slotWidth = 280;
+    const slotHeight = 170;
+    const slotRadius = 16;
+    const slotX = Math.max(19, ctx.canvas.width * 0.015);
+    const slotY = Math.max(20, headerY - slotHeight - 20);
+
+    if (leftLogoImage) {
+      ctx.save();
+      drawRoundedRectPath(ctx, slotX, slotY, slotWidth, slotHeight, slotRadius);
+      ctx.clip();
+
+      const naturalWidth = Math.max(
+        1,
+        leftLogoImage.naturalWidth || leftLogoImage.width || slotWidth
+      );
+      const naturalHeight = Math.max(
+        1,
+        leftLogoImage.naturalHeight || leftLogoImage.height || slotHeight
+      );
+      const containScale = Math.min(slotWidth / naturalWidth, slotHeight / naturalHeight, 1);
+      const renderWidth = naturalWidth * containScale;
+      const renderHeight = naturalHeight * containScale;
+      const renderX = slotX + (slotWidth - renderWidth) / 2;
+      const renderY = slotY + (slotHeight - renderHeight) / 2;
+      ctx.drawImage(leftLogoImage, renderX, renderY, renderWidth, renderHeight);
+
+      ctx.restore();
+    } else if (showLeagueLogoSlot) {
+      ctx.save();
+      drawRoundedRectPath(ctx, slotX, slotY, slotWidth, slotHeight, slotRadius);
+      ctx.fillStyle = "rgba(15, 23, 42, 0.35)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
   ctx.restore();
   return headerY + headerHeight;
 };
@@ -632,22 +772,29 @@ const drawMatches = (
       ? headerStart
       : headerEnd;
   const extraBottomSpacing = clampMin(options?.extraBottomSpacing ?? 0, 0);
+  const customCenterLabel = options?.customCenterLabel || null;
   const FOOTER_HEIGHT = 110;
   const FOOTER_SPACING = 60 + extraBottomSpacing;
   const footerGuard = FOOTER_HEIGHT + FOOTER_SPACING;
   const bottomLimit = ctx.canvas.height - footerGuard;
-  const availableHeight = Math.max(bottomLimit - startY, 240);
-  const matchCount = Math.max(matches.length, 1);
-
   const isFootballMode = options?.mode === "football";
   const isFootballScheduleLayout =
     isFootballMode && (options?.activeSubMenu || "schedule") === "schedule";
   const isFootballScoresLayout =
     isFootballMode && options?.activeSubMenu === "scores";
+  const matchCount = Math.max(matches.length, 1);
+  const shouldApplyScorePadding =
+    isFootballScoresLayout && matchCount <= 3;
+  const layoutPaddingY = shouldApplyScorePadding
+    ? Math.max(32, ctx.canvas.height * 0.035)
+    : 0;
+  const paddedTop = startY + layoutPaddingY;
+  const paddedBottom = bottomLimit - layoutPaddingY;
+  const availableHeight = Math.max(paddedBottom - paddedTop, 240);
 
   if (isFootballScheduleLayout || isFootballScoresLayout) {
     const baseRowHeight = 118;
-    const baseRowGap = isFootballScoresLayout ? 36 : 22;
+    const baseRowGap = 22;
     const baseTotal =
       matchCount * baseRowHeight + Math.max(matchCount - 1, 0) * baseRowGap;
     const scheduleScale =
@@ -661,11 +808,24 @@ const drawMatches = (
         ? (availableHeight - layoutHeight) / 2
         : 0;
     const marginX = Math.max(56, ctx.canvas.width * 0.08);
-    const badgeScale = isFootballScoresLayout ? 1.35 : 1.5;
+    const badgeScale = 1.5;
     const baseCircleRadius = Math.max(rowHeight * 0.34, 34);
     const circleRadius = baseCircleRadius * badgeScale;
-    const barHeight = Math.max(rowHeight * 0.6, 50);
-    const textGap = Math.max(18, 28 * scheduleScale);
+    const barHeight = Math.max(
+      rowHeight * (customCenterLabel ? 0.75 : 0.6),
+      customCenterLabel ? 90 : 50
+    );
+    const textGap = customCenterLabel
+      ? Math.max(32, 40 * scheduleScale)
+      : Math.max(18, 28 * scheduleScale);
+    const topMarginSpace = Math.max((rowHeight - barHeight) / 2, 0);
+    const maxDateCapsuleHeight = Math.max(
+      14,
+      topMarginSpace + Math.min(4, topMarginSpace * 0.2)
+    );
+    const scoreDateCapsuleHeight = isFootballScoresLayout
+      ? Math.min(Math.max(20, 26 * scheduleScale), maxDateCapsuleHeight)
+      : 0;
 
     const drawTeamBadge = (image, centerX, centerY, radius, fallbackLetter) => {
       ctx.save();
@@ -704,15 +864,18 @@ const drawMatches = (
       ctx.restore();
     };
 
-    const drawTeamBlock = (label, fallback, areaX, areaWidth, centerY) => {
+    const drawTeamBlock = (label, fallback, areaX, areaWidth, centerY, { textCenterBias = 0 } = {}) => {
       if (areaWidth <= 0) return;
       const baseText = (label && label.trim()) || fallback;
       const upper = baseText.toUpperCase();
+      const maxFontSizeBase = customCenterLabel
+        ? label ? 44 : 32
+        : 28;
       const layout = layoutTeamName(ctx, upper, {
         maxWidth: areaWidth,
-        maxFontSize: Math.max(28 * scheduleScale, 16),
-        minFontSize: 12,
-        fontWeight: 700,
+        maxFontSize: Math.max(maxFontSizeBase * scheduleScale, 16),
+        minFontSize: customCenterLabel ? 18 : 12,
+        fontWeight: customCenterLabel ? 800 : 700,
         fontFamily: '"Poppins", sans-serif',
       });
       const lines =
@@ -725,70 +888,182 @@ const drawMatches = (
       ctx.fillStyle = "#0f172a";
       ctx.font = `700 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
       lines.forEach((line, idx) => {
-        ctx.fillText(line, areaX + areaWidth / 2, firstLineY + idx * lineHeight);
+        ctx.fillText(line, areaX + areaWidth / 2 + textCenterBias, firstLineY + idx * lineHeight);
       });
       ctx.restore();
     };
 
     matches.forEach((match, index) => {
       const rowTop =
-        startY + verticalOffset + index * (rowHeight + rowGap);
+        paddedTop + verticalOffset + index * (rowHeight + rowGap);
       const centerY = rowTop + rowHeight / 2;
       const leftCircleCenterX = marginX + circleRadius;
       const rightCircleCenterX = ctx.canvas.width - marginX - circleRadius;
       const barX = leftCircleCenterX;
       const barWidth = rightCircleCenterX - leftCircleCenterX;
       const barY = centerY - barHeight / 2;
-      if (isFootballScoresLayout) {
+      const targetCenterWidth = customCenterLabel
+        ? 120 * scheduleScale
+        : 200 * scheduleScale;
+      const minCenterWidth = customCenterLabel ? 100 * scheduleScale : 160 * scheduleScale;
+      const maxCenterWidth = customCenterLabel ? 140 * scheduleScale : 240 * scheduleScale;
+      const centerWidth = clamp(targetCenterWidth, minCenterWidth, maxCenterWidth);
+      const centerX = ctx.canvas.width / 2 - centerWidth / 2;
+      const baseInset = customCenterLabel ? 0.3 : 0.12;
+      const centerTopInset = Math.max(centerWidth * baseInset, 18 * scheduleScale);
+      const centerBottom = barY + barHeight;
+      const shouldRenderPlayerCards =
+        Boolean(customCenterLabel) &&
+        (match.homePlayerImage || match.awayPlayerImage);
+      if (shouldRenderPlayerCards) {
+        const baseCardHeight = rowHeight * 3.2;
+        const playerCardHeight = clamp(
+          baseCardHeight,
+          280,
+          Math.min(ctx.canvas.height * 0.58, 520)
+        );
+        const playerCardWidth = clamp(
+          playerCardHeight * 0.62,
+          220,
+          Math.min(ctx.canvas.width * 0.32, 380)
+        );
+        const desiredCardY = centerY - playerCardHeight * 0.75;
+        const minCardY = Math.max(80, paddedTop - playerCardHeight * 0.4);
+        const cardBottomGuard = FOOTER_HEIGHT + FOOTER_SPACING + 36;
+        const maxCardY = Math.max(
+          minCardY,
+          ctx.canvas.height - cardBottomGuard - playerCardHeight
+        );
+        const playerCardY = clamp(desiredCardY, minCardY, maxCardY);
+        const cardMarginX = Math.max(24, ctx.canvas.width * 0.035);
+        const homeCardX = cardMarginX;
+        const awayCardX = ctx.canvas.width - cardMarginX - playerCardWidth;
+        const homeCardY = Math.max(
+          minCardY,
+          playerCardY - Math.max(playerCardHeight * 0.55, 120)
+        );
+        if (match.homePlayerImage) {
+          drawPlayerPortraitCard(ctx, match.homePlayerImage, {
+            x: homeCardX,
+            y: homeCardY,
+            width: playerCardWidth,
+            height: playerCardHeight,
+            palette: paletteSafe,
+            label: (match.teamHome || "Tuan Rumah").toUpperCase(),
+            adjustments: {
+              scale: match.teamHomePlayerScale,
+              offsetX: match.teamHomePlayerOffsetX,
+              offsetY: match.teamHomePlayerOffsetY,
+              flip: match.teamHomePlayerFlip,
+            },
+          });
+        }
+        if (match.awayPlayerImage) {
+          drawPlayerPortraitCard(ctx, match.awayPlayerImage, {
+            x: awayCardX,
+            y: playerCardY,
+            width: playerCardWidth,
+            height: playerCardHeight,
+            palette: paletteSafe,
+            label: (match.teamAway || "Tim Tamu").toUpperCase(),
+            adjustments: {
+              scale: match.teamAwayPlayerScale,
+              offsetX: match.teamAwayPlayerOffsetX,
+              offsetY: match.teamAwayPlayerOffsetY,
+              flip: match.teamAwayPlayerFlip,
+            },
+            align: "right",
+          });
+        }
+      }
+
+      if (customCenterLabel) {
+        const pillHeight = Math.max(34, 42 * scheduleScale);
+        const pillPaddingX = Math.max(24, 32 * scheduleScale);
+        const dateLabelRaw = formatDate(match.date) || "";
+        const timeLabelRaw = match.time ? formatTime(match.time) : "";
+        const pillLabel = [dateLabelRaw.toUpperCase(), timeLabelRaw.toUpperCase()]
+          .filter(Boolean)
+          .join(" • ") || "JADWAL TBD";
+        const maxPillWidth = Math.min(ctx.canvas.width - marginX, centerWidth + 320);
+        ctx.save();
+        ctx.font = `700 ${Math.round(Math.max(20, 28 * scheduleScale))}px "Poppins", sans-serif`;
+        const textWidth = ctx.measureText(pillLabel).width;
+        const pillWidth = clamp(textWidth + pillPaddingX * 2, 220, maxPillWidth);
+        const pillX = ctx.canvas.width / 2 - pillWidth / 2;
+        const pillY = barY + barHeight + Math.max(18, 24 * scheduleScale);
+        const pillRadius = pillHeight / 2;
+        drawRoundedRectPath(ctx, pillX, pillY, pillWidth, pillHeight, pillRadius);
+        const pillGradient = ctx.createLinearGradient(pillX, pillY, pillX + pillWidth, pillY + pillHeight);
+        pillGradient.addColorStop(0, headerStart);
+        pillGradient.addColorStop(1, headerEnd);
+        ctx.fillStyle = pillGradient;
+        ctx.fill();
+        ctx.fillStyle = "#f8fafc";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(pillLabel, pillX + pillWidth / 2, pillY + pillHeight / 2 + 1);
+        ctx.restore();
+      }
+
+      if (isFootballScoresLayout && scoreDateCapsuleHeight > 0) {
         const scoreDateLabel = (formatDate(match.date) || "").toUpperCase();
         if (scoreDateLabel) {
-          const pillFontSize = Math.max(18, 20 * scheduleScale);
-          const pillHeight = Math.max(30, 36 * scheduleScale);
-          const pillPaddingX = Math.max(24, 34 * scheduleScale);
+          const dateFontSize = Math.max(18, 20 * scheduleScale);
+          const dateHeight = scoreDateCapsuleHeight;
+          const dateTopInset = Math.max(centerTopInset * 0.45, 12 * scheduleScale);
+          const bottomLeft = centerX - centerTopInset;
+          const bottomRight = centerX + centerWidth + centerTopInset;
+          const topLeft = bottomLeft + dateTopInset;
+          const topRight = bottomRight - dateTopInset;
+          const bottomY = barY + Math.max(0.5, scheduleScale * 0.6);
+          const topY = bottomY - dateHeight;
           ctx.save();
-          ctx.font = `700 ${Math.round(pillFontSize)}px "Poppins", sans-serif`;
-          const measuredWidth = ctx.measureText(scoreDateLabel).width;
-          const pillWidth = Math.min(
-            barWidth * 0.75,
-            Math.max(180, measuredWidth + pillPaddingX * 2)
-          );
-          const pillX = ctx.canvas.width / 2 - pillWidth / 2;
-          const pillY =
-            barY -
-            pillHeight -
-            Math.max(6, 10 * scheduleScale) +
-            (index === 0 ? Math.max(10, 14 * scheduleScale) : 0);
-          const pillRadius = pillHeight / 2;
           ctx.beginPath();
-          drawRoundedRectPath(ctx, pillX, pillY, pillWidth, pillHeight, pillRadius);
-          const pillGradient = ctx.createLinearGradient(
-            pillX,
-            pillY,
-            pillX + pillWidth,
-            pillY + pillHeight
+          ctx.moveTo(bottomLeft, bottomY);
+          ctx.lineTo(bottomRight, bottomY);
+          ctx.lineTo(topRight, topY);
+          ctx.lineTo(topLeft, topY);
+          ctx.closePath();
+          const dateGradient = ctx.createLinearGradient(
+            bottomLeft,
+            bottomY,
+            bottomRight,
+            topY
           );
-          pillGradient.addColorStop(
+          dateGradient.addColorStop(
             0,
-            ensureSubduedGradientColor(
-              paletteSafe?.footerEnd,
-              DEFAULT_BRAND_PALETTE.footerEnd,
-              0.4
-            )
-          );
-          pillGradient.addColorStop(
-            1,
             ensureSubduedGradientColor(
               paletteSafe?.footerStart,
               DEFAULT_BRAND_PALETTE.footerStart,
+              0.45
+            )
+          );
+          dateGradient.addColorStop(
+            0.6,
+            ensureSubduedGradientColor(
+              paletteSafe?.headerEnd,
+              DEFAULT_BRAND_PALETTE.headerEnd,
               0.35
             )
           );
-          ctx.fillStyle = pillGradient;
+          dateGradient.addColorStop(
+            1,
+            ensureSubduedGradientColor(
+              paletteSafe?.headerStart,
+              DEFAULT_BRAND_PALETTE.headerStart,
+              0.35
+            )
+          );
+          ctx.fillStyle = dateGradient;
           ctx.fill();
           ctx.fillStyle = "#f8fafc";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText(scoreDateLabel, pillX + pillWidth / 2, pillY + pillHeight / 2);
+          ctx.font = `700 ${Math.round(dateFontSize)}px "Poppins", sans-serif`;
+          const textCenterX = (topLeft + topRight) / 2;
+          const textCenterY = topY + dateHeight / 2;
+          ctx.fillText(scoreDateLabel, textCenterX, textCenterY);
           ctx.restore();
         }
       }
@@ -801,15 +1076,6 @@ const drawMatches = (
       ctx.stroke();
       ctx.restore();
 
-      const targetCenterWidth = 200 * scheduleScale;
-      const centerWidth = clamp(
-        targetCenterWidth,
-        160 * scheduleScale,
-        240 * scheduleScale
-      );
-      const centerX = ctx.canvas.width / 2 - centerWidth / 2;
-      const centerTopInset = Math.max(centerWidth * 0.12, 18 * scheduleScale);
-      const centerBottom = barY + barHeight;
       const centerGradient = ctx.createLinearGradient(
         centerX,
         barY,
@@ -854,15 +1120,21 @@ const drawMatches = (
         const numeric = Number(value);
         return Number.isFinite(numeric) ? numeric : 0;
       };
-      const dateLabel = isFootballScoresLayout
+      let dateLabel = isFootballScoresLayout
         ? `${fallbackScore(match.scoreHome)} - ${fallbackScore(match.scoreAway)}`
         : (formatDate(match.date) || "JADWAL TBD").toUpperCase();
-      const timeLabel = isFootballScoresLayout
+      let timeLabel = isFootballScoresLayout
         ? ""
         : (match.time ? formatTime(match.time) : "WAKTU TBD").toUpperCase();
+      if (customCenterLabel) {
+        dateLabel = (customCenterLabel.title || customCenterLabel.text || "VS").toUpperCase();
+        timeLabel = customCenterLabel.subtitle
+          ? customCenterLabel.subtitle.toUpperCase()
+          : "";
+      }
       const dateFont = Math.max(
         18,
-        (isFootballScoresLayout ? 28 : 24) * scheduleScale
+        (isFootballScoresLayout ? 40 : customCenterLabel ? 72 : 24) * scheduleScale
       );
       const timeFont = Math.max(
         24,
@@ -870,7 +1142,7 @@ const drawMatches = (
       );
       const centerTextX = centerX + centerWidth / 2;
       const centerBandHeight = barHeight * (isFootballScoresLayout ? 0.8 : 0.5);
-      const centerBandPadding = Math.max(8, 10 * scheduleScale);
+      const centerBandPadding = customCenterLabel ? 0 : Math.max(8, 10 * scheduleScale);
       const dateAreaHeight = centerBandHeight * (isFootballScoresLayout ? 1 : 0.45);
       const timeAreaHeight = isFootballScoresLayout
         ? 0
@@ -881,18 +1153,24 @@ const drawMatches = (
       const timeCenterY = isFootballScoresLayout
         ? null
         : barY + barHeight - centerBandPadding - timeAreaHeight / 2;
-      const gradientEndY = isFootballScoresLayout
-        ? dateCenterY + dateFont
-        : timeCenterY + timeFont;
+      const shouldHideTimeLabel = Boolean(customCenterLabel);
+      const effectiveTimeCenterY = shouldHideTimeLabel ? null : timeCenterY;
+      const dateTextCenterY = customCenterLabel
+        ? barY + barHeight / 2
+        : dateCenterY;
+      const gradientEndY = isFootballScoresLayout || shouldHideTimeLabel
+        ? dateTextCenterY + dateFont
+        : effectiveTimeCenterY + timeFont;
       const textGradient = ctx.createLinearGradient(
         centerTextX,
-        dateCenterY - dateFont,
+        dateTextCenterY - dateFont,
         centerTextX,
         gradientEndY
       );
       textGradient.addColorStop(0, "#f8fafc");
       textGradient.addColorStop(0.55, "#d1d5db");
       textGradient.addColorStop(1, "#4b5563");
+      const centerOffset = customCenterLabel ? 0 : 1;
       const drawBeveledText = (text, fontSize, centerY, fontWeight = 700) => {
         ctx.save();
         ctx.textAlign = "center";
@@ -902,7 +1180,7 @@ const drawMatches = (
         ctx.shadowBlur = 8;
         ctx.shadowOffsetY = 3;
         ctx.fillStyle = "#111827";
-        ctx.fillText(text, centerTextX, centerY + 1);
+        ctx.fillText(text, centerTextX, centerY + centerOffset);
         ctx.restore();
         ctx.save();
         ctx.textAlign = "center";
@@ -911,39 +1189,42 @@ const drawMatches = (
         ctx.fillStyle = textGradient;
         ctx.strokeStyle = "rgba(255,255,255,0.35)";
         ctx.lineWidth = Math.max(1, fontSize * 0.05);
-        ctx.fillText(text, centerTextX, centerY - 1);
-        ctx.strokeText(text, centerTextX, centerY - 1);
+        ctx.fillText(text, centerTextX, centerY - centerOffset);
+        ctx.strokeText(text, centerTextX, centerY - centerOffset);
         ctx.restore();
       };
-      drawBeveledText(dateLabel, dateFont, dateCenterY, 700);
-      if (!isFootballScoresLayout && timeLabel) {
-        drawBeveledText(timeLabel, timeFont, timeCenterY, 800);
+      drawBeveledText(dateLabel, dateFont, dateTextCenterY, customCenterLabel ? 800 : 700);
+      if (!isFootballScoresLayout && timeLabel && !shouldHideTimeLabel) {
+        drawBeveledText(timeLabel, timeFont, effectiveTimeCenterY, 800);
       }
 
-      const leftTextX = leftCircleCenterX + circleRadius + textGap;
-      const leftTextWidth = Math.max(
-        60,
-        centerX - textGap - leftTextX
-      );
-      const rightTextX = centerX + centerWidth + textGap;
-      const rightTextWidth = Math.max(
-        60,
-        rightCircleCenterX - circleRadius - textGap - rightTextX
-      );
+      const sideTextPadding = customCenterLabel ? textGap + 14 : textGap;
+      const centerGapPadding = customCenterLabel ? textGap + 18 : textGap;
+      const teamTextBias = customCenterLabel ? 18 * scheduleScale : 0;
+
+      const leftTextX = leftCircleCenterX + circleRadius + sideTextPadding;
+      const leftAreaEnd = centerX - centerGapPadding;
+      const leftTextWidth = Math.max(60, leftAreaEnd - leftTextX);
+
+      const rightTextX = centerX + centerWidth + centerGapPadding;
+      const rightAreaEnd = rightCircleCenterX - circleRadius - sideTextPadding;
+      const rightTextWidth = Math.max(60, rightAreaEnd - rightTextX);
 
       drawTeamBlock(
         match.teamHome,
         "Tuan Rumah",
         leftTextX,
         leftTextWidth,
-        centerY
+        centerY,
+        { textCenterBias: customCenterLabel ? -teamTextBias : 0 }
       );
       drawTeamBlock(
         match.teamAway,
         "Tim Tamu",
         rightTextX,
         rightTextWidth,
-        centerY
+        centerY,
+        { textCenterBias: customCenterLabel ? teamTextBias : 0 }
       );
 
       const homeBadgeLetter =
@@ -1543,234 +1824,29 @@ const drawBigMatchLayout = (
     bigMatchDetails = {},
   } = {}
 ) => {
-  const match = matchesWithImages[0];
-  if (!match) return;
-
-  const canvasWidth = ctx.canvas.width;
-  const contentPadding = Math.max(60, canvasWidth * 0.06);
-  const leagueLogoSize = Math.min(Math.max(canvasWidth * 0.12, 220), 170);
-  const leagueLogoWidth = leagueLogoSize * 1.25;
-  const leagueLogoHeight = leagueLogoSize;
-  const leagueLogoImage = bigMatchDetails?.leagueLogoImage || null;
-  const leagueLogoX = Math.max(70, contentPadding * 0.2);
-  const leagueLogoY = 32;
-
-  const drawLeagueLogo = () => {
-    if (leagueLogoImage) {
-      ctx.save();
-      drawRoundedRectPath(ctx, leagueLogoX, leagueLogoY, leagueLogoWidth, leagueLogoHeight, leagueLogoHeight * 0.2);
-      ctx.clip();
-      const imgWidth = leagueLogoImage.naturalWidth || leagueLogoImage.width || leagueLogoWidth;
-      const imgHeight = leagueLogoImage.naturalHeight || leagueLogoImage.height || leagueLogoHeight;
-      const scale = Math.min(leagueLogoWidth / imgWidth, leagueLogoHeight / imgHeight);
-      const renderWidth = imgWidth * scale;
-      const renderHeight = imgHeight * scale;
-      const renderX = leagueLogoX + (leagueLogoWidth - renderWidth) / 2;
-      const renderY = leagueLogoY + (leagueLogoHeight - renderHeight) / 2;
-      ctx.drawImage(leagueLogoImage, renderX, renderY, renderWidth, renderHeight);
-      ctx.restore();
-      return;
-    }
-    ctx.save();
-    drawRoundedRectPath(ctx, leagueLogoX, leagueLogoY, leagueLogoWidth, leagueLogoHeight, leagueLogoHeight * 0.2);
-    ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = "#e2e8f0";
-    ctx.font = `600 ${Math.round(leagueLogoHeight * 0.18)}px "Poppins", sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("LOGO LIGA", leagueLogoX + leagueLogoWidth / 2, leagueLogoY + leagueLogoHeight / 2);
-    ctx.restore();
-  };
-
-  drawLeagueLogo();
-
-  const baseSafeTop = Math.max(matchesStartY + 40, leagueLogoY + leagueLogoHeight + 30);
-  const leagueGuardTop = leagueLogoY + leagueLogoHeight + 20;
-  const maxPanelLift = 60;
-  const liftableAmount = Math.max(0, baseSafeTop - leagueGuardTop);
-  const appliedLift = Math.min(maxPanelLift, liftableAmount);
-  const safeTop = baseSafeTop - appliedLift;
-  const footerGuard = 120;
-  const maxSafeBottom = ctx.canvas.height - footerGuard;
-  const safeBottom = Math.max(safeTop + 420, Math.min(maxSafeBottom, ctx.canvas.height - 40));
-  const safeHeight = Math.max(420, safeBottom - safeTop);
-  const basePanelHeight = 500;
-  const baseBannerHeight = 95;
-  const basePillHeight = 56;
-  const baseSpacingPanelToBanner = 0;
-  const baseSpacingBannerToPill = 10;
-  const requiredHeight =
-    basePanelHeight + baseBannerHeight + basePillHeight + baseSpacingPanelToBanner + baseSpacingBannerToPill;
-  const layoutScale = Math.min(1, safeHeight / requiredHeight);
-
-  const bannerHeight = Math.max(64, baseBannerHeight * layoutScale);
-  const pillHeight = Math.max(44, basePillHeight * layoutScale);
-  const spacingPanelToBanner = baseSpacingPanelToBanner * layoutScale;
-  const spacingBannerToPill = baseSpacingBannerToPill * layoutScale;
-  const staticBlockHeight =
-    spacingPanelToBanner + bannerHeight + spacingBannerToPill + pillHeight;
-  const fallbackPanelHeight = Math.max(320, basePanelHeight * layoutScale);
-  const computedPanelHeight = safeHeight - staticBlockHeight;
-  const playerPanelHeight =
-    computedPanelHeight > 0
-      ? Math.max(320, computedPanelHeight)
-      : fallbackPanelHeight;
-
-  const panelY = safeTop;
-  const panelGap = Math.max(40, canvasWidth * 0.04);
-  const availableWidth = canvasWidth - contentPadding * 2;
-  const playerPanelWidth = (availableWidth - panelGap) / 2;
-  const leftPanelX = contentPadding;
-  const rightPanelX = canvasWidth - contentPadding - playerPanelWidth;
-  const panelRadius = 32 * layoutScale;
-
-  const drawPlayerPanel = (x, image, fallback, adjustments = {}) => {
-    ctx.save();
-    drawRoundedRectPath(ctx, x, panelY, playerPanelWidth, playerPanelHeight, panelRadius);
-    if (image) {
-      ctx.clip();
-      drawImageCover(ctx, image, x, panelY, playerPanelWidth, playerPanelHeight, adjustments);
-    } else {
-      const gradient = ctx.createLinearGradient(x, panelY, x + playerPanelWidth, panelY + playerPanelHeight);
-      gradient.addColorStop(0, "rgba(15, 23, 42, 0.3)");
-      gradient.addColorStop(1, "rgba(51, 65, 85, 0.2)");
-      ctx.fillStyle = gradient;
-      ctx.fill();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      ctx.fillStyle = "#e2e8f0";
-      ctx.font = `600 ${Math.round(playerPanelHeight * 0.08)}px "Poppins", sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(fallback, x + playerPanelWidth / 2, panelY + playerPanelHeight / 2);
-    }
-    ctx.restore();
-  };
-
-  drawPlayerPanel(leftPanelX, match.homePlayerImage, "Pemain Tuan Rumah", {
-    scale: match?.teamHomePlayerScale,
-    offsetX: match?.teamHomePlayerOffsetX,
-    offsetY: match?.teamHomePlayerOffsetY,
-    flipHorizontal: Boolean(match?.teamHomePlayerFlip),
-  });
-  drawPlayerPanel(rightPanelX, match.awayPlayerImage, "Pemain Tandang", {
-    scale: match?.teamAwayPlayerScale,
-    offsetX: match?.teamAwayPlayerOffsetX,
-    offsetY: match?.teamAwayPlayerOffsetY,
-    flipHorizontal: Boolean(match?.teamAwayPlayerFlip),
-  });
-
-  const bannerLift = Math.max(0, Math.min(playerPanelHeight * 0.3, 50));
-  const bannerY = panelY + playerPanelHeight + spacingPanelToBanner - bannerLift;
-  const bannerRadius = bannerHeight / 2;
-
-  const drawTeamBanner = (x, width, label, logoImage, align = "left") => {
-    ctx.save();
-    drawRoundedRectPath(ctx, x, bannerY, width, bannerHeight, bannerRadius);
-    const baseGradient = ctx.createLinearGradient(x, bannerY, x + width, bannerY);
-    baseGradient.addColorStop(0, "rgba(255,255,255,0.98)");
-    baseGradient.addColorStop(1, "rgba(241, 245, 249, 0.92)");
-    ctx.fillStyle = baseGradient;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(239, 68, 68, 0.8)";
-    ctx.lineWidth = 4;
-    ctx.stroke();
-    ctx.restore();
-
-    const logoSize = Math.min(90, bannerHeight * 0.92);
-    const logoMargin = Math.max(16, bannerHeight * 0.1);
-    const logoX = align === "left" ? x + logoMargin : x + width - logoSize - logoMargin;
-    const logoY = bannerY + (bannerHeight - logoSize) / 2;
-    const logoOptions =
-      align === "left"
-        ? {
-            scale: match?.teamHomeLogoScale,
-            offsetX: match?.teamHomeLogoOffsetX,
-            offsetY: match?.teamHomeLogoOffsetY,
-          }
-        : {
-            scale: match?.teamAwayLogoScale,
-            offsetX: match?.teamAwayLogoOffsetX,
-            offsetY: match?.teamAwayLogoOffsetY,
-          };
-    drawLogoTile(ctx, logoImage, logoX, logoY, logoSize, label, logoOptions);
-
-    const textAreaStart = align === "left" ? logoX + logoSize + 20 : x + 20;
-    const textAreaEnd = align === "left" ? x + width - 20 : logoX - 20;
-    const textAreaWidth = Math.max(0, textAreaEnd - textAreaStart);
-    const centerOffset = align === "left" ? -20 : 20;
-    const effectiveTextWidth = Math.max(0, textAreaWidth - Math.abs(centerOffset) * 2);
-    const textAreaCenter = textAreaStart + textAreaWidth / 2 + centerOffset;
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(textAreaStart, bannerY, textAreaWidth, bannerHeight);
-    ctx.clip();
-    ctx.fillStyle = "#0f172a";
-    const maxFontSize = Math.min(bannerHeight * 0.38, 38);
-    const minFontSize = Math.max(18, bannerHeight * 0.22);
-    const layout = layoutTeamName(ctx, (label || "Tim TBD").toUpperCase(), {
-      maxWidth: effectiveTextWidth,
-      maxFontSize,
-      minFontSize,
-      fontWeight: 800,
-      fontFamily: '"Poppins", sans-serif',
-    });
-    const lines =
-      layout.lines && layout.lines.length
-        ? layout.lines.slice(0, 2)
-        : [(label || "Tim TBD").toUpperCase()];
-    const fontSize = Math.round(layout.fontSize || maxFontSize);
-    ctx.font = `800 ${fontSize}px "Poppins", sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    const lineHeight = fontSize * (lines.length > 1 ? 1.05 : 1);
-    const firstLineY = bannerY + bannerHeight / 2 - ((lines.length - 1) * lineHeight) / 2;
-    lines.forEach((line, index) => {
-      ctx.fillText(line, textAreaCenter, firstLineY + index * lineHeight, effectiveTextWidth);
-    });
-    ctx.restore();
-  };
-
-  const bannerWidth = playerPanelWidth;
-  drawTeamBanner(leftPanelX, bannerWidth, match.teamHome, match.homeLogoImage, "left");
-  drawTeamBanner(rightPanelX, bannerWidth, match.teamAway, match.awayLogoImage, "right");
-
-  const vsCenterX = canvasWidth / 2;
-  const vsCenterY = bannerY + bannerHeight / 2;
-  drawVsBadge(ctx, vsCenterX, vsCenterY, 70, 1);
-
-  const pillTextParts = [];
-  if (bigMatchDetails?.matchDateLabel) {
-    pillTextParts.push(bigMatchDetails.matchDateLabel.toUpperCase());
+  if (!ctx || !matchesWithImages.length) {
+    return;
   }
-  if (bigMatchDetails?.matchTimeLabel) {
-    pillTextParts.push(`PUKUL : ${bigMatchDetails.matchTimeLabel.toUpperCase()} WIB`);
-  }
-  const pillText = pillTextParts.length ? pillTextParts.join("  |  ") : "TANGGAL & JAM PERTANDINGAN";
-  ctx.save();
-  ctx.font = `700 ${Math.round(pillHeight * 0.45)}px "Poppins", sans-serif`;
-  const measuredTextWidth = ctx.measureText ? ctx.measureText(pillText).width : canvasWidth * 0.4;
-  ctx.restore();
-  const pillWidth = Math.min(canvasWidth * 0.8, measuredTextWidth + 120);
-  const pillX = (canvasWidth - pillWidth) / 2;
-  const pillDrop = Math.max(bannerLift * 0.6, 30);
-  const pillY = bannerY + bannerHeight + spacingBannerToPill + pillDrop;
-  drawTogelInfoPill(ctx, {
-    x: pillX,
-    y: pillY,
-    width: pillWidth,
-    height: pillHeight,
-    text: pillText,
-    gradientStart: brandPalette?.headerStart || "#fbbf24",
-    gradientEnd: brandPalette?.headerEnd || "#f59e0b",
-    textColor: "#f8fafc",
-    fontSize: pillHeight * 0.45,
-    textShadowColor: "rgba(15, 23, 42, 0.35)",
+
+  const subtitle = bigMatchDetails?.matchDateLabel
+    ? bigMatchDetails.matchDateLabel.toUpperCase()
+    : "";
+
+  const singleMatch = [matchesWithImages[0]];
+  const canvasHeight = ctx.canvas?.height || 1080;
+  const desiredOffset = Math.max(canvasHeight * 0.38, 320);
+  const maxAllowedStart = canvasHeight - 360;
+  const adjustedStartY = Math.min(
+    maxAllowedStart,
+    Math.max(matchesStartY, matchesStartY + desiredOffset)
+  );
+  drawMatches(ctx, singleMatch, adjustedStartY, brandPalette, {
+    mode: "football",
+    activeSubMenu: "schedule",
+    customCenterLabel: {
+      title: "VS",
+      subtitle,
+    },
   });
 };
 

@@ -60,12 +60,6 @@ const AVAILABLE_ESPORT_GAME_OPTIONS =
     ? AppData.ESPORT_GAME_OPTIONS
     : DEFAULT_ESPORT_GAME_OPTIONS;
 
-const DEFAULT_SCORE_DATE_OPTIONS = [
-  { value: "today", label: "Hari Ini" },
-  { value: "yesterday", label: "Kemarin" },
-  { value: "yesterday_today", label: "Kemarin & Hari Ini" },
-];
-
 const getTogelDrawTimeConfig = (pool, variant) =>
   typeof resolveTogelDrawTimeConfigImpl === "function"
     ? resolveTogelDrawTimeConfigImpl(pool, variant)
@@ -1454,9 +1448,6 @@ const MatchListForm = ({
   backgroundSrc,
   footerSrc,
   activeSubMenu,
-  scoreDateMode = "today",
-  onScoreDateModeChange,
-  scoreDateModeOptions = DEFAULT_SCORE_DATE_OPTIONS,
   matchCount,
   onMatchCountChange,
   matchCountOptions,
@@ -1572,10 +1563,6 @@ const MatchListForm = ({
     typeof showTitleFieldOverride === "boolean"
       ? showTitleFieldOverride
       : !isTogelMode && resolvedShowTitle;
-  const scoreDateOptions = Array.isArray(scoreDateModeOptions) && scoreDateModeOptions.length
-    ? scoreDateModeOptions
-    : DEFAULT_SCORE_DATE_OPTIONS;
-
   return (
     <form className="grid gap-6">
       <BannerMetadataSection
@@ -1602,35 +1589,6 @@ const MatchListForm = ({
           fetchError={raffleFetchError}
           raffleInfo={raffleInfo}
         />
-      )}
-      {isScoreLayoutActive && (
-        <section className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-sm text-slate-200">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-base font-semibold text-slate-100">Label Pertandingan</h3>
-            <p className="text-xs text-slate-400">
-              Tampilkan tanggal yang cocok untuk kapsul &quot;Pertandingan&quot; di atas daftar skor.
-            </p>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {scoreDateOptions.map((option) => {
-              const isActive = option.value === scoreDateMode;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => onScoreDateModeChange?.(option.value)}
-                  className={`rounded-full px-4 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/30 ${
-                    isActive
-                      ? "bg-brand-yellow text-slate-900 shadow"
-                      : "border border-slate-700 bg-slate-900/40 text-slate-300 hover:border-brand-yellow/60 hover:text-white"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
-        </section>
       )}
       <MatchesSection
         shouldShowMatches={shouldShowMatches}
