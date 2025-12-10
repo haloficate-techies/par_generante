@@ -25,6 +25,26 @@ const hexToRgb = hexToRgbHelper;
 const rgbToHex = rgbToHexHelper;
 const drawLogoTile = drawLogoTileHelper;
 
+const BIG_MATCH_DATE_FORMATTER = new Intl.DateTimeFormat("id-ID", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+});
+
+const formatBigMatchDateLabel = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const parsed = new Date(`${dateString}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) {
+      return dateString;
+    }
+    return BIG_MATCH_DATE_FORMATTER.format(parsed);
+  } catch (error) {
+    return dateString;
+  }
+};
+
 const blendHexColors = (sourceHex, targetHex, ratio = 0.4) => {
   if (!sourceHex || !targetHex) {
     return sourceHex || targetHex || "#0f172a";
@@ -334,12 +354,13 @@ const drawPlayerPortraitCard = (
     label = "",
     adjustments = {},
     align = "left",
+    showPlaceholderLabel = true,
   } = {}
 ) => {
   if (!width || !height) {
     return;
   }
-  const radius = Math.min(width, height) * 0.16;
+  const radius = 0;
   const shadowBlur = Math.max(18, width * 0.15);
   const shadowOffsetY = Math.max(8, height * 0.05);
   const gradientStart = ensureSubduedGradientColor(
@@ -388,34 +409,47 @@ const drawPlayerPortraitCard = (
   ctx.restore();
 
   const safeLabel = typeof label === "string" ? label.trim() : "";
-  if (safeLabel) {
+  if (showPlaceholderLabel) {
+    const placeholderLabel =
+      align === "right"
+        ? "FOTO PEMAIN\nTIM TAMU"
+        : "FOTO PEMAIN\nTIM TUAN RUMAH";
     ctx.save();
     ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    const fontSize = Math.round(Math.min(40, width * 0.16));
+    ctx.textBaseline = "middle";
+    const fontSize = Math.round(Math.min(42, width * 0.17));
     ctx.font = `800 ${fontSize}px "Poppins", sans-serif`;
     ctx.fillStyle = "#f8fafc";
     ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
-    ctx.shadowBlur = 14;
+    ctx.shadowBlur = 18;
     ctx.shadowOffsetY = 4;
-    ctx.fillText(safeLabel.toUpperCase(), x + width / 2, y + height - 18);
+    const finalLabel = (safeLabel || placeholderLabel).toUpperCase();
+    const lines = finalLabel.split(/\n+/);
+    const lineHeight = fontSize * 1.1;
+    const totalHeight = lineHeight * lines.length;
+    const startY = y + height / 2 - (totalHeight - lineHeight) / 2;
+    lines.forEach((line, index) => {
+      ctx.fillText(line, x + width / 2, startY + index * lineHeight);
+    });
     ctx.restore();
   }
 
-  ctx.save();
-  drawRoundedRectPath(ctx, x, y, width, height, radius);
-  const borderGradient = ctx.createLinearGradient(
-    align === "right" ? x + width : x,
-    y,
-    align === "right" ? x : x + width,
-    y + height
-  );
-  borderGradient.addColorStop(0, gradientStart);
-  borderGradient.addColorStop(1, gradientEnd);
-  ctx.strokeStyle = borderGradient;
-  ctx.lineWidth = Math.max(3, width * 0.015);
-  ctx.stroke();
-  ctx.restore();
+  if (!image) {
+    ctx.save();
+    drawRoundedRectPath(ctx, x, y, width, height, radius);
+    const borderGradient = ctx.createLinearGradient(
+      align === "right" ? x + width : x,
+      y,
+      align === "right" ? x : x + width,
+      y + height
+    );
+    borderGradient.addColorStop(0, gradientStart);
+    borderGradient.addColorStop(1, gradientEnd);
+    ctx.strokeStyle = borderGradient;
+    ctx.lineWidth = Math.max(3, width * 0.015);
+    ctx.stroke();
+    ctx.restore();
+  }
 };
 
 const drawVsBadge = (ctx, centerX, centerY, radius, detailScale = 1) => {
@@ -744,6 +778,12 @@ const drawHeader = (
       ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
       ctx.lineWidth = 2;
       ctx.stroke();
+      ctx.fillStyle = "rgba(248, 250, 252, 0.9)";
+      ctx.font = `700 ${Math.round(slotHeight * 0.16)}px "Poppins", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      const placeholderText = "LOGO LIGA";
+      ctx.fillText(placeholderText, slotX + slotWidth / 2, slotY + slotHeight / 2);
       ctx.restore();
     }
   }
@@ -773,6 +813,7 @@ const drawMatches = (
       : headerEnd;
   const extraBottomSpacing = clampMin(options?.extraBottomSpacing ?? 0, 0);
   const customCenterLabel = options?.customCenterLabel || null;
+  const brandDisplayName = options?.brandDisplayName || "";
   const FOOTER_HEIGHT = 110;
   const FOOTER_SPACING = 60 + extraBottomSpacing;
   const footerGuard = FOOTER_HEIGHT + FOOTER_SPACING;
@@ -912,9 +953,7 @@ const drawMatches = (
       const baseInset = customCenterLabel ? 0.3 : 0.12;
       const centerTopInset = Math.max(centerWidth * baseInset, 18 * scheduleScale);
       const centerBottom = barY + barHeight;
-      const shouldRenderPlayerCards =
-        Boolean(customCenterLabel) &&
-        (match.homePlayerImage || match.awayPlayerImage);
+      const shouldRenderPlayerCards = Boolean(customCenterLabel);
       if (shouldRenderPlayerCards) {
         const baseCardHeight = rowHeight * 3.2;
         const playerCardHeight = clamp(
@@ -922,10 +961,22 @@ const drawMatches = (
           280,
           Math.min(ctx.canvas.height * 0.58, 520)
         );
-        const playerCardWidth = clamp(
+        const homePlayerCardHeight = Math.min(playerCardHeight + 120, ctx.canvas.height * 0.7);
+        const awayPlayerCardHeight = Math.min(playerCardHeight + 120, ctx.canvas.height * 0.7);
+        const basePlayerCardWidth = clamp(
           playerCardHeight * 0.62,
           220,
           Math.min(ctx.canvas.width * 0.32, 380)
+        );
+        const homePlayerCardWidth = clamp(
+          basePlayerCardWidth * 1.75,
+          basePlayerCardWidth,
+          Math.min(ctx.canvas.width * 0.64, basePlayerCardWidth + 420)
+        );
+        const awayPlayerCardWidth = clamp(
+          basePlayerCardWidth * 1.75,
+          basePlayerCardWidth,
+          Math.min(ctx.canvas.width * 0.64, basePlayerCardWidth + 420)
         );
         const desiredCardY = centerY - playerCardHeight * 0.75;
         const minCardY = Math.max(80, paddedTop - playerCardHeight * 0.4);
@@ -936,73 +987,128 @@ const drawMatches = (
         );
         const playerCardY = clamp(desiredCardY, minCardY, maxCardY);
         const cardMarginX = Math.max(24, ctx.canvas.width * 0.035);
-        const homeCardX = cardMarginX;
-        const awayCardX = ctx.canvas.width - cardMarginX - playerCardWidth;
+        const homeCardHorizontalOffset = Math.max(homePlayerCardWidth * 0.18, 70);
+        const homeCardX = cardMarginX + homeCardHorizontalOffset;
+        const awayCardHorizontalOffset = Math.max(awayPlayerCardWidth * 0.18, 70);
+        const awayCardX =
+          ctx.canvas.width - cardMarginX - awayPlayerCardWidth - awayCardHorizontalOffset;
+        const homeCardLift = Math.max(playerCardHeight * 0.2, 80);
+        const additionalHomeOffset = Math.max(playerCardHeight * 0.25, 110);
+        const finalHomeLift = Math.max(playerCardHeight * 0.15, 80);
+        const homeMinCardY = Math.max(20, paddedTop - homePlayerCardHeight * 0.8);
         const homeCardY = Math.max(
-          minCardY,
-          playerCardY - Math.max(playerCardHeight * 0.55, 120)
+          homeMinCardY,
+          playerCardY -
+            Math.max(playerCardHeight * 0.55, 120) -
+            homeCardLift -
+            additionalHomeOffset -
+            finalHomeLift
         );
-        if (match.homePlayerImage) {
-          drawPlayerPortraitCard(ctx, match.homePlayerImage, {
-            x: homeCardX,
-            y: homeCardY,
-            width: playerCardWidth,
-            height: playerCardHeight,
-            palette: paletteSafe,
-            label: (match.teamHome || "Tuan Rumah").toUpperCase(),
-            adjustments: {
-              scale: match.teamHomePlayerScale,
-              offsetX: match.teamHomePlayerOffsetX,
-              offsetY: match.teamHomePlayerOffsetY,
-              flip: match.teamHomePlayerFlip,
-            },
-          });
-        }
-        if (match.awayPlayerImage) {
-          drawPlayerPortraitCard(ctx, match.awayPlayerImage, {
-            x: awayCardX,
-            y: playerCardY,
-            width: playerCardWidth,
-            height: playerCardHeight,
-            palette: paletteSafe,
-            label: (match.teamAway || "Tim Tamu").toUpperCase(),
-            adjustments: {
-              scale: match.teamAwayPlayerScale,
-              offsetX: match.teamAwayPlayerOffsetX,
-              offsetY: match.teamAwayPlayerOffsetY,
-              flip: match.teamAwayPlayerFlip,
-            },
-            align: "right",
-          });
-        }
+        drawPlayerPortraitCard(ctx, match.homePlayerImage, {
+          x: homeCardX,
+          y: homeCardY,
+          width: homePlayerCardWidth,
+          height: homePlayerCardHeight,
+          palette: paletteSafe,
+          label: "",
+          adjustments: {
+            scale: match.teamHomePlayerScale,
+            offsetX: match.teamHomePlayerOffsetX,
+            offsetY: match.teamHomePlayerOffsetY,
+            flip: match.teamHomePlayerFlip,
+          },
+          showPlaceholderLabel: !match.homePlayerImage,
+        });
+        const awayCardDrop = Math.max(awayPlayerCardHeight * 0.2, 80);
+        const additionalAwayOffset = Math.max(awayPlayerCardHeight * 0.25, 110);
+        const finalAwayDrop = Math.max(awayPlayerCardHeight * 0.15, 80);
+        const awayMinCardY = Math.max(20, paddedTop - awayPlayerCardHeight * 0.8);
+        const awayCardY = Math.max(
+          awayMinCardY,
+          playerCardY -
+            Math.max(playerCardHeight * 0.55, 120) -
+            awayCardDrop -
+            additionalAwayOffset -
+            finalAwayDrop
+        );
+        drawPlayerPortraitCard(ctx, match.awayPlayerImage, {
+          x: awayCardX,
+          y: awayCardY,
+          width: awayPlayerCardWidth,
+          height: awayPlayerCardHeight,
+          palette: paletteSafe,
+          label: "",
+          adjustments: {
+            scale: match.teamAwayPlayerScale,
+            offsetX: match.teamAwayPlayerOffsetX,
+            offsetY: match.teamAwayPlayerOffsetY,
+            flip: match.teamAwayPlayerFlip,
+          },
+          align: "right",
+          showPlaceholderLabel: !match.awayPlayerImage,
+        });
       }
 
       if (customCenterLabel) {
         const pillHeight = Math.max(34, 42 * scheduleScale);
         const pillPaddingX = Math.max(24, 32 * scheduleScale);
-        const dateLabelRaw = formatDate(match.date) || "";
+        const dateLabelRaw = formatBigMatchDateLabel(match.date) || "";
         const timeLabelRaw = match.time ? formatTime(match.time) : "";
         const pillLabel = [dateLabelRaw.toUpperCase(), timeLabelRaw.toUpperCase()]
           .filter(Boolean)
           .join(" • ") || "JADWAL TBD";
-        const maxPillWidth = Math.min(ctx.canvas.width - marginX, centerWidth + 320);
+        const maxPillWidth = Math.min(ctx.canvas.width - marginX, centerWidth + 480);
         ctx.save();
         ctx.font = `700 ${Math.round(Math.max(20, 28 * scheduleScale))}px "Poppins", sans-serif`;
         const textWidth = ctx.measureText(pillLabel).width;
-        const pillWidth = clamp(textWidth + pillPaddingX * 2, 220, maxPillWidth);
+        const basePillWidth = clamp(textWidth + pillPaddingX * 2, 380, maxPillWidth);
+        const trapezoidInset = Math.max(pillHeight * 0.13, 20);
+        const pillWidth = Math.min(maxPillWidth, basePillWidth + trapezoidInset * 3);
         const pillX = ctx.canvas.width / 2 - pillWidth / 2;
-        const pillY = barY + barHeight + Math.max(18, 24 * scheduleScale);
-        const pillRadius = pillHeight / 2;
-        drawRoundedRectPath(ctx, pillX, pillY, pillWidth, pillHeight, pillRadius);
+        const pillY = barY - pillHeight;
+        ctx.beginPath();
+        ctx.moveTo(pillX, pillY + pillHeight);
+        ctx.lineTo(pillX + trapezoidInset, pillY);
+        ctx.lineTo(pillX + pillWidth - trapezoidInset, pillY);
+        ctx.lineTo(pillX + pillWidth, pillY + pillHeight);
+        ctx.closePath();
         const pillGradient = ctx.createLinearGradient(pillX, pillY, pillX + pillWidth, pillY + pillHeight);
-        pillGradient.addColorStop(0, headerStart);
-        pillGradient.addColorStop(1, headerEnd);
+        const trapezoidGradientStart = ensureSubduedGradientColor(
+          headerStart,
+          DEFAULT_BRAND_PALETTE.headerStart,
+          0.2
+        );
+        const trapezoidGradientEnd = ensureSubduedGradientColor(
+          headerEnd,
+          DEFAULT_BRAND_PALETTE.headerEnd,
+          0.2
+        );
+        pillGradient.addColorStop(0, trapezoidGradientStart);
+        pillGradient.addColorStop(1, trapezoidGradientEnd);
         ctx.fillStyle = pillGradient;
         ctx.fill();
-        ctx.fillStyle = "#f8fafc";
+        const textCenterX = pillX + pillWidth / 2;
+        const textCenterY = pillY + pillHeight / 2 + 1;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(pillLabel, pillX + pillWidth / 2, pillY + pillHeight / 2 + 1);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.35)";
+        ctx.fillText(pillLabel, textCenterX, textCenterY + 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(pillLabel, textCenterX, textCenterY);
+        ctx.restore();
+
+        const brandNameForCta = (brandDisplayName || "GOLBOS").toUpperCase();
+        const ctaText = `DUKUNG TIM JAGOANMU DENGAN PASANG TARUHAN DI ${brandNameForCta}`;
+        ctx.save();
+        const ctaFontSize = Math.max(20, 30 * scheduleScale);
+        ctx.font = `800 ${Math.round(ctaFontSize)}px "Poppins", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        const ctaY = barY + barHeight + Math.max(24, 36 * scheduleScale);
+        ctx.fillStyle = "rgba(15, 23, 42, 0.4)";
+        ctx.fillText(ctaText, ctx.canvas.width / 2, ctaY + 2);
+        ctx.fillStyle = "#f8fafc";
+        ctx.fillText(ctaText, ctx.canvas.width / 2, ctaY);
         ctx.restore();
       }
 
@@ -1822,6 +1928,7 @@ const drawBigMatchLayout = (
     matchesStartY = 0,
     brandPalette = DEFAULT_BRAND_PALETTE,
     bigMatchDetails = {},
+    brandDisplayName = "",
   } = {}
 ) => {
   if (!ctx || !matchesWithImages.length) {
@@ -1843,6 +1950,7 @@ const drawBigMatchLayout = (
   drawMatches(ctx, singleMatch, adjustedStartY, brandPalette, {
     mode: "football",
     activeSubMenu: "schedule",
+    brandDisplayName,
     customCenterLabel: {
       title: "VS",
       subtitle,

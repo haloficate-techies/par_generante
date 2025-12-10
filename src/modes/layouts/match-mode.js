@@ -10,6 +10,7 @@ const renderMatchModeLayout = ({
   matchesWithImages = [],
   matchesStartY = 0,
   brandPalette,
+  brandDisplayName,
   activeMode,
   activeSubMenu,
   miniBannerLayout,
@@ -25,11 +26,13 @@ const renderMatchModeLayout = ({
       matchesStartY,
       brandPalette,
       bigMatchDetails,
+      brandDisplayName,
     });
   } else {
     drawMatches(ctx, matchesWithImages, matchesStartY, brandPalette, {
       mode: activeMode,
       activeSubMenu,
+      brandDisplayName,
       extraBottomSpacing: miniBannerLayout?.totalHeight ?? 0,
     });
   }

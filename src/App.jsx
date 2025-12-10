@@ -233,6 +233,12 @@ const App = () => {
     allowCustomTitle && !isTogelMode && !isRaffleMode && !isScoreModeActive && !isBigMatchLayout;
   const shouldRenderMatches =
     typeof modeFeatures.showMatches === "boolean" ? modeFeatures.showMatches : !isTogelMode;
+  const selectedBrandOption = useMemo(
+    () =>
+      AVAILABLE_BRAND_LOGOS.find((option) => option && option.value === brandLogoSrc) || null,
+    [AVAILABLE_BRAND_LOGOS, brandLogoSrc]
+  );
+  const selectedBrandName = selectedBrandOption?.brand || selectedBrandOption?.label || "";
   useEffect(() => {
     if (!activeModeConfig) {
       setActiveSubMenu("");
@@ -778,6 +784,13 @@ const App = () => {
       const isBigMatchLayoutActive = activeMode === "football" && layoutSubMenu === "big_match";
       const isScoreLayoutActive = activeMode === "football" && layoutSubMenu === "scores";
       const poolLabel = resolveTogelPoolLabel(effectiveTogelPool);
+      const resolveBrandDisplayName = (logoValue) => {
+        if (!logoValue) return "";
+        const matched = AVAILABLE_BRAND_LOGOS.find((option) => option && option.value === logoValue);
+        return matched?.brand || matched?.label || "";
+      };
+      const effectiveBrandDisplayName =
+        resolveBrandDisplayName(effectiveBrandLogoSrc) || selectedBrandName || "";
       const selectedLeagueLogoOption =
         isBigMatchLayoutActive && LEAGUE_LOGO_OPTIONS.length
           ? LEAGUE_LOGO_OPTIONS.find((option) => option.value === effectiveLeagueLogoSrc) || null
@@ -937,6 +950,7 @@ const App = () => {
         matchesWithImages,
         matchesStartY,
         brandPalette,
+        brandDisplayName: effectiveBrandDisplayName,
         miniBannerLayout,
         miniBannerImage,
         streamingInfo: streamingInfoForRender,
@@ -988,6 +1002,7 @@ const App = () => {
     }
   }, [
     activeMatchCount,
+    AVAILABLE_BRAND_LOGOS,
     backgroundSrc,
     footerSrc,
     brandLogoSrc,
@@ -1014,6 +1029,7 @@ const App = () => {
     raffleWinners,
     raffleInfo,
     raffleEventLabel,
+    selectedBrandName,
   ]);
 
   const scheduleRender = useCallback(() => {
