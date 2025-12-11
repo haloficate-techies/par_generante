@@ -1,5 +1,8 @@
 const backgroundRemovalConfig = {
+  // Endpoint utama (misalnya untuk foto pemain)
   endpoint: (import.meta.env.VITE_REMOVE_BG_ENDPOINT || "").trim(),
+  // Endpoint opsional khusus logo; fallback ke endpoint utama bila kosong
+  logoEndpoint: (import.meta.env.VITE_REMOVE_LOGO_BG_ENDPOINT || "").trim(),
   apiKey: (import.meta.env.VITE_REMOVE_BG_TOKEN || "").trim(),
 };
 
@@ -12,7 +15,7 @@ const blobToDataUrl = (blob) =>
   });
 
 export const isBackgroundRemovalConfigured = () =>
-  Boolean(backgroundRemovalConfig.endpoint);
+  Boolean(backgroundRemovalConfig.endpoint || backgroundRemovalConfig.logoEndpoint);
 
 const extractImageFromPayload = (payload) => {
   if (!payload || typeof payload !== "object") {
@@ -28,14 +31,7 @@ const extractImageFromPayload = (payload) => {
   );
 };
 
-export const removePlayerBackground = async (imageDataUrl, { signal } = {}) => {
-  if (!isBackgroundRemovalConfigured()) {
-    throw new Error("Background removal endpoint belum dikonfigurasi.");
-  }
-  if (!imageDataUrl) {
-    throw new Error("Tidak ada gambar yang bisa diproses.");
-  }
-
+const callBackgroundRemoval = async (endpoint, imageDataUrl, { signal } = {}) => {
   const headers = {
     "Content-Type": "application/json",
   };
@@ -43,7 +39,7 @@ export const removePlayerBackground = async (imageDataUrl, { signal } = {}) => {
     headers.Authorization = `Bearer ${backgroundRemovalConfig.apiKey}`;
   }
 
-  const response = await fetch(backgroundRemovalConfig.endpoint, {
+  const response = await fetch(endpoint, {
     method: "POST",
     headers,
     body: JSON.stringify({ image: imageDataUrl }),
@@ -88,6 +84,30 @@ export const removePlayerBackground = async (imageDataUrl, { signal } = {}) => {
     throw new Error("Layanan tidak mengembalikan data gambar.");
   }
   return blobToDataUrl(blob);
+};
+
+export const removePlayerBackground = async (imageDataUrl, { signal } = {}) => {
+  const endpoint = backgroundRemovalConfig.endpoint || backgroundRemovalConfig.logoEndpoint;
+  if (!endpoint) {
+    throw new Error("Background removal endpoint belum dikonfigurasi.");
+  }
+  if (!imageDataUrl) {
+    throw new Error("Tidak ada gambar yang bisa diproses.");
+  }
+
+  return callBackgroundRemoval(endpoint, imageDataUrl, { signal });
+};
+
+export const removeLogoBackground = async (imageDataUrl, { signal } = {}) => {
+  const endpoint = backgroundRemovalConfig.logoEndpoint || backgroundRemovalConfig.endpoint;
+  if (!endpoint) {
+    throw new Error("Background removal endpoint logo belum dikonfigurasi.");
+  }
+  if (!imageDataUrl) {
+    throw new Error("Tidak ada gambar logo yang bisa diproses.");
+  }
+
+  return callBackgroundRemoval(endpoint, imageDataUrl, { signal });
 };
 
 export const getBackgroundRemovalConfig = () => ({ ...backgroundRemovalConfig });

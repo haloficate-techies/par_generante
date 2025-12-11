@@ -15,6 +15,7 @@ import MatchListForm from "./components/MatchListForm";
 import { CanvasUtils } from "./utils/canvas-utils";
 import {
   removePlayerBackground,
+  removeLogoBackground,
   isBackgroundRemovalConfigured,
 } from "./services/background-removal";
 import "./app/mode-layout-registry";
@@ -197,6 +198,7 @@ const mapRaffleWinners = (prizes = []) =>
   });
 
 const buildPlayerSlotKey = (index, side) => `${index}-${side}`;
+const buildLogoSlotKey = (index, side) => `${index}-${side}-logo`;
 
 const App = () => {
   const canvasRef = useRef(null);
@@ -284,6 +286,7 @@ const App = () => {
   const [isFetchingRaffle, setIsFetchingRaffle] = useState(false);
   const [raffleFetchError, setRaffleFetchError] = useState("");
   const [playerBgRemovalStatus, setPlayerBgRemovalStatus] = useState({});
+  const [logoBgRemovalStatus, setLogoBgRemovalStatus] = useState({});
   const backgroundRemovalAvailable = useMemo(
     () => isBackgroundRemovalConfigured(),
     []
@@ -655,6 +658,16 @@ const App = () => {
       },
     }));
   }, [setPlayerBgRemovalStatus]);
+  const updateLogoBgRemovalState = useCallback((key, updates) => {
+    if (!key) return;
+    setLogoBgRemovalStatus((prev) => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || { loading: false, error: "" }),
+        ...updates,
+      },
+    }));
+  }, [setLogoBgRemovalStatus]);
 
   const handleRemovePlayerBackground = useCallback(
     async (matchIndex, side, imageSrc) => {
@@ -678,14 +691,46 @@ const App = () => {
         console.error("Gagal menghapus background pemain:", error);
         const message =
           error?.message || "Gagal menghapus background. Coba lagi.";
-        updatePlayerBgRemovalState(slotKey, { loading: false, error: message });
+      updatePlayerBgRemovalState(slotKey, { loading: false, error: message });
+      window.alert(message);
+    }
+  },
+  [
+    backgroundRemovalAvailable,
+    handleMatchFieldChange,
+    updatePlayerBgRemovalState,
+  ]
+);
+
+  const handleRemoveLogoBackground = useCallback(
+    async (matchIndex, side, imageSrc) => {
+      if (!backgroundRemovalAvailable) {
+        window.alert("Fitur hapus background belum dikonfigurasi.");
+        return;
+      }
+      if (!imageSrc) {
+        window.alert("Unggah logo tim terlebih dahulu sebelum menghapus background.");
+        return;
+      }
+      const slotKey = buildLogoSlotKey(matchIndex, side);
+      updateLogoBgRemovalState(slotKey, { loading: true, error: "" });
+      try {
+        const cleanedImage = await removeLogoBackground(imageSrc);
+        const fieldName = side === "home" ? "teamHomeLogo" : "teamAwayLogo";
+        handleMatchFieldChange(matchIndex, fieldName, cleanedImage);
+        updateLogoBgRemovalState(slotKey, { loading: false, error: "" });
+      } catch (error) {
+        console.error("Gagal menghapus background logo:", error);
+        const message =
+          error?.message || "Gagal menghapus background logo. Coba lagi.";
+        updateLogoBgRemovalState(slotKey, { loading: false, error: message });
         window.alert(message);
       }
     },
     [
       backgroundRemovalAvailable,
       handleMatchFieldChange,
-      updatePlayerBgRemovalState,
+      updateLogoBgRemovalState,
     ]
   );
 
@@ -1389,6 +1434,8 @@ const App = () => {
               isBigMatchLayout={isBigMatchLayout}
               onRemovePlayerBackground={handleRemovePlayerBackground}
               playerBackgroundRemovalState={playerBgRemovalStatus}
+              onRemoveLogoBackground={handleRemoveLogoBackground}
+              logoBackgroundRemovalState={logoBgRemovalStatus}
               isBackgroundRemovalAvailable={backgroundRemovalAvailable}
               raffleSlug={raffleSlug}
               onRaffleSlugChange={handleRaffleSlugChange}

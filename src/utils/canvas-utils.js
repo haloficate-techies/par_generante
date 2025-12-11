@@ -377,41 +377,47 @@ const drawPlayerPortraitCard = (
   );
 
   ctx.save();
-  ctx.shadowColor = "rgba(15, 23, 42, 0.55)";
-  ctx.shadowBlur = shadowBlur;
-  ctx.shadowOffsetY = shadowOffsetY;
-  drawRoundedRectPath(ctx, x, y, width, height, radius);
-  ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
-  ctx.fill();
+  if (!image) {
+    ctx.shadowColor = "rgba(15, 23, 42, 0.55)";
+    ctx.shadowBlur = shadowBlur;
+    ctx.shadowOffsetY = shadowOffsetY;
+    drawRoundedRectPath(ctx, x, y, width, height, radius);
+    ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
+    ctx.fill();
+  }
   ctx.restore();
 
-  ctx.save();
-  drawRoundedRectPath(ctx, x, y, width, height, radius);
-  ctx.clip();
   if (image) {
+    ctx.save();
+    drawRoundedRectPath(ctx, x, y, width, height, radius);
+    ctx.clip();
     drawImageCover(ctx, image, x, y, width, height, {
       scale: clamp(adjustments.scale ?? 1, 0.6, 1.6),
       offsetX: clamp(adjustments.offsetX ?? 0, -1.1, 1.1),
       offsetY: clamp(adjustments.offsetY ?? 0, -1.1, 1.1),
       flipHorizontal: Boolean(adjustments.flip),
     });
+    ctx.restore();
   } else {
+    ctx.save();
+    drawRoundedRectPath(ctx, x, y, width, height, radius);
+    ctx.clip();
     const placeholderGradient = ctx.createLinearGradient(x, y, x + width, y + height);
     placeholderGradient.addColorStop(0, "#111827");
     placeholderGradient.addColorStop(1, "#1f2937");
     ctx.fillStyle = placeholderGradient;
     ctx.fillRect(x, y, width, height);
+    const overlayGradient = ctx.createLinearGradient(x, y + height * 0.45, x, y + height);
+    overlayGradient.addColorStop(0, "rgba(15, 23, 42, 0)");
+    overlayGradient.addColorStop(0.55, "rgba(15, 23, 42, 0.45)");
+    overlayGradient.addColorStop(1, "rgba(15, 23, 42, 0.9)");
+    ctx.fillStyle = overlayGradient;
+    ctx.fillRect(x, y, width, height);
+    ctx.restore();
   }
-  const overlayGradient = ctx.createLinearGradient(x, y + height * 0.45, x, y + height);
-  overlayGradient.addColorStop(0, "rgba(15, 23, 42, 0)");
-  overlayGradient.addColorStop(0.55, "rgba(15, 23, 42, 0.45)");
-  overlayGradient.addColorStop(1, "rgba(15, 23, 42, 0.9)");
-  ctx.fillStyle = overlayGradient;
-  ctx.fillRect(x, y, width, height);
-  ctx.restore();
 
   const safeLabel = typeof label === "string" ? label.trim() : "";
-  if (showPlaceholderLabel) {
+  if (showPlaceholderLabel && !image) {
     const placeholderLabel =
       align === "right"
         ? "FOTO PEMAIN\nTIM TAMU"

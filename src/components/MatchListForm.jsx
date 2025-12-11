@@ -162,6 +162,7 @@ const DigitStepperInput = ({ label, value = "0", onChange }) => {
 };
 
 const buildPlayerSlotKey = (index, side) => `${index}-${side}`;
+const buildLogoSlotKey = (index, side) => `${index}-${side}-logo`;
 
 const MatchFieldset = ({
   match,
@@ -178,6 +179,8 @@ const MatchFieldset = ({
   onRemoveBackground,
   playerBackgroundRemovalState = {},
   canUseBackgroundRemoval = false,
+  onRemoveLogoBackground,
+  logoBackgroundRemovalState = {},
 }) => {
   const gameSlotPreviewStyle = {
     backgroundImage: "linear-gradient(135deg, #0d1829, #050912)",
@@ -217,6 +220,10 @@ const MatchFieldset = ({
   const awayRemovalKey = buildPlayerSlotKey(index, "away");
   const homeRemovalState = playerBackgroundRemovalState[homeRemovalKey] || {};
   const awayRemovalState = playerBackgroundRemovalState[awayRemovalKey] || {};
+  const homeLogoRemovalKey = buildLogoSlotKey(index, "home");
+  const awayLogoRemovalKey = buildLogoSlotKey(index, "away");
+  const homeLogoRemovalState = logoBackgroundRemovalState[homeLogoRemovalKey] || {};
+  const awayLogoRemovalState = logoBackgroundRemovalState[awayLogoRemovalKey] || {};
 
   return (
     <fieldset className="rounded-xl border border-slate-700/60 bg-slate-800/40 p-4">
@@ -330,6 +337,12 @@ const MatchFieldset = ({
         offsetX={match.teamHomeLogoOffsetX}
         offsetY={match.teamHomeLogoOffsetY}
         onAdjust={(adjustments) => onLogoAdjust?.(index, "home", adjustments)}
+        canRemoveBackground={canUseBackgroundRemoval}
+        onRemoveBackground={() =>
+          onRemoveLogoBackground?.(index, "home", match.teamHomeLogo)
+        }
+        isRemovingBackground={Boolean(homeLogoRemovalState.loading)}
+        removeBackgroundError={homeLogoRemovalState.error || ""}
       />
       <ImageUploadPreview
         label="Logo Tim Tamu"
@@ -345,6 +358,12 @@ const MatchFieldset = ({
         offsetX={match.teamAwayLogoOffsetX}
         offsetY={match.teamAwayLogoOffsetY}
         onAdjust={(adjustments) => onLogoAdjust?.(index, "away", adjustments)}
+        canRemoveBackground={canUseBackgroundRemoval}
+        onRemoveBackground={() =>
+          onRemoveLogoBackground?.(index, "away", match.teamAwayLogo)
+        }
+        isRemovingBackground={Boolean(awayLogoRemovalState.loading)}
+        removeBackgroundError={awayLogoRemovalState.error || ""}
       />
     </div>
     {isEsportsMode && (
@@ -1229,6 +1248,8 @@ const MatchesSection = ({
   onRemovePlayerBackground,
   playerBackgroundRemovalState = {},
   canUseBackgroundRemoval = false,
+  onRemoveLogoBackground,
+  logoBackgroundRemovalState = {},
 }) => {
   if (!shouldShowMatches) {
     return null;
@@ -1251,22 +1272,24 @@ const MatchesSection = ({
         />
       )}
         {(disableMatchCountAdjuster ? matches.slice(0, 1) : matches).map((match, index) => (
-          <MatchFieldset
-            key={index}
-            match={match}
-            index={index}
-            onFieldChange={onMatchFieldChange}
-            onRequestAutoLogo={onAutoLogoRequest}
-            onLogoAdjust={onLogoAdjust}
-            onPlayerImageAdjust={onPlayerImageAdjust}
-            onPlayerImageFlipToggle={onPlayerImageFlipToggle}
-            isEsportsMode={isEsportsMode}
+        <MatchFieldset
+          key={index}
+          match={match}
+          index={index}
+          onFieldChange={onMatchFieldChange}
+          onRequestAutoLogo={onAutoLogoRequest}
+          onLogoAdjust={onLogoAdjust}
+          onPlayerImageAdjust={onPlayerImageAdjust}
+          onPlayerImageFlipToggle={onPlayerImageFlipToggle}
+          isEsportsMode={isEsportsMode}
           gameOptions={availableGameOptions}
           showScoreInputs={showScoreInputs}
           showBigMatchExtras={showBigMatchExtras}
           onRemoveBackground={onRemovePlayerBackground}
           playerBackgroundRemovalState={playerBackgroundRemovalState}
           canUseBackgroundRemoval={canUseBackgroundRemoval}
+          onRemoveLogoBackground={onRemoveLogoBackground}
+          logoBackgroundRemovalState={logoBackgroundRemovalState}
         />
       ))}
     </section>
@@ -1468,6 +1491,8 @@ const MatchListForm = ({
   leagueLogoOptions = AVAILABLE_LEAGUE_LOGO_OPTIONS,
   onRemovePlayerBackground,
   playerBackgroundRemovalState = {},
+  onRemoveLogoBackground,
+  logoBackgroundRemovalState = {},
   isBackgroundRemovalAvailable = false,
   raffleSlug = "",
   onRaffleSlugChange,
