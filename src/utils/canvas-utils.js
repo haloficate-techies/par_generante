@@ -1097,18 +1097,82 @@ const drawMatches = (
         ctx.fillText(pillLabel, textCenterX, textCenterY);
         ctx.restore();
 
-        const brandNameForCta = (brandDisplayName || "GOLBOS").toUpperCase();
-        const ctaText = `DUKUNG TIM JAGOANMU DENGAN PASANG TARUHAN DI ${brandNameForCta}`;
-        ctx.save();
-        const ctaFontSize = Math.max(20, 30 * scheduleScale);
-        ctx.font = `800 ${Math.round(ctaFontSize)}px "Poppins", sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
+        const ctaPrefix = "Dukung tim jagoanmu dengan pasang taruhan di ";
+        const brandNameForCta = (brandDisplayName || "Golbos").trim() || "Golbos";
+        const primaryTextColor = "#ffffff";
+        const fallbackTextColor = "#f2f2f2";
+        const letterSpacing = clamp(2 * scheduleScale, 1, 3);
+        const estimatedScheduleFontSize = Math.max(28, 36 * scheduleScale);
+        const baseCtaFontSize = clamp(
+          estimatedScheduleFontSize * 0.75,
+          estimatedScheduleFontSize * 0.7,
+          estimatedScheduleFontSize * 0.8
+        );
+        const buildCtaSegments = (fontSize) => [
+          {
+            text: ctaPrefix,
+            font: `400 ${Math.round(fontSize)}px "Montserrat", "Poppins", sans-serif`,
+          },
+          {
+            text: brandNameForCta,
+            font: `500 ${Math.round(fontSize)}px "Montserrat", "Poppins", sans-serif`,
+          },
+        ];
+        const measureSegmentedWidth = (segments) => {
+          let width = 0;
+          let totalChars = 0;
+          segments.forEach((segment) => {
+            if (!segment?.text) return;
+            ctx.font = segment.font;
+            const chars = segment.text.split("");
+            totalChars += chars.length;
+            chars.forEach((char) => {
+              width += ctx.measureText(char).width;
+            });
+          });
+          const spacingCount = Math.max(totalChars - 1, 0);
+          return width + spacingCount * letterSpacing;
+        };
+        const baseSegments = buildCtaSegments(baseCtaFontSize);
+        const maxCtaWidth = ctx.canvas.width - marginX * 2;
+        const baseWidth = measureSegmentedWidth(baseSegments);
+        const shrinkFactor =
+          baseWidth > maxCtaWidth ? clamp(maxCtaWidth / baseWidth, 0.9, 1) : 1;
+        const finalFontSize = baseCtaFontSize * shrinkFactor;
+        const ctaSegments = buildCtaSegments(finalFontSize);
+        const ctaTextWidth = measureSegmentedWidth(ctaSegments);
         const ctaY = barY + barHeight + Math.max(24, 36 * scheduleScale);
-        ctx.fillStyle = "rgba(15, 23, 42, 0.4)";
-        ctx.fillText(ctaText, ctx.canvas.width / 2, ctaY + 2);
-        ctx.fillStyle = "#f8fafc";
-        ctx.fillText(ctaText, ctx.canvas.width / 2, ctaY);
+        const startX = ctx.canvas.width / 2 - ctaTextWidth / 2;
+        const drawSegmentedText = (segments, draw) => {
+          let cursorX = startX;
+          segments.forEach((segment, segmentIndex) => {
+            if (!segment?.text) return;
+            ctx.font = segment.font;
+            const chars = segment.text.split("");
+            chars.forEach((char, charIndex) => {
+              draw(char, cursorX, ctaY);
+              cursorX += ctx.measureText(char).width;
+              const hasMore =
+                charIndex < chars.length - 1 ||
+                segmentIndex < segments.length - 1;
+              if (hasMore) {
+                cursorX += letterSpacing;
+              }
+            });
+          });
+        };
+        ctx.save();
+        ctx.textAlign = "left";
+        ctx.textBaseline = "top";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+        ctx.shadowBlur = clamp(2.5 * scheduleScale, 2, 3);
+        ctx.shadowOffsetY = 1;
+        ctx.shadowOffsetX = 0;
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.2)";
+        ctx.lineWidth = 1;
+        drawSegmentedText(ctaSegments, (char, x, y) => ctx.strokeText(char, x, y));
+        ctx.fillStyle = primaryTextColor || fallbackTextColor;
+        drawSegmentedText(ctaSegments, (char, x, y) => ctx.fillText(char, x, y));
         ctx.restore();
       }
 
