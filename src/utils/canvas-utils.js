@@ -175,8 +175,10 @@ const layoutTeamName = (
     };
   }
 
-  const targetMax = Math.max(minFontSize, Math.round(maxFontSize));
+  const multiWordModifier = words.length > 1 ? 0.94 : 1;
+  const targetMax = Math.max(minFontSize, Math.round(maxFontSize * multiWordModifier));
   const targetMin = Math.max(8, Math.round(minFontSize));
+  const widthTolerance = words.length === 1 ? 1.08 : 1;
 
   for (let size = targetMax; size >= targetMin; size -= 1) {
     ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
@@ -190,7 +192,7 @@ const layoutTeamName = (
 
     const joined = words.join(" ");
     const singleLineWidth = ctx.measureText(joined).width;
-    if (singleLineWidth <= safeWidth) {
+    if (singleLineWidth <= safeWidth * widthTolerance) {
       return {
         fontSize: size,
         lines: [joined],
@@ -857,7 +859,7 @@ const drawMatches = (
       customCenterLabel ? 90 : 50
     );
     const textGap = customCenterLabel
-      ? Math.max(32, 40 * scheduleScale)
+      ? Math.max(28, 34 * scheduleScale)
       : Math.max(18, 28 * scheduleScale);
     const topMarginSpace = Math.max((rowHeight - barHeight) / 2, 0);
     const maxDateCapsuleHeight = Math.max(
@@ -889,7 +891,7 @@ const drawMatches = (
         const naturalHeight = Math.max(1, image.naturalHeight || image.height || slotSize);
         const containScale = Math.min(slotSize / naturalWidth, slotSize / naturalHeight);
         const userScale = clamp(Number(logoAdjustments.scale) || 1, 0.7, 1.5);
-        const insetMultiplier = 0.75;
+        const insetMultiplier = 0.65;
         const renderScale = clamp(containScale * insetMultiplier * userScale, 0, containScale);
         const renderWidth = naturalWidth * renderScale;
         const renderHeight = naturalHeight * renderScale;
@@ -924,7 +926,7 @@ const drawMatches = (
       const baseText = (label && label.trim()) || fallback;
       const upper = baseText.toUpperCase();
       const maxFontSizeBase = customCenterLabel
-        ? label ? 44 : 32
+        ? label ? 40 : 34
         : 28;
       const layout = layoutTeamName(ctx, upper, {
         maxWidth: areaWidth,
@@ -958,10 +960,10 @@ const drawMatches = (
       const barWidth = rightCircleCenterX - leftCircleCenterX;
       const barY = centerY - barHeight / 2;
       const targetCenterWidth = customCenterLabel
-        ? 120 * scheduleScale
+        ? 110 * scheduleScale
         : 200 * scheduleScale;
-      const minCenterWidth = customCenterLabel ? 100 * scheduleScale : 160 * scheduleScale;
-      const maxCenterWidth = customCenterLabel ? 140 * scheduleScale : 240 * scheduleScale;
+      const minCenterWidth = customCenterLabel ? 90 * scheduleScale : 160 * scheduleScale;
+      const maxCenterWidth = customCenterLabel ? 130 * scheduleScale : 240 * scheduleScale;
       const centerWidth = clamp(targetCenterWidth, minCenterWidth, maxCenterWidth);
       const centerX = ctx.canvas.width / 2 - centerWidth / 2;
       const baseInset = customCenterLabel ? 0.3 : 0.12;
@@ -1382,8 +1384,8 @@ const drawMatches = (
         drawBeveledText(timeLabel, timeFont, effectiveTimeCenterY, 800);
       }
 
-      const sideTextPadding = customCenterLabel ? textGap + 14 : textGap;
-      const centerGapPadding = customCenterLabel ? textGap + 18 : textGap;
+      const sideTextPadding = customCenterLabel ? textGap + 8 : textGap;
+      const centerGapPadding = customCenterLabel ? textGap + 12 : textGap;
       const teamTextBias = customCenterLabel ? 18 * scheduleScale : 0;
 
       const leftTextX = leftCircleCenterX + circleRadius + sideTextPadding;
