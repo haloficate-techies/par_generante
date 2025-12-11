@@ -868,7 +868,14 @@ const drawMatches = (
       ? Math.min(Math.max(20, 26 * scheduleScale), maxDateCapsuleHeight)
       : 0;
 
-    const drawTeamBadge = (image, centerX, centerY, radius, fallbackLetter) => {
+    const drawTeamBadge = (
+      image,
+      centerX,
+      centerY,
+      radius,
+      fallbackLetter,
+      logoAdjustments = {}
+    ) => {
       ctx.save();
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -877,15 +884,22 @@ const drawMatches = (
       ctx.fill();
       ctx.clip();
       if (image) {
-        drawImageCover(
-          ctx,
-          image,
-          centerX - radius,
-          centerY - radius,
-          radius * 2,
-          radius * 2,
-          { scale: 0.9 }
-        );
+        const slotSize = radius * 2;
+        const naturalWidth = Math.max(1, image.naturalWidth || image.width || slotSize);
+        const naturalHeight = Math.max(1, image.naturalHeight || image.height || slotSize);
+        const containScale = Math.min(slotSize / naturalWidth, slotSize / naturalHeight);
+        const userScale = clamp(Number(logoAdjustments.scale) || 1, 0.7, 1.5);
+        const insetMultiplier = 0.75;
+        const renderScale = clamp(containScale * insetMultiplier * userScale, 0, containScale);
+        const renderWidth = naturalWidth * renderScale;
+        const renderHeight = naturalHeight * renderScale;
+        const offsetRangeX = Math.max((slotSize - renderWidth) / 2, 0);
+        const offsetRangeY = Math.max((slotSize - renderHeight) / 2, 0);
+        const offsetX = clamp(Number(logoAdjustments.offsetX) || 0, -0.75, 0.75);
+        const offsetY = clamp(Number(logoAdjustments.offsetY) || 0, -0.75, 0.75);
+        const renderX = centerX - renderWidth / 2 + offsetX * offsetRangeX;
+        const renderY = centerY - renderHeight / 2 + offsetY * offsetRangeY;
+        ctx.drawImage(image, renderX, renderY, renderWidth, renderHeight);
       } else {
         ctx.fillStyle = "#1e293b";
         ctx.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
@@ -1407,14 +1421,24 @@ const drawMatches = (
         leftCircleCenterX,
         centerY,
         circleRadius,
-        homeBadgeLetter
+        homeBadgeLetter,
+        {
+          scale: match.teamHomeLogoScale,
+          offsetX: match.teamHomeLogoOffsetX,
+          offsetY: match.teamHomeLogoOffsetY,
+        }
       );
       drawTeamBadge(
         match.awayLogoImage,
         rightCircleCenterX,
         centerY,
         circleRadius,
-        awayBadgeLetter
+        awayBadgeLetter,
+        {
+          scale: match.teamAwayLogoScale,
+          offsetX: match.teamAwayLogoOffsetX,
+          offsetY: match.teamAwayLogoOffsetY,
+        }
       );
     });
 
