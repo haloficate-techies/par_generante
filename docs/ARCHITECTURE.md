@@ -27,6 +27,12 @@
 ### 5. Hooks
 - `src/hooks/background-manager.js`, `streaming-theme.js`, `togel-controls.js`
   - Hook stateful khusus banner/togel. Masing-masing diekspor sebagai modul dan juga diregistrasikan ke `AppEnvironment` untuk kompatibilitas.
+- `src/hooks/use-banner-state.js`
+  - Mengelola state form/banner melalui `useReducer` dan mengekspor action ter-memo untuk pemakaian di `App.jsx` dan komponen lain.
+- `src/hooks/use-mode-features.js`
+  - Menyediakan kalkulasi flag per mode (esports/togel/raffle, big match, dsb.) dengan membaca konfigurasi di `AppGlobals` + registry mode.
+- `src/hooks/use-raffle-data.js`, `use-background-removal.js`, `use-render-scheduler.js`, `use-preview-modal.js`
+  - Mengambil alih logika side-effect (fetch raffle, integrasi layanan hapus background, debounce render, serta kontrol modal preview).
 
 ### 6. Komponen
 - `src/components/layout/*.jsx`
@@ -34,17 +40,24 @@
 - `src/components/MatchListForm.jsx`
   - Form utama untuk input pertandingan/togel, now fully modular tanpa ketergantungan global.
 
-### 7. Aplikasi Utama
-- `src/App.jsx`
-  - Mengatur state (judul, mode, matches, brand assets) dan memanggil hook khusus.
-  - Menggunakan registry mode untuk merender canvas dan membungkus fungsi download (PNG & ZIP).
+### 7. Servis Rendering & Export
+- `src/services/banner-renderer.js`
+  - Mengambil semua state + asset loader, melakukan cached rendering canvas, dan mengembalikan hasilnya. Service ini dipakai oleh `App.jsx` dan oleh proses ekspor agar draw logic konsisten.
+- `src/services/banner-exporter.js`
+  - Menyediakan `exportPng` & `exportZip` (menggunakan JSZip) yang mengorkestrasi render per-brand sebelum mengunduh PNG/ZIP.
 
-### 8. Alur Data Singkat
+### 8. Aplikasi Utama
+- `src/App.jsx`
+  - Bertindak sebagai orkestra: memanfaatkan hook state, mode features, scheduler, preview modal, raffle/background removal, lalu mengoper data ke `banner-renderer` & `banner-exporter`.
+  - Menghubungkan registry mode untuk menggambar layout, serta meneruskan handler/actions ke `MatchListForm` dan komponen lain.
+
+### 9. Alur Data Singkat
 1. Data global dan helper diekspor dari `app-data.js` & `canvas-utils.js`, kemudian disimpan di `AppEnvironment`.
 2. `App.jsx` mengimpor hooks, komponen, dan resolver mode sebagai modul umum.
 3. Saat render, `drawMatches/drawTogelResult` menggunakan helper warna/kanvas dari bundle tersebut.
 4. Hasil kanvas dipakai untuk preview, download PNG, atau ZIP multi-brand.
 
-### 9. Fokus Perbaikan Berikutnya
+### 10. Fokus Perbaikan Berikutnya
 - Perketat validasi input serta tambahkan pengujian otomatis untuk fungsi kanvas/togel.
 - Evaluasi pemecahan ulang AppEnvironment apabila nanti diperlukan DI lintas worker/preview lain.
+- Tambah dokumentasi changelog dan panduan kontribusi ketika arsitektur mengalami perubahan besar.
