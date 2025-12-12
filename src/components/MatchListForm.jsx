@@ -1635,6 +1635,8 @@ const MatchListForm = ({
         onRemovePlayerBackground={onRemovePlayerBackground}
         playerBackgroundRemovalState={playerBackgroundRemovalState}
         canUseBackgroundRemoval={isBackgroundRemovalAvailable}
+        onRemoveLogoBackground={onRemoveLogoBackground}
+        logoBackgroundRemovalState={logoBackgroundRemovalState}
       />
       <TogelControlsSection
         isTogelMode={isTogelMode}
