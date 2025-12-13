@@ -434,7 +434,9 @@ const App = () => {
     ]
   );
 
-  const scheduleRender = useRenderScheduler(renderBanner, isRenderingRef);
+  const scheduleRender = useRenderScheduler(renderBanner, {
+    renderLockRef: isRenderingRef,
+  });
 
   // Keeps preview up to date when relevant data changes.
   const renderDependencies = [

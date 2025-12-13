@@ -1,11 +1,11 @@
 import {
   DEFAULT_BRAND_PALETTE,
   clampMin,
-} from "./constants";
-import { drawRoundedRectPath } from "./geometry";
-import { resolveTogelDateLabel, getTodayDateLabel } from "./date";
-import { normalizeTogelDigits } from "./togel/digits";
-import { resolveStreamingUrlCanvasStyle } from "./togel/streaming-style";
+} from "../constants";
+import { drawRoundedRectPath } from "../geometry";
+import { resolveTogelDateLabel, getTodayDateLabel } from "../date";
+import { normalizeTogelDigits } from "./digits";
+import { resolveStreamingUrlCanvasStyle } from "./streaming-style";
 
 export const drawTogelInfoPill = (
   ctx,
