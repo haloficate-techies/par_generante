@@ -1,4 +1,3 @@
-// -------- Main application --------
 import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import AppEnvironment from "./app/app-environment";
 import AppData, { DEFAULT_BRAND_PALETTE as FALLBACK_BRAND_PALETTE } from "./data/app-data";
@@ -161,6 +160,7 @@ const App = () => {
     applyTogelBackgroundPath,
   } = useBackgroundManager(activeMode);
   const isRenderingRef = useRef(false);
+  const [isRenderingUi, setIsRenderingUi] = useState(false);
   const [isBulkDownloading, setIsBulkDownloading] = useState(false);
   const [bulkProgress, setBulkProgress] = useState(0);
   const [lastRenderAt, setLastRenderAt] = useState(null);
@@ -302,6 +302,7 @@ const App = () => {
         return canvasRef.current;
       }
       isRenderingRef.current = true;
+      setIsRenderingUi(true);
       try {
         return await renderBannerService({
           overrides,
@@ -377,6 +378,7 @@ const App = () => {
         return null;
       } finally {
         isRenderingRef.current = false;
+        setIsRenderingUi(false);
       }
     },
     [
@@ -727,7 +729,7 @@ const App = () => {
 
             <BannerPreviewPanel
               canvasRef={canvasRef}
-              isRendering={isRenderingRef.current}
+              isRendering={isRenderingUi}
               isBulkDownloading={isBulkDownloading}
               bulkProgress={bulkProgress}
               onPreviewClick={handlePreviewClick}
