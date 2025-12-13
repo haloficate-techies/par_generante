@@ -145,7 +145,7 @@ const App = () => {
       "";
     setActiveSubMenu(defaultSubMenuId);
     }, [activeModeConfig]);
-    const pageBackgroundClass = activeModeConfig.pageBackgroundClass || "bg-slate-950";
+    const pageBackgroundClass = activeModeConfig?.pageBackgroundClass || "bg-slate-950";
     useEffect(() => {
       if (isBigMatchLayout && activeMatchCount !== 1) {
         setMatchCount(1);
@@ -160,7 +160,7 @@ const App = () => {
     togelBackgroundSrc,
     applyTogelBackgroundPath,
   } = useBackgroundManager(activeMode);
-  const [isRendering, setIsRendering] = useState(false);
+  const isRenderingRef = useRef(false);
   const [isBulkDownloading, setIsBulkDownloading] = useState(false);
   const [bulkProgress, setBulkProgress] = useState(0);
   const [lastRenderAt, setLastRenderAt] = useState(null);
@@ -298,10 +298,10 @@ const App = () => {
   // Draws the entire banner on the canvas.
   const renderBanner = useCallback(
     async (overrides = {}) => {
-      if (isRendering) {
+      if (isRenderingRef.current) {
         return canvasRef.current;
       }
-      setIsRendering(true);
+      isRenderingRef.current = true;
       try {
         return await renderBannerService({
           overrides,
@@ -376,11 +376,10 @@ const App = () => {
         window.alert("Gagal membuat preview banner. Periksa data & gambar lalu coba lagi.");
         return null;
       } finally {
-        setIsRendering(false);
+        isRenderingRef.current = false;
       }
     },
     [
-      isRendering,
       canvasRef,
       brandPaletteCacheRef,
       BRAND_PALETTE_CACHE_LIMIT,
@@ -435,7 +434,7 @@ const App = () => {
     ]
   );
 
-  const scheduleRender = useRenderScheduler(renderBanner);
+  const scheduleRender = useRenderScheduler(renderBanner, isRenderingRef);
 
   // Keeps preview up to date when relevant data changes.
   const renderDependencies = [
@@ -467,7 +466,7 @@ const App = () => {
   ];
   const dependenciesHash = JSON.stringify(renderDependencies);
   useEffect(() => {
-    if (isRendering) return;
+    if (isRenderingRef.current) return;
     scheduleRender();
   }, [dependenciesHash, scheduleRender]);
 
@@ -584,19 +583,19 @@ const App = () => {
 
   // Converts the current canvas to PNG and downloads it.
   const handlePreviewClick = useCallback(async () => {
-    if (isRendering) return;
+    if (isRenderingRef.current) return;
     const renderedCanvas = await renderBanner();
     const canvas = renderedCanvas || canvasRef.current;
     openPreviewModal(canvas);
-  }, [isRendering, renderBanner, openPreviewModal]);
+  }, [renderBanner, openPreviewModal]);
 
   const downloadBanner = useCallback(async () => {
-    if (isRendering) return;
+    if (isRenderingRef.current) return;
     await exportPng({ renderBanner, canvasRef });
-  }, [isRendering, renderBanner]);
+  }, [renderBanner]);
 
   const downloadAllBanners = useCallback(async () => {
-    if (isRendering || isBulkDownloading || !AVAILABLE_BRAND_LOGOS.length) {
+    if (isRenderingRef.current || isBulkDownloading || !AVAILABLE_BRAND_LOGOS.length) {
       return;
     }
 
@@ -638,7 +637,7 @@ const App = () => {
     footballDefaultBackground,
     footerLink,
     isBulkDownloading,
-    isRendering,
+    isRenderingRef.current,
     renderBanner,
     activeMode,
     isTogelMode,
@@ -726,7 +725,7 @@ const App = () => {
 
             <BannerPreviewPanel
               canvasRef={canvasRef}
-              isRendering={isRendering}
+              isRendering={isRenderingRef.current}
               isBulkDownloading={isBulkDownloading}
               bulkProgress={bulkProgress}
               onPreviewClick={handlePreviewClick}

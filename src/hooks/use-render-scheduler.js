@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-const useRenderScheduler = (renderFn, delay = 80) => {
+const useRenderScheduler = (renderFn, delay = 80, renderLockRef = null) => {
   const timeoutRef = useRef(null);
   const latestFnRef = useRef(renderFn);
 
@@ -9,6 +9,9 @@ const useRenderScheduler = (renderFn, delay = 80) => {
   }, [renderFn]);
 
   const schedule = useCallback(() => {
+    if (renderLockRef?.current) {
+      return;
+    }
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -18,7 +21,7 @@ const useRenderScheduler = (renderFn, delay = 80) => {
         latestFnRef.current();
       }
     }, delay);
-  }, [delay]);
+  }, [delay, renderLockRef]);
 
   useEffect(
     () => () => {
