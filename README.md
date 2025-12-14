@@ -38,10 +38,14 @@ npm run check
   Base URL proxy image. Default: `https://proxy.superbia.app/image?url=`
 - `VITE_IMAGE_PROXY_ALLOW_HOSTS`  
   Comma-separated allowlist host yang boleh diproxy. Jika kosong, default allow `*`.
-- `VITE_REMOVE_BG_ENDPOINT`  
-  Endpoint service background removal (opsional).
-- `VITE_REMOVE_BG_TOKEN`  
-  API key/token background removal (opsional).
+- `VITE_REMOVE_BG_ENDPOINT` (wajib)  
+  Endpoint service background removal.
+- `VITE_REMOVE_BG_TOKEN` (wajib)  
+  API key/token background removal.
+
+Vite otomatis membaca file env berdasarkan mode, jadi cukup buat sekali dan biarkan file-nya ada di mesin Anda:
+- Development: `.env.local`
+- Production build: `.env.production.local`
 
 ## CORS & Canvas Safety (Image Proxy)
 
@@ -72,4 +76,3 @@ Konfigurasi & allowlist host berada di `src/data/app-data.js` (lihat `DEFAULT_IM
 - `docs/ARCHITECTURE.md` — ringkasan arsitektur & alur data
 - `docs/ASSETS.md` — pedoman struktur aset di `public/assets/`
 - `docs/CHANGELOG.md` — catatan perubahan
-

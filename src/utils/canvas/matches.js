@@ -1,5 +1,6 @@
 import {
   DEFAULT_BRAND_PALETTE,
+  TEAM_LOGO_PLACEHOLDER_COLORS,
   applyFittedFont,
   clamp,
   clampMin,
@@ -105,11 +106,13 @@ export const drawMatches = (
       fallbackLetter,
       logoAdjustments = {}
     ) => {
+      const badgeBackgroundFill = "#d7d9de";
+
       ctx.save();
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.closePath();
-      ctx.fillStyle = "#0f172a";
+      ctx.fillStyle = badgeBackgroundFill;
       ctx.fill();
       ctx.clip();
       if (image) {
@@ -130,9 +133,7 @@ export const drawMatches = (
         const renderY = centerY - renderHeight / 2 + offsetY * offsetRangeY;
         ctx.drawImage(image, renderX, renderY, renderWidth, renderHeight);
       } else {
-        ctx.fillStyle = "#1e293b";
-        ctx.fillRect(centerX - radius, centerY - radius, radius * 2, radius * 2);
-        ctx.fillStyle = "#f8fafc";
+        ctx.fillStyle = "#0f172a";
         ctx.font = `700 ${Math.round(radius * 0.85)}px "Poppins", sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -959,6 +960,7 @@ export const drawMatches = (
         scale: match.teamHomeLogoScale,
         offsetX: match.teamHomeLogoOffsetX,
         offsetY: match.teamHomeLogoOffsetY,
+        placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
       }
     );
     drawLogoTile(
@@ -972,6 +974,7 @@ export const drawMatches = (
         scale: match.teamAwayLogoScale,
         offsetX: match.teamAwayLogoOffsetX,
         offsetY: match.teamAwayLogoOffsetY,
+        placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
       }
     );
 
@@ -1220,11 +1223,13 @@ export const drawScoreboardMatches = (
       scale: match.teamHomeLogoScale,
       offsetX: match.teamHomeLogoOffsetX,
       offsetY: match.teamHomeLogoOffsetY,
+      placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
     });
     drawLogoTile(ctx, match.awayLogoImage, rightLogoX, logoY, circleSize, match.teamAway, {
       scale: match.teamAwayLogoScale,
       offsetX: match.teamAwayLogoOffsetX,
       offsetY: match.teamAwayLogoOffsetY,
+      placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
     });
 
     const leftAreaStart = leftLogoX + circleSize + textPadding;

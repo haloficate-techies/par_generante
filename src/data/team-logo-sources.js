@@ -258,7 +258,7 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["juventus"],
-    source: "https://1000logos.net/wp-content/uploads/2021/05/Juventus-logo.png",
+    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg/250px-Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg.png",
   },
   {
     names: ["napoli", "ssc napoli"],

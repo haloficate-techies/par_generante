@@ -126,6 +126,12 @@ export const PLACEHOLDER_COLORS = {
   text: "#e2e8f0",
 };
 
+export const TEAM_LOGO_PLACEHOLDER_COLORS = {
+  fill: "#ffffff",
+  border: "rgba(15, 23, 42, 0.18)",
+  text: "#0f172a",
+};
+
 const INDONESIAN_DAY_NAMES = [
   "Minggu",
   "Senin",
@@ -1199,7 +1205,9 @@ export const drawLogoTile = (
     offsetX = 0,
     offsetY = 0,
     paddingRatio = 0.08,
+    placeholderColors,
   } = options || {};
+  const placeholder = placeholderColors || PLACEHOLDER_COLORS;
 
   ctx.save();
   ctx.beginPath();
@@ -1256,16 +1264,16 @@ export const drawLogoTile = (
     ctx.stroke();
     ctx.restore();
   } else {
-    ctx.fillStyle = PLACEHOLDER_COLORS.fill;
+    ctx.fillStyle = placeholder.fill || PLACEHOLDER_COLORS.fill;
     ctx.fill();
 
     ctx.lineWidth = borderWidth;
-    ctx.strokeStyle = PLACEHOLDER_COLORS.border;
+    ctx.strokeStyle = placeholder.border || PLACEHOLDER_COLORS.border;
     ctx.stroke();
 
     ctx.save();
     ctx.clip();
-    ctx.fillStyle = PLACEHOLDER_COLORS.text;
+    ctx.fillStyle = placeholder.text || PLACEHOLDER_COLORS.text;
     ctx.font = `700 ${size * 0.38}px Poppins`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
