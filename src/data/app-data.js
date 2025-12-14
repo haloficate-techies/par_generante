@@ -1,8 +1,16 @@
 import AppEnvironment from "../app/app-environment";
+import TEAM_AUTO_LOGO_SOURCES from "./team-logo-sources";
 
-const IMAGE_PROXY_BASE_URL = (import.meta.env.VITE_IMAGE_PROXY_BASE || "").trim();
-const IMAGE_PROXY_EXTRA_HOSTS = (import.meta.env.VITE_IMAGE_PROXY_ALLOW_HOSTS || "")
-  .split(",")
+const DEFAULT_IMAGE_PROXY_BASE_URL = "https://proxy.superbia.app/image?url=";
+const IMAGE_PROXY_BASE_URL = (
+  import.meta.env.VITE_IMAGE_PROXY_BASE || DEFAULT_IMAGE_PROXY_BASE_URL
+).trim();
+const IMAGE_PROXY_ALLOW_HOSTS_RAW = (import.meta.env.VITE_IMAGE_PROXY_ALLOW_HOSTS || "").trim();
+const IMAGE_PROXY_EXTRA_HOSTS = (
+  IMAGE_PROXY_ALLOW_HOSTS_RAW
+    ? IMAGE_PROXY_ALLOW_HOSTS_RAW.split(",")
+    : ["*"]
+)
   .map((host) => host.trim().toLowerCase())
   .filter(Boolean);
 const DEFAULT_IMAGE_PROXY_HOSTS = [
@@ -14,6 +22,11 @@ const DEFAULT_IMAGE_PROXY_HOSTS = [
   "img.uefa.com",
   "static.wikia.nocookie.net",
   "liquipedia.net",
+  "premierleague.com",
+  "www.premierleague.com",
+  "resources.premierleague.com",
+  "assets.laliga.com",
+  "file.ilustrepro.com"
 ];
 const IMAGE_PROXY_HOST_ALLOWLIST = Array.from(
   new Set([...DEFAULT_IMAGE_PROXY_HOSTS, ...IMAGE_PROXY_EXTRA_HOSTS].filter(Boolean))
@@ -34,6 +47,9 @@ const getProxyHostFromUrl = (value) => {
 const matchesAllowlistedHost = (hostname, allowedHost) => {
   if (!hostname || !allowedHost) {
     return false;
+  }
+  if (allowedHost === "*") {
+    return true;
   }
   if (hostname === allowedHost) {
     return true;
@@ -261,572 +277,6 @@ const normalizeTeamName = (name) => {
     .replace(/\s+/g, " ")
     .trim();
 };
-
-const TEAM_AUTO_LOGO_SOURCES = [
-  {
-    names: ["arsenal", "arsenal fc"],
-    source: "https://upload.wikimedia.org/wikipedia/hif/8/82/Arsenal_FC.png?size=256",
-  },
-  {
-    names: ["aston villa", "aston villa fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Aston_Villa_FC_new_crest.svg/250px-Aston_Villa_FC_new_crest.svg.png?size=256",
-  },
-  {
-    names: ["afc bournemouth", "bournemouth"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e5/AFC_Bournemouth_%282013%29.svg/912px-AFC_Bournemouth_%282013%29.svg.png?size=256",
-  },
-  {
-    names: ["brentford", "brentford fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/2/2a/Brentford_FC_crest.svg/1200px-Brentford_FC_crest.svg.png?size=256",
-  },
-  {
-    names: ["brighton and hove albion", "brighton", "brighton hove albion"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/331.png?size=256",
-  },
-  {
-    names: ["burnley", "burnley fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Burnley_FC_Logo.svg/250px-Burnley_FC_Logo.svg.png?size=256",
-  },
-  {
-    names: ["chelsea", "chelsea fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/cc/Chelsea_FC.svg/1200px-Chelsea_FC.svg.png?size=256",
-  },
-  {
-    names: ["crystal palace", "crystal palace fc"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/384.png?size=256",
-  },
-  {
-    names: ["everton", "everton fc"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/368.png?size=256",
-  },
-  {
-    names: ["fulham", "fulham fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Fulham_FC_%28shield%29.svg/901px-Fulham_FC_%28shield%29.svg.png?size=256",
-  },
-  {
-    names: ["liverpool", "liverpool fc"],
-    source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/800px-Liverpool_FC.svg.png?size=256",
-  },
-  {
-    names: ["luton town", "luton"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9d/Luton_Town_logo.svg/1200px-Luton_Town_logo.svg.png?size=256",
-  },
-  {
-    names: ["manchester city", "man city", "manchester city fc"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/1200px-Manchester_City_FC_badge.svg.png?size=256",
-  },
-  {
-    names: ["manchester united", "man united", "man utd"],
-    source: "https://upload.wikimedia.org/wikipedia/hif/f/ff/Manchester_United_FC_crest.png?size=256",
-  },
-  {
-    names: ["newcastle united", "newcastle"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Newcastle_United_Logo.svg/1192px-Newcastle_United_Logo.svg.png?size=256",
-  },
-  {
-    names: ["nottingham forest", "forest"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e5/Nottingham_Forest_F.C._logo.svg/1024px-Nottingham_Forest_F.C._logo.svg.png?size=256",
-  },
-  {
-    names: ["sheffield united", "sheffield utd"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9c/Sheffield_United_FC_logo.svg/1200px-Sheffield_United_FC_logo.svg.png?size=256",
-  },
-  {
-    names: ["tottenham hotspur", "tottenham", "spurs"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/Tottenham_Hotspur.svg/584px-Tottenham_Hotspur.svg.png?size=256",
-  },
-  {
-    names: ["west ham united", "west ham"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/West_Ham_United_FC_logo.svg/1079px-West_Ham_United_FC_logo.svg.png?size=256",
-  },
-  {
-    names: ["wolverhampton wanderers", "wolves"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c9/Wolverhampton_Wanderers_FC_crest.svg/250px-Wolverhampton_Wanderers_FC_crest.svg.png?size=256",
-  },
-  {
-    names: ["bayern munich", "fc bayern", "bayern"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/2048px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png?size=256",
-  },
-  {
-    names: ["borussia dortmund", "dortmund", "bvb"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Borussia_Dortmund_logo.svg/1200px-Borussia_Dortmund_logo.svg.png?size=256",
-  },
-  {
-    names: ["rb leipzig", "leipzig"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/RB_Leipzig_2014_logo.svg/1200px-RB_Leipzig_2014_logo.svg.png?size=256",
-  },
-  {
-    names: ["bayer leverkusen", "leverkusen"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Bayer_04_Leverkusen_logo.svg/1200px-Bayer_04_Leverkusen_logo.svg.png?size=256",
-  },
-  {
-    names: ["union berlin"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/1._FC_Union_Berlin_Logo.svg/1200px-1._FC_Union_Berlin_Logo.svg.png?size=256",
-  },
-  {
-    names: ["freiburg", "sc freiburg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/SC_Freiburg_logo.svg/841px-SC_Freiburg_logo.svg.png?size=256",
-  },
-  {
-    names: ["eintracht frankfurt", "frankfurt"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/125.png?size=256",
-  },
-  {
-    names: ["vfl wolfsburg", "wolfsburg"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/VfL_Wolfsburg_Logo.svg/1200px-VfL_Wolfsburg_Logo.svg.png?size=256",
-  },
-  {
-    names: ["mainz 05", "mainz"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/8/83/Mainz_05_crest.svg/1200px-Mainz_05_crest.svg.png?size=256",
-  },
-  {
-    names: ["borussia monchengladbach", "monchengladbach", "gladbach"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Borussia_M%C3%B6nchengladbach_logo.svg/250px-Borussia_M%C3%B6nchengladbach_logo.svg.png?size=256",
-  },
-  {
-    names: ["fc koln", "1 fc koln", "koln", "cologne"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/1._FC_Koeln_Logo_2014%E2%80%93.svg/1054px-1._FC_Koeln_Logo_2014%E2%80%93.svg.png?size=256",
-  },
-  {
-    names: ["hoffenheim", "tsg hoffenheim"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Logo_TSG_Hoffenheim.svg/1005px-Logo_TSG_Hoffenheim.svg.png?size=256",
-  },
-  {
-    names: ["augsburg", "fc augsburg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/FC_Augsburg_logo.svg/920px-FC_Augsburg_logo.svg.png?size=256",
-  },
-  {
-    names: ["stuttgart", "vfb stuttgart"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/VfB_Stuttgart_1893_Logo.svg/1103px-VfB_Stuttgart_1893_Logo.svg.png?size=256",
-  },
-  {
-    names: ["bochum", "vfl bochum"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/VfL_Bochum_logo.svg/1140px-VfL_Bochum_logo.svg.png?size=256",
-  },
-  {
-    names: ["darmstadt", "sv darmstadt 98"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Darmstadt_98_football_club_new_logo_2015.png?size=256",
-  },
-  {
-    names: ["heidenheim", "1 fc heidenheim"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/1._FC_Heidenheim_1846.svg/973px-1._FC_Heidenheim_1846.svg.png?size=256",
-  },
-  {
-    names: ["werder bremen", "bremen"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/SV-Werder-Bremen-Logo.svg/798px-SV-Werder-Bremen-Logo.svg.png?size=256",
-  },
-  {
-    names: ["barcelona", "fc barcelona", "barca"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/1183px-FC_Barcelona_%28crest%29.svg.png?size=256",
-  },
-  {
-    names: ["real madrid"],
-    source: "https://upload.wikimedia.org/wikipedia/sco/thumb/5/56/Real_Madrid_CF.svg/1464px-Real_Madrid_CF.svg.png?size=256",
-  },
-  {
-    names: ["atletico madrid", "atletico de madrid"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/1068.png?size=256",
-  },
-  {
-    names: ["real sociedad"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Real_Sociedad_logo.svg/1044px-Real_Sociedad_logo.svg.png?size=256",
-  },
-  {
-    names: ["villarreal"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b9/Villarreal_CF_logo-en.svg/962px-Villarreal_CF_logo-en.svg.png?size=256",
-  },
-  {
-    names: ["real betis", "betis"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Real_betis_logo.svg/1200px-Real_betis_logo.svg.png?size=256",
-  },
-  {
-    names: ["athletic club", "athletic bilbao", "bilbao"],
-    source: "https://img.uefa.com/imgml/TP/teams/logos/240x240/50125.png?size=256",
-  },
-  {
-    names: ["girona"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/9812.png?size=256",
-  },
-  {
-    names: ["sevilla"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/243.png?size=256",
-  },
-  {
-    names: ["valencia"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/94.png?size=256",
-  },
-  {
-    names: ["osasuna"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/3/38/CA_Osasuna_2024_crest.svg/895px-CA_Osasuna_2024_crest.svg.png?size=256",
-  },
-  {
-    names: ["celta vigo", "celta"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/1/12/RC_Celta_de_Vigo_logo.svg/676px-RC_Celta_de_Vigo_logo.svg.png?size=256",
-  },
-  {
-    names: ["getafe"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/4/46/Getafe_logo.svg/1148px-Getafe_logo.svg.png?size=256",
-  },
-  {
-    names: ["almeria"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4a/UD_Almeria_logo.svg/887px-UD_Almeria_logo.svg.png?size=256",
-  },
-  {
-    names: ["cadiz", "cadiz cf"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/58/C%C3%A1diz_CF_logo.svg/777px-C%C3%A1diz_CF_logo.svg.png?size=256",
-  },
-  {
-    names: ["granada", "granada cf"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d5/Logo_of_Granada_Club_de_F%C3%BAtbol.svg/536px-Logo_of_Granada_Club_de_F%C3%BAtbol.svg.png?size=256",
-  },
-  {
-    names: ["rayo vallecano", "rayo"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d8/Rayo_Vallecano_logo.svg/1200px-Rayo_Vallecano_logo.svg.png?size=256",
-  },
-  {
-    names: ["mallorca"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Rcd_mallorca.svg/906px-Rcd_mallorca.svg.png?size=256",
-  },
-  {
-    names: ["las palmas"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/2/20/UD_Las_Palmas_logo.svg/696px-UD_Las_Palmas_logo.svg.png?size=256",
-  },
-  {
-    names: ["alaves"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f8/Deportivo_Alaves_logo_%282020%29.svg/1200px-Deportivo_Alaves_logo_%282020%29.svg.png?size=256",
-  },
-  {
-    names: ["ac milan", "milan"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Logo_of_AC_Milan.svg/250px-Logo_of_AC_Milan.svg.png?size=256",
-  },
-  {
-    names: ["inter milan", "inter", "internazionale"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/FC_Internazionale_Milano_2021.svg/1200px-FC_Internazionale_Milano_2021.svg.png?size=256",
-  },
-  {
-    names: ["juventus"],
-    source: "https://1000logos.net/wp-content/uploads/2021/05/Juventus-logo.png?size=256",
-  },
-  {
-    names: ["napoli", "ssc napoli"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/114.png?size=256",
-  },
-  {
-    names: ["roma", "as roma"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/104.png?size=256",
-  },
-  {
-    names: ["lazio"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/S.S._Lazio_badge.svg/1200px-S.S._Lazio_badge.svg.png?size=256",
-  },
-  {
-    names: ["atalanta"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/105.png?size=256",
-  },
-  {
-    names: ["fiorentina"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg/1200px-ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg.png?size=256",
-  },
-  {
-    names: ["bologna"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/107.png?size=256",
-  },
-  {
-    names: ["torino"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500/239.png?size=256",
-  },
-  {
-    names: ["udinese"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Udinese_Calcio_logo.svg/1200px-Udinese_Calcio_logo.svg.png?size=256",
-  },
-  {
-    names: ["sassuolo"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/US_Sassuolo_Calcio_logo.svg/1095px-US_Sassuolo_Calcio_logo.svg.png?size=256",
-  },
-  {
-    names: ["genoa"],
-    source: "https://upload.wikimedia.org/wikipedia/min/4/4e/Genoa_cfc.png?size=256",
-  },
-  {
-    names: ["lecce"],
-    source: "https://upload.wikimedia.org/wikipedia/it/thumb/3/36/US_Lecce_Stemma.svg/820px-US_Lecce_Stemma.svg.png?size=256",
-  },
-  {
-    names: ["monza"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Logo_of_AC_Monza.png/500px-Logo_of_AC_Monza.png?20220615144419?size=256",
-  },
-  {
-    names: ["empoli"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/9/94/Empoli_FC.png?size=256",
-  },
-  {
-    names: ["cagliari"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Cagliari_Calcio_1920.svg/992px-Cagliari_Calcio_1920.svg.png?size=256",
-  },
-  {
-    names: ["hellas verona", "verona"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/92/Hellas_Verona_FC_logo_%282020%29.svg/1176px-Hellas_Verona_FC_logo_%282020%29.svg.png?size=256",
-  },
-  {
-    names: ["salernitana"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/US_Salernitana_1919_logo.svg/1200px-US_Salernitana_1919_logo.svg.png?size=256",
-  },
-  {
-    names: ["frosinone"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/0/0b/Frosinone_Calcio_logo.svg/1056px-Frosinone_Calcio_logo.svg.png?size=256",
-  },
-  {
-    names: ["paris saint germain", "psg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/1200px-Paris_Saint-Germain_F.C..svg.png?size=256",
-  },
-  {
-    names: ["marseille", "olympique marseille", "om"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Olympique_Marseille_logo.svg/927px-Olympique_Marseille_logo.svg.png?size=256",
-  },
-  {
-    names: ["lyon", "olympique lyon", "olympique lyonnais", "ol"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/167.png?size=256",
-  },
-  {
-    names: ["monaco", "as monaco"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/LogoASMonacoFC2021.svg/692px-LogoASMonacoFC2021.svg.png?size=256",
-  },
-  {
-    names: ["lille", "losc lille"],
-    source: "https://1000logos.net/wp-content/uploads/2020/09/Lille-Olympique-logo.png?size=256",
-  },
-  {
-    names: ["nice", "ogc nice"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/2502.png?size=256",
-  },
-  {
-    names: ["rennes", "stade rennais"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Stade_Rennais_FC.svg/983px-Stade_Rennais_FC.svg.png?size=256",
-  },
-  {
-    names: ["montpellier"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a8/Montpellier_HSC_logo.svg/1200px-Montpellier_HSC_logo.svg.png?size=256",
-  },
-  {
-    names: ["strasbourg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Racing_Club_de_Strasbourg_logo.svg/1200px-Racing_Club_de_Strasbourg_logo.svg.png?size=256",
-  },
-  {
-    names: ["reims"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3243.png?size=256",
-  },
-  {
-    names: ["brest"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Stade_Brestois_29_logo.svg/990px-Stade_Brestois_29_logo.svg.png?size=256",
-  },
-  {
-    names: ["toulouse"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/63/Toulouse_FC_2018_logo.svg/1200px-Toulouse_FC_2018_logo.svg.png?size=256",
-  },
-  {
-    names: ["nantes"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/165.png?size=256",
-  },
-  {
-    names: ["lorient"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/273.png?size=256",
-  },
-  {
-    names: ["metz"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/FC_Metz_2021_Logo.svg/839px-FC_Metz_2021_Logo.svg.png?size=256",
-  },
-  {
-    names: ["clermont", "clermont foot"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Clermont_Foot_logo.svg/1015px-Clermont_Foot_logo.svg.png?size=256",
-  },
-  {
-    names: ["lens"],
-    source: "hthttps://upload.wikimedia.org/wikipedia/en/thumb/c/cc/RC_Lens_logo.svg/893px-RC_Lens_logo.svg.png?size=256",
-  },
-  {
-    names: ["angers"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Angers_SCO_logo.svg/1006px-Angers_SCO_logo.svg.png?size=256",
-  },
-  {
-    names: ["auxerre"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500/172.png?size=256",
-  },
-  // Liga 1 Indonesia
-  {
-    names: ["arema", "arema fc", "arema malang"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/Arema_FC_2017_logo.svg/1072px-Arema_FC_2017_logo.svg.png?size=256",
-  },
-  {
-    names: ["bali united", "bali united fc"],
-    source: "https://upload.wikimedia.org/wikipedia/id/thumb/5/5e/Bali_United_logo.svg/881px-Bali_United_logo.svg.png?size=256",
-  },
-  {
-    names: ["borneo fc", "borneo fc samarinda", "borneo samarinda"],
-    source: "https://upload.wikimedia.org/wikipedia/id/thumb/4/4d/Logo_Borneo_FC.svg/932px-Logo_Borneo_FC.svg.png?size=256",
-  },
-  {
-    names: ["dewa united", "dewa united fc"],
-    source: "https://upload.wikimedia.org/wikipedia/id/5/53/Dewa_United_FC.png?size=256",
-  },
-  {
-    names: ["madura united", "madura united fc"],
-    source: "https://upload.wikimedia.org/wikipedia/id/8/8a/Madura_United_FC.png?size=256",
-  },
-  {
-    names: ["persib", "persib bandung"],
-    source: "https://upload.wikimedia.org/wikipedia/en/8/85/Persib_Bandung_Football_Logo.png?size=256",
-  },
-  {
-    names: ["persija", "persija jakarta"],
-    source: "https://upload.wikimedia.org/wikipedia/id/9/94/Persija_Jakarta_logo.png?size=256",
-  },
-  {
-    names: ["persebaya", "persebaya surabaya"],
-    source: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi23-kQDXzE8u2w6bCdzqSXmLo3YzMgNIPb908jPISefuDc-8Jay3_9XF_uFKO9Fwov3ec_WfYZRKU8GTAR7JFK2GPk9o11svcnAEvw1Aeqg89-FS3fZWQTBUHUN79iy2j_tLeCnsPfH06lm3XcEKK9uR0Mml12ru4Ri4suP1Th0WL2_zu6lwe-uA/w265-h320/Persebaya%20Surabaya%20Logo.png?size=256",
-  },
-  {
-    names: ["psm", "psm makassar"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c9/PSS_Sleman_logo.svg/1001px-PSS_Sleman_logo.svg.png?size=256",
-  },
-  {
-    names: ["psis", "psis semarang"],
-    source: "https://upload.wikimedia.org/wikipedia/id/thumb/f/f5/PSIS_logo.svg/762px-PSIS_logo.svg.png?size=256",
-  },
-  {
-    names: ["pss", "pss sleman"],
-    source: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiwtCg3nlC9tn8nczCAaUDZCVYv0335hyphenhyphenEuHqwkqf4Hm9uRS2xmvGOdR_7dKA5RvBCpOILyiJUm3L4B3ggr-GuAbRh2TzTQtOPps0X-5iTI3UjZ9m7jMxXWm2xgNe9FxobwEGDf0rYt_DE/s2048/Logo+PSS+%2528Persatuan+Sepak+bola+Sleman%2529.png?size=256",
-  },
-  {
-    names: ["persik", "persik kediri"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Persik_Kediri_logo.svg/1200px-Persik_Kediri_logo.svg.png?size=256",
-  },
-  {
-    names: ["persis", "persis solo"],
-    source: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhwTeStOozJyWuO7Z9hFpB-NqGlMH4XsYs9cWmkcPv0DnPbSJljVBA9fhj2Wr_whHunYUH5mf3_-ZLQYfPLCHEq1UN8N0lCsqLycLHcfIXI9Dm3jMI6nbI4YWK8lTcra4H0FLEVNFfaN5sHvwmRRoMns7LXREvRWJ7zT7YqmrPipPm_L-7cWrPw2w/w320-h320/Persis%20Solo.png?size=256",
-  },
-  {
-    names: ["persita", "persita tangerang"],
-    source: "https://upload.wikimedia.org/wikipedia/id/thumb/9/95/Persita_logo_%282020%29.svg/1000px-Persita_logo_%282020%29.svg.png?size=256",
-  },
-  {
-    names: ["barito putera", "ps barito putera"],
-    source: "https://upload.wikimedia.org/wikipedia/id/b/b8/Barito_Putera_logo.png?size=256",
-  },
-  {
-    names: ["rans nusantara", "rans fc"],
-    source: "https://upload.wikimedia.org/wikipedia/id/thumb/6/6f/RANS_Nusantara_FC_logo_baru.svg/1200px-RANS_Nusantara_FC_logo_baru.svg.png?size=256",
-  },
-  {
-    names: ["bhayangkara", "bhayangkara fc", "bhayangkara presisi"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6a/Bhayangkara_FC_logo.svg/822px-Bhayangkara_FC_logo.svg.png?size=256",
-  },
-  {
-    names: ["psbs", "psbs biak"],
-    source: "https://upload.wikimedia.org/wikipedia/id/thumb/9/9b/Logo_PSBS_Biak_baru.png/250px-Logo_PSBS_Biak_baru.png?size=256",
-  },
-  {
-    names: ["semen padang"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Semen_Padang_FC_logo.svg/1200px-Semen_Padang_FC_logo.svg.png?size=256",
-  },
-  // FIFA U-17 World Cup 2023 flag fallbacks
-  {
-    names: ["indonesia", "indonesia u17", "indonesia u-17", "timnas indonesia", "timnas indonesia u17"],
-    source: "https://flagcdn.com/w320/id.png",
-  },
-  {
-    names: ["brasil", "brazil", "timnas brasil", "brasil u17", "brazil u17"],
-    source: "https://flagcdn.com/w320/br.png",
-  },
-  {
-    names: ["inggris", "england", "timnas inggris", "inggris u17", "england u17"],
-    source: "https://flagcdn.com/w320/gb.png",
-  },
-  {
-    names: ["prancis", "perancis", "france", "timnas prancis", "prancis u17"],
-    source: "https://flagcdn.com/w320/fr.png",
-  },
-  {
-    names: ["jepang", "japan", "timnas jepang", "jepang u17"],
-    source: "https://flagcdn.com/w320/jp.png",
-  },
-  {
-    names: ["meksiko", "mexico", "timnas meksiko", "meksiko u17"],
-    source: "https://flagcdn.com/w320/mx.png",
-  },
-  {
-    names: ["selandia baru", "new zealand", "timnas selandia baru", "selandia baru u17", "new zealand u17"],
-    source: "https://flagcdn.com/w320/nz.png",
-  },
-  {
-    names: ["korea selatan", "korsel", "korea republic", "south korea", "korea selatan u17"],
-    source: "https://flagcdn.com/w320/kr.png",
-  },
-  {
-    names: ["spanyol", "spain", "timnas spanyol", "spanyol u17"],
-    source: "https://flagcdn.com/w320/es.png",
-  },
-  {
-    names: ["amerika serikat", "usa", "timnas amerika serikat", "amerika serikat u17", "united states u17"],
-    source: "https://flagcdn.com/w320/us.png",
-  },
-  {
-    names: ["kanada", "canada", "timnas kanada", "kanada u17"],
-    source: "https://flagcdn.com/w320/ca.png",
-  },
-  {
-    names: ["jerman", "germany", "timnas jerman", "jerman u17"],
-    source: "https://flagcdn.com/w320/de.png",
-  },
-  {
-    names: ["argentina", "timnas argentina", "argentina u17"],
-    source: "https://flagcdn.com/w320/ar.png",
-  },
-  {
-    names: ["senegal", "timnas senegal", "senegal u17"],
-    source: "https://flagcdn.com/w320/sn.png",
-  },
-  {
-    names: ["mali", "timnas mali", "mali u17"],
-    source: "https://flagcdn.com/w320/ml.png",
-  },
-  {
-    names: ["burkina faso", "timnas burkina faso", "burkina faso u17"],
-    source: "https://flagcdn.com/w320/bf.png",
-  },
-  {
-    names: ["maroko", "morocco", "timnas maroko", "maroko u17"],
-    source: "https://flagcdn.com/w320/ma.png",
-  },
-  {
-    names: ["ekuador", "ecuador", "timnas ekuador", "ekuador u17"],
-    source: "https://flagcdn.com/w320/ec.png",
-  },
-  {
-    names: ["panama", "timnas panama", "panama u17"],
-    source: "https://flagcdn.com/w320/pa.png",
-  },
-  {
-    names: ["uzbekistan", "timnas uzbekistan", "uzbekistan u17"],
-    source: "https://flagcdn.com/w320/uz.png",
-  },
-  {
-    names: ["polandia", "poland", "timnas polandia", "polandia u17"],
-    source: "https://flagcdn.com/w320/pl.png",
-  },
-  {
-    names: ["venezuela", "timnas venezuela", "venezuela u17"],
-    source: "https://flagcdn.com/w320/ve.png",
-  },
-  {
-    names: ["iran", "timnas iran", "iran u17"],
-    source: "https://flagcdn.com/w320/ir.png",
-  },
-  {
-    names: ["kaledonia baru", "new caledonia", "timnas kaledonia baru", "kaledonia baru u17"],
-    source: "https://flagcdn.com/w320/nc.png",
-  },
-];
 
 const TEAM_AUTO_LOGO_LOOKUP = TEAM_AUTO_LOGO_SOURCES.reduce((acc, entry) => {
   entry.names.forEach((name) => {
@@ -1127,6 +577,100 @@ export const readFileAsDataURL = (
       });
   });
 
+const loadImageElement = (src) =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = (event) => reject(event);
+    img.src = src;
+  });
+
+const isSvgUrl = (value) => {
+  if (typeof value !== "string" || !value) return false;
+  if (!/^https?:\/\//i.test(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.pathname.toLowerCase().endsWith(".svg");
+  } catch (error) {
+    return /\.svg(\?|#|$)/i.test(value);
+  }
+};
+
+const estimateSvgSize = (svgText) => {
+  if (typeof svgText !== "string" || !svgText) {
+    return { width: 512, height: 512 };
+  }
+
+  const numeric = (value) => {
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  };
+
+  const widthMatch = svgText.match(/\bwidth\s*=\s*["']\s*([0-9.]+)\s*(px)?\s*["']/i);
+  const heightMatch = svgText.match(/\bheight\s*=\s*["']\s*([0-9.]+)\s*(px)?\s*["']/i);
+  const width = widthMatch ? numeric(widthMatch[1]) : null;
+  const height = heightMatch ? numeric(heightMatch[1]) : null;
+  if (width && height) {
+    return { width: Math.round(width), height: Math.round(height) };
+  }
+
+  const viewBoxMatch = svgText.match(/\bviewBox\s*=\s*["']\s*([-0-9.\s]+)\s*["']/i);
+  if (viewBoxMatch) {
+    const parts = viewBoxMatch[1]
+      .trim()
+      .split(/\s+/)
+      .map((part) => Number.parseFloat(part));
+    if (parts.length === 4 && parts.every((part) => Number.isFinite(part))) {
+      const vbWidth = parts[2];
+      const vbHeight = parts[3];
+      if (vbWidth > 0 && vbHeight > 0) {
+        return { width: Math.round(vbWidth), height: Math.round(vbHeight) };
+      }
+    }
+  }
+
+  return { width: 512, height: 512 };
+};
+
+const convertSvgUrlToPngDataUrl = async (src, { maxDimension = 512 } = {}) => {
+  if (typeof src !== "string" || !src || !/^https?:\/\//i.test(src)) {
+    return null;
+  }
+
+  const proxied = buildProxiedImageUrl(src);
+  const fetchUrl = proxied || src;
+  const response = await fetch(fetchUrl, {
+    mode: "cors",
+    headers: { Accept: "image/svg+xml,*/*" },
+  });
+  if (!response.ok) {
+    throw new Error(`Gagal mengambil SVG (${response.status})`);
+  }
+
+  const svgText = await response.text();
+  const { width: rawWidth, height: rawHeight } = estimateSvgSize(svgText);
+  const maxSide = Math.max(rawWidth || 0, rawHeight || 0) || 512;
+  const scale = maxSide > maxDimension ? maxDimension / maxSide : 1;
+  const width = Math.max(1, Math.round(rawWidth * scale));
+  const height = Math.max(1, Math.round(rawHeight * scale));
+
+  const blob = new Blob([svgText], { type: "image/svg+xml" });
+  const objectUrl = URL.createObjectURL(blob);
+  try {
+    const image = await loadImageElement(objectUrl);
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    return canvas.toDataURL("image/png");
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+};
+
 const loadImage = (src) =>
   new Promise((resolve, reject) => {
     const candidates = buildImageSourceCandidates(src);
@@ -1135,34 +679,47 @@ const loadImage = (src) =>
       return;
     }
 
-    const attemptCandidate = (index, useCrossOrigin) => {
+    let settled = false;
+    const finalizeResolve = (value) => {
+      if (settled) return;
+      settled = true;
+      resolve(value);
+    };
+    const finalizeReject = (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    };
+
+    const attemptCandidate = async (index) => {
       if (index >= candidates.length) {
-        reject(new Error(`Gagal memuat gambar setelah mencoba ${candidates.length} sumber.`));
+        finalizeReject(
+          new Error(`Gagal memuat gambar setelah mencoba ${candidates.length} sumber.`)
+        );
         return;
       }
       const candidateSrc = candidates[index];
-      const img = new Image();
-      if (
-        useCrossOrigin &&
-        typeof candidateSrc === "string" &&
-        candidateSrc &&
-        !candidateSrc.startsWith("data:") &&
-        !candidateSrc.startsWith("blob:")
-      ) {
-        img.crossOrigin = "anonymous";
-      }
-      img.onload = () => resolve(img);
-      img.onerror = () => {
-        if (useCrossOrigin) {
-          attemptCandidate(index, false);
-        } else {
-          attemptCandidate(index + 1, true);
+      try {
+        const image = await loadImageElement(candidateSrc);
+        finalizeResolve(image);
+      } catch (error) {
+        if (typeof candidateSrc === "string" && isSvgUrl(candidateSrc)) {
+          try {
+            const pngDataUrl = await convertSvgUrlToPngDataUrl(candidateSrc);
+            if (pngDataUrl) {
+              const pngImage = await loadImageElement(pngDataUrl);
+              finalizeResolve(pngImage);
+              return;
+            }
+          } catch (convertError) {
+            // ignore and continue with fallback candidate
+          }
         }
-      };
-      img.src = candidateSrc;
+        attemptCandidate(index + 1);
+      }
     };
 
-    attemptCandidate(0, true);
+    attemptCandidate(0);
   });
 
 export const loadOptionalImage = async (src) => {
