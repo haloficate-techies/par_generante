@@ -1,55 +1,75 @@
-# Banner Generator
+# Banner Generator (Vite + React)
 
-A React + Vite tool for generating square banner images (1080 × 1080) that can be previewed, downloaded as PNG, or exported in bulk for every brand. Tailwind powers the UI while custom canvas utilities render each layout mode (football, esports, togel, dll.).
+Web app untuk membuat banner (match/togel/raffle), render ke canvas, dan export sebagai PNG atau ZIP.
 
-## Prerequisites
+## Fitur Utama
 
-- Node.js 18+
-- npm 9+
+- Render banner berbasis canvas + caching layer (`src/services/banner-renderer.js`)
+- Export `Download PNG` & `Download ZIP` (JSZip) (`src/services/banner-exporter.js`)
+- Mode/fitur terstruktur via hooks (state, scheduler, modal preview, background removal, raffle, dll) (`src/hooks/`)
+- Auto logo tim dari mapping sumber (`src/data/team-logo-sources.js`)
+- Aman untuk canvas: load gambar memakai proxy + `crossOrigin="anonymous"` (lihat bagian CORS)
 
-## Getting Started
+## Quick Start
+
+Prerequisite: Node.js 18+ (CI memakai Node 18).
 
 ```bash
 npm install
 npm run dev
 ```
 
-Visit the URL displayed by Vite (default `http://localhost:5173`) to access the builder.
-
-## Useful Scripts
-
-| Command          | Description                                          |
-| ---------------- | ---------------------------------------------------- |
-| `npm run dev`    | Start Vite dev server with hot reload.               |
-| `npm run build`  | Build production assets into `dist/`.               |
-| `npm run preview`| Preview the production build locally.               |
-| `npm run lint`   | Run ESLint on all `src/**/*.{js,jsx}` files.        |
-| `npm run test`   | Execute Vitest + Testing Library smoke tests.       |
-
-## Background Removal Service
-
-Fitur hapus background untuk foto pemain bergantung pada layanan eksternal yang Anda jalankan sendiri (mis. VPS dengan `rembg`). Konfigurasikan endpoint tersebut melalui environment variables Vite:
+Build & preview:
 
 ```bash
-VITE_REMOVE_BG_ENDPOINT=https://your-vps.example.com/remove-bg
-VITE_REMOVE_BG_TOKEN=optionalBearerToken
+npm run build
+npm run preview
 ```
 
-Jika `VITE_REMOVE_BG_ENDPOINT` terisi, setiap slot foto pemain akan menampilkan tombol **Hapus Background** setelah gambar dipilih. Aplikasi akan mengirim data URL gambar ke endpoint tersebut dan mengganti preview dengan hasil PNG transparan yang dikembalikan layanan.
+Check (lint + test):
 
-## Tests
+```bash
+npm run check
+```
 
-Tests live under `src/__tests__` and rely on Vitest with React Testing Library. They cover smoke rendering of the main app and BannerHeader component to avoid regressions.
+## Konfigurasi (`.env`)
 
-## Project Structure (Ringkas)
+- `VITE_IMAGE_PROXY_BASE`  
+  Base URL proxy image. Default: `https://proxy.superbia.app/image?url=`
+- `VITE_IMAGE_PROXY_ALLOW_HOSTS`  
+  Comma-separated allowlist host yang boleh diproxy. Jika kosong, default allow `*`.
+- `VITE_REMOVE_BG_ENDPOINT`  
+  Endpoint service background removal (opsional).
+- `VITE_REMOVE_BG_TOKEN`  
+  API key/token background removal (opsional).
 
-- `src/App.jsx` – Core application logic (state, canvas rendering, download).
-- `src/components/` – UI components (`MatchListForm`, `BannerHeader`, dsb.).
-- `src/hooks/` – Custom hooks for background handling, togel controls, streaming theme.
-- `src/data/app-data.js` – Brand/pool data + helper functions.
-- `src/utils/canvas-utils.js` – Canvas drawing utilities.
-- `docs/` – Arsitektur & panduan aset.
+## CORS & Canvas Safety (Image Proxy)
 
-## Continuous Integration
+Canvas akan menjadi *tainted* bila gambar cross-origin tidak mengirim header CORS yang tepat, sehingga operasi seperti `getImageData()` / `toDataURL()` / export PNG akan gagal.
 
-CI workflows run lint, tests, and build on every push/PR via GitHub Actions (lihat `.github/workflows/ci.yml`). This keeps the project deploy-ready at all times.
+Project ini menangani itu dengan:
+- Mem-proxy semua URL gambar eksternal (`http/https`) melalui `VITE_IMAGE_PROXY_BASE` (tidak mem-proxy `data:` atau `blob:`).
+- Menyetel `crossOrigin = "anonymous"` pada setiap `Image()` yang dimuat untuk canvas.
+- Fallback ke URL asli bila proxy gagal (agar UI tetap jalan; untuk export PNG tetap disarankan gunakan proxy).
+- Untuk sumber SVG, ada konversi runtime SVG → PNG sebelum dipakai di canvas.
+
+Konfigurasi & allowlist host berada di `src/data/app-data.js` (lihat `DEFAULT_IMAGE_PROXY_HOSTS` dan builder proxy URL).
+
+## Struktur Project (Ringkas)
+
+- `src/App.jsx` — orkestra utama (state, mode features, render scheduler, preview modal, raffle/background removal, render & export)
+- `src/hooks/` — hooks pendukung (banner state reducer, mode features, image cache, render scheduler, preview modal, raffle, background removal, dll)
+- `src/services/` — `banner-renderer.js`, `banner-exporter.js`, background removal service
+- `src/data/app-data.js` — data global + helper canvas + loader gambar (proxy/CORS/SVG handling)
+- `src/data/team-logo-sources.js` — sumber auto logo tim (`{ names: string[], source: string }`)
+- `src/utils/canvas-utils.js` — helper menggambar layout ke canvas
+- `src/app/` + `src/modes/` — registry + konfigurasi global/mode (mode layouts & modules)
+- `src/components/` — UI utama (terutama `MatchListForm` + layout components)
+- `docs/` — `ARCHITECTURE.md`, `ASSETS.md`, `CHANGELOG.md`
+
+## Dokumentasi
+
+- `docs/ARCHITECTURE.md` — ringkasan arsitektur & alur data
+- `docs/ASSETS.md` — pedoman struktur aset di `public/assets/`
+- `docs/CHANGELOG.md` — catatan perubahan
+
