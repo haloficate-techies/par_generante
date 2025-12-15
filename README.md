@@ -57,14 +57,16 @@ Project ini menangani itu dengan:
 - Fallback ke URL asli bila proxy gagal (agar UI tetap jalan; untuk export PNG tetap disarankan gunakan proxy).
 - Untuk sumber SVG, ada konversi runtime SVG → PNG sebelum dipakai di canvas.
 
-Konfigurasi & allowlist host berada di `src/data/app-data.js` (lihat `DEFAULT_IMAGE_PROXY_HOSTS` dan builder proxy URL).
+Konfigurasi & allowlist host berada di `src/data/image-proxy.js` (lihat `DEFAULT_IMAGE_PROXY_HOSTS` dan builder proxy URL).
 
 ## Struktur Project (Ringkas)
 
 - `src/App.jsx` — orkestra utama (state, mode features, render scheduler, preview modal, raffle/background removal, render & export)
 - `src/hooks/` — hooks pendukung (banner state reducer, mode features, image cache, render scheduler, preview modal, raffle, background removal, dll)
 - `src/services/` — `banner-renderer.js`, `banner-exporter.js`, background removal service
-- `src/data/app-data.js` — data global + helper canvas + loader gambar (proxy/CORS/SVG handling)
+- `src/data/app-data.js` — data global + helper canvas + aggregator AppData
+- `src/data/image-proxy.js` — konfigurasi proxy + builder URL (CORS allowlist/SVG handling)
+- `src/utils/image-loader.js` — loader gambar (proxy fallback, SVG convert, cache logo otomatis)
 - `src/data/team-logo-sources.js` — sumber auto logo tim (`{ names: string[], source: string }`)
 - `src/utils/canvas-utils.js` — helper menggambar layout ke canvas
 - `src/app/` + `src/modes/` — registry + konfigurasi global/mode (mode layouts & modules)

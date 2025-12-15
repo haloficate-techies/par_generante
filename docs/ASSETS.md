@@ -30,7 +30,7 @@
    - Bola: `public/assets/BOLA/banner_background/BRAND.webp`
    - Basket: `public/assets/BASKET/banner_background/BRAND.webp`
    - Esports: `public/assets/ESPORT/banner_background/BRAND.webp`
-4. Masukkan nama brand ke `BRAND_NAMES` (`src/data/app-data.js`) agar otomatis ter-register.
+4. Masukkan nama brand ke `BRAND_NAMES` (`src/data/brand-assets.js`) agar otomatis ter-register.
 
 ### Cara Menambah Pool Togel Baru
 1. Sediakan background di `public/assets/TOTO/banner_background/POOLNAME.webp`.
