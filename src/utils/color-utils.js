@@ -32,7 +32,7 @@ export const rgbToHex = (r, g, b) => {
   )}${toHex(clamp(Math.round(b), 0, 255))}`;
 };
 
-const rgbToHsl = (r, g, b) => {
+export const rgbToHsl = (r, g, b) => {
   const rNorm = r / 255;
   const gNorm = g / 255;
   const bNorm = b / 255;
@@ -64,7 +64,7 @@ const rgbToHsl = (r, g, b) => {
   return { h, s, l };
 };
 
-const mixColors = (baseHex, targetHex, amount) => {
+export const mixColors = (baseHex, targetHex, amount) => {
   const base = hexToRgb(baseHex);
   const target = hexToRgb(targetHex);
   const normalizedAmount = clamp(amount, 0, 1);
@@ -77,12 +77,12 @@ const mixColors = (baseHex, targetHex, amount) => {
   return rgbToHex(mixChannel("r"), mixChannel("g"), mixChannel("b"));
 };
 
-const lightenColor = (hex, amount) =>
+export const lightenColor = (hex, amount) =>
   mixColors(hex, "#ffffff", clamp(amount, 0, 1));
-const darkenColor = (hex, amount) =>
+export const darkenColor = (hex, amount) =>
   mixColors(hex, "#000000", clamp(amount, 0, 1));
 
-const colorDistance = (colorA, colorB) => {
+export const colorDistance = (colorA, colorB) => {
   const a = hexToRgb(colorA);
   const b = hexToRgb(colorB);
   return Math.sqrt(
@@ -199,5 +199,10 @@ export default {
   clamp,
   hexToRgb,
   rgbToHex,
+  rgbToHsl,
+  mixColors,
+  lightenColor,
+  darkenColor,
+  colorDistance,
   deriveBrandPalette,
 };

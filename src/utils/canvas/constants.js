@@ -1,15 +1,19 @@
 import {
-  PLACEHOLDER_COLORS as DATA_PLACEHOLDER_COLORS,
   TEAM_LOGO_PLACEHOLDER_COLORS as DATA_TEAM_LOGO_PLACEHOLDER_COLORS,
-  DEFAULT_BRAND_PALETTE as DATA_DEFAULT_BRAND_PALETTE,
-  applyFittedFont as applyFittedFontHelper,
-  clampMin as clampMinHelper,
   formatDate as formatDateHelper,
   formatTime as formatTimeHelper,
+} from "../../data/app-data";
+import {
+  DEFAULT_BRAND_PALETTE as DATA_DEFAULT_BRAND_PALETTE,
   hexToRgb as hexToRgbHelper,
   rgbToHex as rgbToHexHelper,
+} from "../color-utils";
+import {
+  PLACEHOLDER_COLORS as DATA_PLACEHOLDER_COLORS,
+  applyFittedFont as applyFittedFontHelper,
+  clampMin as clampMinHelper,
   drawLogoTile as drawLogoTileHelper,
-} from "../../data/app-data";
+} from "../draw-logo-tile";
 
 export const PLACEHOLDER_FILL_COLOR = DATA_PLACEHOLDER_COLORS.fill || "#1f2937";
 export const PLACEHOLDER_BORDER_COLOR =
