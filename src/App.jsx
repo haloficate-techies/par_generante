@@ -9,17 +9,17 @@ import useTogelControls from "./hooks/togel-controls";
 import useImageCache from "./hooks/use-image-cache";
 import useRaffleData from "./hooks/use-raffle-data";
 import useBannerState from "./hooks/use-banner-state";
-import useRenderScheduler from "./hooks/use-render-scheduler";
 import usePreviewModal from "./hooks/use-preview-modal";
 import useModeFeatures from "./hooks/use-mode-features";
-import { exportPng, exportZip } from "./services/banner-exporter";
-import { renderBanner as renderBannerService } from "./services/banner-renderer";
 import BannerHeader from "./components/layout/BannerHeader";
 import BannerPreviewPanel from "./components/layout/BannerPreviewPanel";
 import PreviewModal from "./components/layout/PreviewModal";
 import MatchListForm from "./components/MatchListForm";
 import { formatMatchDateLabel, formatMatchTimeLabel } from "./utils/formatters/match";
 import { formatRaffleEventLabel } from "./utils/formatters/raffle";
+import useBannerRenderPipeline from "./hooks/render/use-banner-render-pipeline";
+import useBannerExportActions from "./hooks/render/use-banner-export-actions";
+import usePrefetchBannerAssets from "./hooks/assets/use-prefetch-banner-assets";
 import "./app/mode-layout-registry";
 import "./app/mode-modules";
 import "./modes/layouts/match-mode";
@@ -58,16 +58,12 @@ const deriveBrandPaletteFn =
   AppData.deriveBrandPalette ||
   AppData.DERIVE_BRAND_PALETTE ||
   (() => DEFAULT_BRAND_PALETTE);
-const BRAND_PALETTE_CACHE_LIMIT = 50;
-
 const deriveBrandPalette = (image) => {
   if (typeof deriveBrandPaletteFn === "function") {
     return deriveBrandPaletteFn(image) || DEFAULT_BRAND_PALETTE;
   }
   return DEFAULT_BRAND_PALETTE;
 };
-const BASE_LAYER_CACHE_LIMIT = 12;
-const HEADER_LAYER_CACHE_LIMIT = 32;
 
 const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
 
@@ -159,21 +155,6 @@ const App = () => {
     togelBackgroundSrc,
     applyTogelBackgroundPath,
   } = useBackgroundManager(activeMode);
-  const isRenderingRef = useRef(false);
-  const [isRenderingUi, setIsRenderingUi] = useState(false);
-  const [isBulkDownloading, setIsBulkDownloading] = useState(false);
-  const [bulkProgress, setBulkProgress] = useState(0);
-  const [lastRenderAt, setLastRenderAt] = useState(null);
-  const baseLayerCacheRef = useRef(new Map());
-  const headerLayerCacheRef = useRef(new Map());
-  const brandPaletteCacheRef = useRef(new Map());
-  const yieldToFrame = useCallback(
-    () =>
-      new Promise((resolve) => {
-        window.setTimeout(resolve, 0);
-      }),
-    []
-  );
   const visibleMatches = useMemo(
     () => matches.slice(0, activeMatchCount),
     [matches, activeMatchCount]
@@ -218,6 +199,154 @@ const App = () => {
     return formatRaffleEventLabel(raffleInfo);
   }, [raffleInfo]);
 
+  const {
+    isOpen: isPreviewModalOpen,
+    imageSrc: previewImage,
+    openWith: openPreviewModal,
+    close: closePreviewModal,
+  } = usePreviewModal();
+
+  const renderAssets = useMemo(
+    () => ({
+      loadCachedOptionalImage,
+      loadMatchLogoImage,
+      computeMiniBannerLayout,
+      defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
+      raffleHeaderLogoSrc: RAFFLE_HEADER_LOGO_SRC,
+    }),
+    [loadCachedOptionalImage, loadMatchLogoImage, computeMiniBannerLayout]
+  );
+
+  const renderConfig = useMemo(
+    () => ({
+      availableBrandLogos: AVAILABLE_BRAND_LOGOS,
+      leagueLogoOptions: LEAGUE_LOGO_OPTIONS,
+      getModeLayoutConfig,
+    }),
+    [AVAILABLE_BRAND_LOGOS, LEAGUE_LOGO_OPTIONS, getModeLayoutConfig]
+  );
+
+  const renderState = useMemo(
+    () => ({
+      matches,
+      activeMatchCount,
+      activeMode,
+      activeSubMenu,
+      brandLogoSrc,
+      footerSrc,
+      footerLink,
+      backgroundSrc,
+      title,
+      includeMiniBanner,
+      shouldSkipHeader,
+      allowCustomTitle,
+      shouldRenderMatches,
+      selectedBrandName,
+      isBigMatchLayout,
+      isScoreModeActive,
+      isTogelMode,
+      isRaffleMode,
+      leagueLogoSrc,
+    }),
+    [
+      matches,
+      activeMatchCount,
+      activeMode,
+      activeSubMenu,
+      brandLogoSrc,
+      footerSrc,
+      footerLink,
+      backgroundSrc,
+      title,
+      includeMiniBanner,
+      shouldSkipHeader,
+      allowCustomTitle,
+      shouldRenderMatches,
+      selectedBrandName,
+      isBigMatchLayout,
+      isScoreModeActive,
+      isTogelMode,
+      isRaffleMode,
+      leagueLogoSrc,
+    ]
+  );
+
+  const renderTogelState = useMemo(
+    () => ({
+      digits: togelDigits,
+      pool: togelPool,
+      variant: togelPoolVariant,
+      drawTime: togelDrawTime,
+      streamingInfo: togelStreamingInfo,
+    }),
+    [togelDigits, togelPool, togelPoolVariant, togelDrawTime, togelStreamingInfo]
+  );
+
+  const renderRaffleState = useMemo(
+    () => ({
+      winners: raffleWinners,
+      info: raffleInfo,
+      eventLabel: raffleEventLabel,
+    }),
+    [raffleWinners, raffleInfo, raffleEventLabel]
+  );
+
+  const renderHelpers = useMemo(
+    () => ({
+      deriveBrandPalette,
+      defaultBrandPalette: DEFAULT_BRAND_PALETTE,
+      buildTogelTitle,
+      resolveTogelPoolLabel,
+      scoreModeTitle: SCORE_MODE_TITLE,
+      bigMatchTitle: BIG_MATCH_TITLE,
+      formatMatchDateLabel,
+      formatMatchTimeLabel,
+    }),
+    [deriveBrandPalette]
+  );
+
+  const {
+    renderBanner,
+    isRenderingRef,
+    isRenderingUi,
+    lastRenderAt,
+  } = useBannerRenderPipeline({
+    canvasRef,
+    assets: renderAssets,
+    config: renderConfig,
+    state: renderState,
+    togelState: renderTogelState,
+    raffleState: renderRaffleState,
+    helpers: renderHelpers,
+  });
+
+  const {
+    handlePreviewClick,
+    downloadBanner,
+    downloadAllBanners,
+    isBulkDownloading,
+    bulkProgress,
+  } = useBannerExportActions({
+    renderBanner,
+    canvasRef,
+    brandOptions: AVAILABLE_BRAND_LOGOS,
+    createBrandSlug,
+    resolveFooterSrcForBrand,
+    backgroundLookup: BACKGROUND_LOOKUP,
+    modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
+    footballDefaultBackground,
+    togelBackgroundSrc,
+    togelPool,
+    includeMiniBanner,
+    defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
+    prefetchImages,
+    activeMode,
+    isTogelMode,
+    footerLink,
+    openPreviewModal,
+    isRenderingRef,
+  });
+
   // Handles updating a single match field.
   const handleMatchFieldChange = useCallback(
     (index, field, value) => {
@@ -254,12 +383,6 @@ const App = () => {
   const backgroundRemoval = useBackgroundRemoval({
     onApplyResult: handleMatchFieldChange,
   });
-  const {
-    isOpen: isPreviewModalOpen,
-    imageSrc: previewImage,
-    openWith: openPreviewModal,
-    close: closePreviewModal,
-  } = usePreviewModal();
 
   const handleMatchCountChange = useCallback(
     (nextCount) => {
@@ -268,212 +391,17 @@ const App = () => {
     [setMatchCount]
   );
 
-  // Prefetch backgrounds relevant to active mode to reduce unnecessary loads.
-  useEffect(() => {
-    const modeDefaults = MODE_BACKGROUND_DEFAULTS || {};
-    const modeSpecificBackgrounds = AVAILABLE_BRAND_LOGOS
-      .map((option) => option?.backgroundByMode?.[activeMode])
-      .filter(Boolean);
-    const sharedBackgrounds = AVAILABLE_BRAND_LOGOS
-      .map((option) => option?.backgroundValue)
-      .filter(Boolean);
-    const candidates = [
-      ...modeSpecificBackgrounds,
-      ...sharedBackgrounds,
-      modeDefaults[activeMode],
-      activeMode === "football" ? footballDefaultBackground : null,
-      includeMiniBanner ? DEFAULT_ESPORT_MINI_BANNER : null,
-    ].filter(Boolean);
-    if (candidates.length) {
-      prefetchImages(candidates);
-    }
-  }, [
+  usePrefetchBannerAssets({
     activeMode,
-    AVAILABLE_BRAND_LOGOS,
+    brandOptions: AVAILABLE_BRAND_LOGOS,
     footballDefaultBackground,
     includeMiniBanner,
+    defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
+    modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
     prefetchImages,
-  ]);
-
-  // Draws the entire banner on the canvas.
-  const renderBanner = useCallback(
-    async (overrides = {}) => {
-      if (isRenderingRef.current) {
-        return canvasRef.current;
-      }
-      isRenderingRef.current = true;
-      setIsRenderingUi(true);
-      try {
-        return await renderBannerService({
-          overrides,
-          canvasRef,
-          caches: {
-            brandPaletteCacheRef,
-            brandPaletteCacheLimit: BRAND_PALETTE_CACHE_LIMIT,
-            baseLayerCacheRef,
-            baseLayerCacheLimit: BASE_LAYER_CACHE_LIMIT,
-            headerLayerCacheRef,
-            headerLayerCacheLimit: HEADER_LAYER_CACHE_LIMIT,
-          },
-          assets: {
-            loadCachedOptionalImage,
-            loadMatchLogoImage,
-            computeMiniBannerLayout,
-            defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
-            raffleHeaderLogoSrc: RAFFLE_HEADER_LOGO_SRC,
-          },
-          config: {
-            availableBrandLogos: AVAILABLE_BRAND_LOGOS,
-            leagueLogoOptions: LEAGUE_LOGO_OPTIONS,
-            getModeLayoutConfig,
-          },
-          state: {
-            matches,
-            activeMatchCount,
-            activeMode,
-            activeSubMenu,
-            brandLogoSrc,
-            footerSrc,
-            footerLink,
-            backgroundSrc,
-            title,
-            includeMiniBanner,
-            shouldSkipHeader,
-            allowCustomTitle,
-            shouldRenderMatches,
-            selectedBrandName,
-            isBigMatchLayout,
-            isScoreModeActive,
-            isTogelMode,
-            isRaffleMode,
-            leagueLogoSrc,
-          },
-          togel: {
-            digits: togelDigits,
-            pool: togelPool,
-            variant: togelPoolVariant,
-            drawTime: togelDrawTime,
-            streamingInfo: togelStreamingInfo,
-          },
-          raffle: {
-            winners: raffleWinners,
-            info: raffleInfo,
-            eventLabel: raffleEventLabel,
-          },
-          helpers: {
-            deriveBrandPalette,
-            defaultBrandPalette: DEFAULT_BRAND_PALETTE,
-            buildTogelTitle,
-            resolveTogelPoolLabel,
-            scoreModeTitle: SCORE_MODE_TITLE,
-            bigMatchTitle: BIG_MATCH_TITLE,
-            formatMatchDateLabel,
-            formatMatchTimeLabel,
-          },
-          setLastRenderAt,
-        });
-      } catch (error) {
-        console.error(error);
-        window.alert("Gagal membuat preview banner. Periksa data & gambar lalu coba lagi.");
-        return null;
-      } finally {
-        isRenderingRef.current = false;
-        setIsRenderingUi(false);
-      }
-    },
-    [
-      canvasRef,
-      brandPaletteCacheRef,
-      BRAND_PALETTE_CACHE_LIMIT,
-      baseLayerCacheRef,
-      BASE_LAYER_CACHE_LIMIT,
-      headerLayerCacheRef,
-      HEADER_LAYER_CACHE_LIMIT,
-      loadCachedOptionalImage,
-      loadMatchLogoImage,
-      computeMiniBannerLayout,
-      DEFAULT_ESPORT_MINI_BANNER,
-      RAFFLE_HEADER_LOGO_SRC,
-      AVAILABLE_BRAND_LOGOS,
-      LEAGUE_LOGO_OPTIONS,
-      getModeLayoutConfig,
-      matches,
-      activeMatchCount,
-      activeMode,
-      activeSubMenu,
-      brandLogoSrc,
-      footerSrc,
-      footerLink,
-      backgroundSrc,
-      title,
-      includeMiniBanner,
-      shouldSkipHeader,
-      allowCustomTitle,
-      shouldRenderMatches,
-      selectedBrandName,
-      isBigMatchLayout,
-      isScoreModeActive,
-      isTogelMode,
-      isRaffleMode,
-      leagueLogoSrc,
-      togelDigits,
-      togelPool,
-      togelPoolVariant,
-      togelDrawTime,
-      togelStreamingInfo,
-      raffleWinners,
-      raffleInfo,
-      raffleEventLabel,
-      deriveBrandPalette,
-      DEFAULT_BRAND_PALETTE,
-      buildTogelTitle,
-      resolveTogelPoolLabel,
-      SCORE_MODE_TITLE,
-      BIG_MATCH_TITLE,
-      formatMatchDateLabel,
-      formatMatchTimeLabel,
-      setLastRenderAt,
-    ]
-  );
-
-  const scheduleRender = useRenderScheduler(renderBanner, {
-    renderLockRef: isRenderingRef,
   });
 
-  // Keeps preview up to date when relevant data changes.
-  const renderDependencies = [
-    matches,
-    activeMatchCount,
-    activeMode,
-    activeSubMenu,
-    brandLogoSrc,
-    footerSrc,
-    footerLink,
-    backgroundSrc,
-    title,
-    includeMiniBanner,
-    shouldSkipHeader,
-    shouldRenderMatches,
-    selectedBrandName,
-    isBigMatchLayout,
-    isScoreModeActive,
-    isTogelMode,
-    isRaffleMode,
-    leagueLogoSrc,
-    togelDigits,
-    togelPool,
-    togelPoolVariant,
-    togelDrawTime,
-    raffleWinners,
-    raffleInfo,
-    raffleEventLabel,
-  ];
-  const dependenciesHash = JSON.stringify(renderDependencies);
-  useEffect(() => {
-    if (isRenderingRef.current) return;
-    scheduleRender();
-  }, [dependenciesHash, scheduleRender]);
-
+  // Draws the entire banner on the canvas.
   useEffect(() => {
     if (!brandLogoSrc) {
       setFooter("", isRaffleMode ? DEFAULT_RAFFLE_FOOTER : "");
@@ -586,73 +514,6 @@ const App = () => {
   }, []);
 
   // Converts the current canvas to PNG and downloads it.
-  const handlePreviewClick = useCallback(async () => {
-    if (isRenderingRef.current) return;
-    const renderedCanvas = await renderBanner();
-    const canvas = renderedCanvas || canvasRef.current;
-    openPreviewModal(canvas);
-  }, [renderBanner, openPreviewModal]);
-
-  const downloadBanner = useCallback(async () => {
-    if (isRenderingRef.current) return;
-    await exportPng({ renderBanner, canvasRef });
-  }, [renderBanner]);
-
-  const downloadAllBanners = useCallback(async () => {
-    if (isRenderingRef.current || isBulkDownloading || !AVAILABLE_BRAND_LOGOS.length) {
-      return;
-    }
-
-    setIsBulkDownloading(true);
-    setBulkProgress(0);
-
-    try {
-      await exportZip({
-        renderBanner,
-        canvasRef,
-        brandOptions: AVAILABLE_BRAND_LOGOS,
-        createBrandSlug,
-        resolveFooterSrcForBrand,
-        backgroundLookup: BACKGROUND_LOOKUP,
-        modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
-        footballDefaultBackground,
-        togelBackgroundSrc,
-        togelPool,
-        includeMiniBanner,
-        defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
-        prefetchImages,
-        activeMode,
-        isTogelMode,
-        footerLink,
-        yieldToFrame,
-        onProgress: setBulkProgress,
-      });
-    } catch (error) {
-      console.error("Gagal membuat ZIP banner:", error);
-      window.alert("Terjadi kesalahan saat membuat ZIP banner. Coba lagi sebentar lagi.");
-    } finally {
-      await renderBanner();
-      setIsBulkDownloading(false);
-      setBulkProgress(0);
-    }
-  }, [
-    AVAILABLE_BRAND_LOGOS,
-    BACKGROUND_LOOKUP,
-    footballDefaultBackground,
-    footerLink,
-    isBulkDownloading,
-    isRenderingRef.current,
-    renderBanner,
-    activeMode,
-    isTogelMode,
-    togelBackgroundSrc,
-    togelPool,
-    includeMiniBanner,
-    prefetchImages,
-    yieldToFrame,
-    setBulkProgress,
-  ]);
-
   const handleClosePreview = useCallback(() => {
     closePreviewModal();
   }, [closePreviewModal]);
