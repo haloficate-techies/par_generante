@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
 import BannerHeader from "../components/layout/BannerHeader";
 
 describe("BannerHeader", () => {
