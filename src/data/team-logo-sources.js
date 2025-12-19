@@ -81,60 +81,60 @@ const TEAM_AUTO_LOGO_SOURCES = [
     source: "https://resources.premierleague.com/premierleague/badges/70/t39.png",
   },
   {
-    names: ["bayern munich", "fc bayern", "bayern"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/2048px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png",
+    names: ["bayern munich", "fc bayern", "bayern", "bayern munchen"],
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000G.svg",
   },
   {
     names: ["borussia dortmund", "dortmund", "bvb"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Borussia_Dortmund_logo.svg/1200px-Borussia_Dortmund_logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000007.svg",
   },
   {
     names: ["rb leipzig", "leipzig"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/RB_Leipzig_2014_logo.svg/1200px-RB_Leipzig_2014_logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000017.svg",
   },
   {
     names: ["bayer leverkusen", "leverkusen"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Bayer_04_Leverkusen_logo.svg/1200px-Bayer_04_Leverkusen_logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000B.svg",
   },
   {
-    names: ["union berlin"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/1._FC_Union_Berlin_Logo.svg/1200px-1._FC_Union_Berlin_Logo.svg.png",
+    names: ["union berlin", "1 fc union berlin"],
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000V.svg",
   },
   {
     names: ["freiburg", "sc freiburg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/SC_Freiburg_logo.svg/841px-SC_Freiburg_logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000A.svg",
   },
   {
     names: ["eintracht frankfurt", "frankfurt"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/125.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000F.svg",
   },
   {
     names: ["vfl wolfsburg", "wolfsburg"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/VfL_Wolfsburg_Logo.svg/1200px-VfL_Wolfsburg_Logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000003.svg",
   },
   {
     names: ["mainz 05", "mainz"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/8/83/Mainz_05_crest.svg/1200px-Mainz_05_crest.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000006.svg",
   },
   {
     names: ["borussia monchengladbach", "monchengladbach", "gladbach"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Borussia_M%C3%B6nchengladbach_logo.svg/250px-Borussia_M%C3%B6nchengladbach_logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000004.svg",
   },
   {
     names: ["fc koln", "1 fc koln", "koln", "cologne"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/1._FC_Koeln_Logo_2014%E2%80%93.svg/1054px-1._FC_Koeln_Logo_2014%E2%80%93.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000008.svg",
   },
   {
     names: ["hoffenheim", "tsg hoffenheim"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Logo_TSG_Hoffenheim.svg/1005px-Logo_TSG_Hoffenheim.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000002.svg",
   },
   {
     names: ["augsburg", "fc augsburg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/FC_Augsburg_logo.svg/920px-FC_Augsburg_logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000010.svg",
   },
   {
     names: ["stuttgart", "vfb stuttgart"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/VfB_Stuttgart_1893_Logo.svg/1103px-VfB_Stuttgart_1893_Logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000D.svg",
   },
   {
     names: ["bochum", "vfl bochum"],
@@ -145,12 +145,12 @@ const TEAM_AUTO_LOGO_SOURCES = [
     source: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Darmstadt_98_football_club_new_logo_2015.png",
   },
   {
-    names: ["heidenheim", "1 fc heidenheim"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/1._FC_Heidenheim_1846.svg/973px-1._FC_Heidenheim_1846.svg.png",
+    names: ["heidenheim", "1 fc heidenheim", "fc heidenheim 1846"],
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-000018.svg",
   },
   {
     names: ["werder bremen", "bremen"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/SV-Werder-Bremen-Logo.svg/798px-SV-Werder-Bremen-Logo.svg.png",
+    source: "https://assets.bundesliga.com/clublogos/DFL-SEA-0001K9/DFL-CLU-00000E.svg",
   },
   {
     names: ["barcelona", "fc barcelona", "barca"],
@@ -250,59 +250,75 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["ac milan", "milan"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Logo_of_AC_Milan.svg/250px-Logo_of_AC_Milan.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef513/milan.png",
   },
   {
     names: ["inter milan", "inter", "internazionale"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/FC_Internazionale_Milano_2021.svg/1200px-FC_Internazionale_Milano_2021.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef496/inter.png",
   },
   {
     names: ["juventus"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg/250px-Juventus_FC_-_logo_black_%28Italy%2C_2020%29.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cfda28/colore=BLACK.png",
   },
   {
     names: ["napoli", "ssc napoli"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/114.png",
+    source: "https://img.legaseriea.it/vimages/68ac86eb/SSC-Napoli_Logo_persfondoscuro.png",
   },
   {
     names: ["roma", "as roma"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/104.png",
+    source: "https://img.legaseriea.it/vimages/62cfd5ce/roma.png",
   },
   {
     names: ["lazio"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/S.S._Lazio_badge.svg/1200px-S.S._Lazio_badge.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef4d5/lazio.png",
   },
   {
     names: ["atalanta"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/105.png",
+    source: "https://img.legaseriea.it/vimages/62cfd69d/atalanta.png",
   },
   {
     names: ["fiorentina"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg/1200px-ACF_Fiorentina_-_logo_%28Italy%2C_2022%29.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef452/fiorentina.png",
   },
   {
     names: ["bologna"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/107.png",
+    source: "https://img.legaseriea.it/vimages/62cef3f6/bologna.png",
+  },
+  {
+    names: ["como"],
+    source: "https://img.legaseriea.it/vimages/62e28387/como.png",
+  },
+  {
+    names: ["cremonese"],
+    source: "https://img.legaseriea.it/vimages/62cef3c1/cremonese.png",
+  },
+  {
+    names: ["parma", "parma calcio"],
+    source: "https://img.legaseriea.it/vimages/632da7d1/parmalogo.png",
+  },
+  {
+    names: ["pisa", "pisa sporting club"],
+    source: "https://img.legaseriea.it/vimages/62e2814e/pisa.png",
   },
   {
     names: ["torino"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500/239.png",
+    source: "https://img.legaseriea.it/vimages/62cef5cb/torino.png",
   },
   {
     names: ["udinese"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Udinese_Calcio_logo.svg/1200px-Udinese_Calcio_logo.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef5e9/udinese.png",
   },
   {
     names: ["sassuolo"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/US_Sassuolo_Calcio_logo.svg/1095px-US_Sassuolo_Calcio_logo.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef590/sassuolo.png",
   },
   {
     names: ["genoa"],
-    source: "https://upload.wikimedia.org/wikipedia/min/4/4e/Genoa_cfc.png",
+    source: "https://img.legaseriea.it/vimages/649e8a06/GENOA-1.png",
   },
   {
     names: ["lecce"],
-    source: "https://upload.wikimedia.org/wikipedia/it/thumb/3/36/US_Lecce_Stemma.svg/820px-US_Lecce_Stemma.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cef4f6/lecce.png",
   },
   {
     names: ["monza"],
@@ -314,11 +330,11 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["cagliari"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Cagliari_Calcio_1920.svg/992px-Cagliari_Calcio_1920.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cfd202/cagliari.png",
   },
   {
     names: ["hellas verona", "verona"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/92/Hellas_Verona_FC_logo_%282020%29.svg/1176px-Hellas_Verona_FC_logo_%282020%29.svg.png",
+    source: "https://img.legaseriea.it/vimages/62cfe8b8/colore=BLUE.png",
   },
   {
     names: ["salernitana"],
@@ -330,31 +346,31 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["paris saint germain", "psg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/1200px-Paris_Saint-Germain_F.C..svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/160.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["marseille", "olympique marseille", "om"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Olympique_Marseille_logo.svg/927px-Olympique_Marseille_logo.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/176.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["lyon", "olympique lyon", "olympique lyonnais", "ol"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/167.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/167.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["monaco", "as monaco"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/LogoASMonacoFC2021.svg/692px-LogoASMonacoFC2021.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/174.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["lille", "losc lille"],
-    source: "https://1000logos.net/wp-content/uploads/2020/09/Lille-Olympique-logo.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/166.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["nice", "ogc nice"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/2502.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/2502.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["rennes", "stade rennais"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Stade_Rennais_FC.svg/983px-Stade_Rennais_FC.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/169.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["montpellier"],
@@ -362,7 +378,7 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["strasbourg"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Racing_Club_de_Strasbourg_logo.svg/1200px-Racing_Club_de_Strasbourg_logo.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/180.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["reims"],
@@ -370,101 +386,108 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["brest"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/Stade_Brestois_29_logo.svg/990px-Stade_Brestois_29_logo.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6997.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["toulouse"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/6/63/Toulouse_FC_2018_logo.svg/1200px-Toulouse_FC_2018_logo.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/179.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["nantes"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500-dark/165.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/165.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["lorient"],
-    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/273.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/273.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["metz"],
-    source: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/FC_Metz_2021_Logo.svg/839px-FC_Metz_2021_Logo.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/177.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["clermont", "clermont foot"],
     source: "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/Clermont_Foot_logo.svg/1015px-Clermont_Foot_logo.svg.png",
   },
   {
-    names: ["lens"],
-    source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/c/cc/RC_Lens_logo.svg/893px-RC_Lens_logo.svg.png",
+    names: ["lens", "rc lens"],
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/175.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["angers"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Angers_SCO_logo.svg/1006px-Angers_SCO_logo.svg.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/7868.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["auxerre"],
-    source: "https://a.espncdn.com/i/teamlogos/soccer/500/172.png",
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/172.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["le havre", "le havre ac"],
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3236.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["paris fc"],
+    source: "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6851.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   // Belgian Pro League
   {
     names: ["club brugge", "club brugge kv"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f7/Club_Brugge_KV_logo.svg/1200px-Club_Brugge_KV_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/22/optimized/87037540-e967-4443-bd1b-042670b4133e-175.png",
   },
   {
     names: ["anderlecht", "rsc anderlecht"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/RSC_Anderlecht_logo.svg/1200px-RSC_Anderlecht_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/07/31/optimized/972dac6a-5d23-4f3e-88f5-d8b3ee851e6f-984.png",
   },
   {
     names: ["union saint gilloise", "union sg"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/Royale_Union_Saint-Gilloise_logo.svg/1200px-Royale_Union_Saint-Gilloise_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/22/optimized/72230810-e6f8-4ccb-9853-236b5ae22bc8-81.png",
   },
   {
     names: ["royal antwerp", "antwerp"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Royal_Antwerp_FC_logo.svg/1200px-Royal_Antwerp_FC_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/22/optimized/3b2d3230-be64-4d75-8971-d507f92b498e-599.png",
   },
   {
     names: ["krc genk", "genk"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/64/KRC_Genk_logo.svg/1200px-KRC_Genk_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/08/07/optimized/1e7eda02-edb9-42e7-8880-f96794c6cb29-713.png",
   },
   {
     names: ["kaa gent", "gent"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/02/KAA_Gent_logo.svg/1200px-KAA_Gent_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/08/07/optimized/0d2a7c80-6244-4443-afaf-bdf0f0e23e62-40.png",
   },
   {
     names: ["standard liege"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/4a/Standard_Li%C3%A8ge_logo.svg/1200px-Standard_Li%C3%A8ge_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2024/08/01/original/cf44703b-48d2-4a92-b859-968d86e19340-383.png",
   },
   {
     names: ["cercle brugge"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/Cercle_Brugge_K.S.V._logo.svg/1200px-Cercle_Brugge_K.S.V._logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/22/optimized/056065e8-3441-4645-a903-3c93c396627b-657.png",
   },
   {
     names: ["kv mechelen"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/49/KV_Mechelen_logo.svg/1200px-KV_Mechelen_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2024/09/18/original/9f1986e1-deaa-48a2-8d55-7304f4106590-47.png",
   },
   {
     names: ["oh leuven", "oud heverlee leuven"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/b/b1/Oud-Heverlee_Leuven_logo.svg/1200px-Oud-Heverlee_Leuven_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/26/optimized/a9dba384-b8bf-4d57-a74a-77e527394daf-239.png",
   },
   {
     names: ["westerlo", "kvc westerlo"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/K.V._Westerlo_logo.svg/1200px-K.V._Westerlo_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/22/optimized/3d32fc5b-587f-4880-8ba7-2b88316e6cbe-745.png",
   },
   {
     names: ["charleroi", "sporting charleroi"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/38/Royal_Charleroi_Sporting_Club_logo.svg/1200px-Royal_Charleroi_Sporting_Club_logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2024/09/18/original/55b8f4cf-9d25-4165-881f-917dbd1a3600-545.png",
   },
   {
     names: ["eupen", "kas eupen"],
@@ -484,7 +507,22 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["sint truiden", "sint truidense", "stvv"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6f/Sint-Truidense_V.V._logo.svg/1200px-Sint-Truidense_V.V._logo.svg.png",
+      "https://statics-maker.llt-services.com/prl/images/2023/06/22/optimized/3a41b0c9-11e4-4796-bb12-4b2bf5b07cbc-933.png",
+  },
+  {
+    names: ["dender", "dender eh", "fcv dender", "fcv dender eh"],
+    source:
+      "https://statics-maker.llt-services.com/prl/images/2023/06/20/optimized/3039e2bf-6eb6-4682-8740-22c1fc0403a9-162.png",
+  },
+  {
+    names: ["raal la louviere", "la louviere"],
+    source:
+      "https://statics-maker.llt-services.com/prl/images/2025/07/02/original/3712148e-c565-422a-9dc8-fef2387b22de-872.png",
+  },
+  {
+    names: ["zulte waregem", "sv zulte waregem"],
+    source:
+      "https://statics-maker.llt-services.com/prl/images/2023/08/10/optimized/b0108679-5ce7-49c4-96b2-2ac11137410c-102.png",
   },
   // EFL Championship (England)
   {

@@ -2,8 +2,14 @@ import AppEnvironment from "./app-environment";
 import AppData, { DEFAULT_BRAND_PALETTE as FALLBACK_BRAND_PALETTE } from "../data/app-data";
 import AppGlobals from "./config/globals";
 
-export const getModeLayoutConfig = AppEnvironment.getModeLayoutResolver();
-export const getModeModule = AppEnvironment.getModeModuleResolver();
+export const getModeLayoutConfig = (modeId) => {
+  const resolver = AppEnvironment.getModeLayoutResolver();
+  return typeof resolver === "function" ? resolver(modeId) : null;
+};
+export const getModeModule = (modeId) => {
+  const resolver = AppEnvironment.getModeModuleResolver();
+  return typeof resolver === "function" ? resolver(modeId) : null;
+};
 
 export const AVAILABLE_BRAND_LOGOS = Array.isArray(AppData.BRAND_LOGO_OPTIONS)
   ? AppData.BRAND_LOGO_OPTIONS
