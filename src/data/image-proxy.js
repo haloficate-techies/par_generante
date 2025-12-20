@@ -26,7 +26,10 @@ const DEFAULT_IMAGE_PROXY_HOSTS = [
   "file.ilustrepro.com",
   "img.legaseriea.it",
   "bundesliga.com",
-  "statics-maker.llt-services.com"
+  "statics-maker.llt-services.com",
+  "ligaportugal.pt",
+  "images.mlssoccer.com",
+  "www.jleague.co",
 ];
 const IMAGE_PROXY_HOST_ALLOWLIST = Array.from(
   new Set([...DEFAULT_IMAGE_PROXY_HOSTS, ...IMAGE_PROXY_EXTRA_HOSTS].filter(Boolean))

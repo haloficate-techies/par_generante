@@ -66,7 +66,8 @@ const TEAM_AUTO_LOGO_SOURCES = [
   },
   {
     names: ["sheffield united", "sheffield utd"],
-    source: "https://upload.wikimedia.org/wikipedia/en/thumb/9/9c/Sheffield_United_FC_logo.svg/1200px-Sheffield_United_FC_logo.svg.png",
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/398.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["tottenham hotspur", "tottenham", "spurs"],
@@ -528,7 +529,7 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["leicester city", "leicester"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/Leicester_City_FC_logo.svg/1200px-Leicester_City_FC_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/375.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["leeds united", "leeds"],
@@ -538,22 +539,22 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["southampton"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/fd/Southampton_FC.svg/1200px-Southampton_FC.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/376.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["ipswich town", "ipswich"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Ipswich_Town.svg/1200px-Ipswich_Town.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/373.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["norwich city", "norwich"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/Norwich_City_FC_logo.svg/1200px-Norwich_City_FC_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/381.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["west bromwich albion", "west brom"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/West_Bromwich_Albion.svg/1200px-West_Bromwich_Albion.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/383.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["sunderland"],
@@ -563,22 +564,22 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["middlesbrough"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d7/Middlesbrough_FC_crest.svg/1200px-Middlesbrough_FC_crest.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/369.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["hull city"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Hull_City_A.F.C._logo.svg/1200px-Hull_City_A.F.C._logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/306.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["coventry city", "coventry"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5b/Coventry_City_F.C._logo.svg/1200px-Coventry_City_F.C._logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/388.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["preston north end", "preston"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/21/Preston_North_End_F.C._logo.svg/1200px-Preston_North_End_F.C._logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/394.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["cardiff city", "cardiff"],
@@ -588,17 +589,17 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["watford"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/e/e2/Watford_FC_logo.svg/1200px-Watford_FC_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/395.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["stoke city"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Stoke_City_FC.svg/1200px-Stoke_City_FC.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/336.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["swansea city", "swansea"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f9/Swansea_City_A.F.C._logo.svg/1200px-Swansea_City_A.F.C._logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/318.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["huddersfield town", "huddersfield"],
@@ -608,27 +609,47 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["queens park rangers", "qpr"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/3e/Queens_Park_Rangers_crest.svg/1200px-Queens_Park_Rangers_crest.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/334.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["birmingham city"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/Birmingham_City_FC_logo.svg/1200px-Birmingham_City_FC_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/392.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["bristol city"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/09/Bristol_City_CoA.svg/1200px-Bristol_City_CoA.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/333.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["blackburn rovers"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/Blackburn_Rovers.svg/1200px-Blackburn_Rovers.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/365.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["charlton athletic", "charlton"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/372.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["derby county", "derby"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/374.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["millwall"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/Millwall_FC_logo.svg/1200px-Millwall_FC_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/391.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["oxford united", "oxford"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/311.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["portsmouth"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/385.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["plymouth argyle", "plymouth"],
@@ -638,38 +659,43 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["sheffield wednesday"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/Sheffield_Wednesday_badge.svg/1200px-Sheffield_Wednesday_badge.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/399.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["rotherham united"],
     source:
       "https://upload.wikimedia.org/wikipedia/en/thumb/5/5f/Rotherham_United_FC.svg/1200px-Rotherham_United_FC.svg.png",
   },
+  {
+    names: ["wrexham"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/352.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
   // Liga Portugal
   {
     names: ["benfica", "sl benfica"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/SL_Benfica_logo.svg/1200px-SL_Benfica_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_SL_Benfica_AF_200x200_300_0707325542.png",
   },
   {
     names: ["porto", "fc porto"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/FC_Porto.svg/1200px-FC_Porto.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_FC_Porto_AF_200x200_300_0ff1ab3115.png",
   },
   {
     names: ["sporting cp", "sporting lisbon"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/31/Sporting_Clube_de_Portugal.png/1200px-Sporting_Clube_de_Portugal.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_Sporting_CP_Positivo_200x200_300_fcdfc36244.png",
   },
   {
     names: ["braga", "sc braga"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/SC_Braga_logo.svg/1200px-SC_Braga_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_SC_Braga_AF_200x200_300_53d73be09a.png",
   },
   {
     names: ["vitoria guimaraes", "vitoria sc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/9/92/Vit%C3%B3ria_SC_logo.svg/1200px-Vit%C3%B3ria_SC_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Simbolo_Original_Preto_branco_2f7cd164d2.png",
   },
   {
     names: ["boavista"],
@@ -677,24 +703,49 @@ const TEAM_AUTO_LOGO_SOURCES = [
       "https://upload.wikimedia.org/wikipedia/en/thumb/0/02/Boavista_F.C._logo.svg/1200px-Boavista_F.C._logo.svg.png",
   },
   {
-    names: ["famalicao"],
+    names: ["famalicao", "fc famalicao"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/F.C._Famalic%C3%A3o_logo.svg/1200px-F.C._Famalic%C3%A3o_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_FC_Famalicao_AF_200x200_300_af9671a0a4.png",
   },
   {
     names: ["estoril", "estoril praia"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5f/G.D._Estoril_Praia_logo.svg/1200px-G.D._Estoril_Praia_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_Estoril_Praia_044249cca4.png",
   },
   {
-    names: ["casa pia"],
+    names: ["casa pia", "casa pia ac"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/84/Casa_Pia_A.C._logo.svg/1200px-Casa_Pia_A.C._logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_Casa_Pia_AC_AF_200x200_300_aa0e9e9667.png",
   },
   {
-    names: ["rio ave"],
+    names: ["rio ave", "rio ave fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/Rio_Ave_FC_logo.svg/1200px-Rio_Ave_FC_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_Rio_Ave_FC_AF_200x200_300_e2e84f5563.png",
+  },
+  {
+    names: ["nacional", "cd nacional"],
+    source:
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_CD_Nacional_AF_200x200_300_a3a56992f4.png",
+  },
+  {
+    names: ["santa clara"],
+    source:
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_CD_Santa_Clara_Emblema_1x1_2de61e70ec.png",
+  },
+  {
+    names: ["tondela", "cd tondela"],
+    source:
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_CD_Tondela_AF_200x200_300_391877e498.png",
+  },
+  {
+    names: ["alverca", "fc alverca"],
+    source:
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_FC_Alverca_280d268be1.png",
+  },
+  {
+    names: ["afs", "avs"],
+    source:
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_AVS_AF_200x200_300_5c5ea09677.png",
   },
   {
     names: ["vizela"],
@@ -712,19 +763,19 @@ const TEAM_AUTO_LOGO_SOURCES = [
       "https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Portimonense_S.C._logo.svg/1200px-Portimonense_S.C._logo.svg.png",
   },
   {
-    names: ["moreirense"],
+    names: ["moreirense", "moreirense fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Moreirense_F.C._logo.svg/1200px-Moreirense_F.C._logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_MFC_logo_94240ed691.png",
   },
   {
-    names: ["gil vicente"],
+    names: ["gil vicente", "gil vicente fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/0b/Gil_Vicente_F.C._logo.svg/1200px-Gil_Vicente_F.C._logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_Gil_Vicente_AF_200x200_300_d617d176cd.png",
   },
   {
     names: ["estrela amadora"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Club_Desportivo_Estrela.png/1200px-Club_Desportivo_Estrela.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_CF_Est_Amadora_AF_200x200_300_576b195166.png",
   },
   {
     names: ["farense", "sc farense"],
@@ -734,83 +785,118 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["arouca"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/7/79/F.C._Arouca_logo.svg/1200px-F.C._Arouca_logo.svg.png",
+      "https://www.ligaportugal.pt/backoffice/assets/thumbnail_Emb_FC_Arouca_AF_200x200_300_ab36fb5518.png",
   },
   // Campeonato Brasileiro Serie A
   {
     names: ["palmeiras"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/1/10/SE_Palmeiras.svg/1200px-SE_Palmeiras.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/2029.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["flamengo"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Clube_de_Regatas_do_Flamengo_logo.svg/1200px-Clube_de_Regatas_do_Flamengo_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/819.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["botafogo"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Botafogo_de_Futebol_e_Regatas_logo.svg/1200px-Botafogo_de_Futebol_e_Regatas_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6086.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["gremio"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Gremio.svg/1200px-Gremio.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6273.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
-    names: ["atletico mineiro"],
+    names: ["atletico mineiro", "atletico mineiro saf"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/Clube_Atl%C3%A9tico_Mineiro_logo.svg/1200px-Clube_Atl%C3%A9tico_Mineiro_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/7632.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["athletico paranaense"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Club_Athletico_Paranaense_2020.svg/1200px-Club_Athletico_Paranaense_2020.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3458.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["fluminense"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/88/Fluminense_FC_crest.svg/1200px-Fluminense_FC_crest.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3445.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["corinthians"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/SC_Corinthians_Paulista_logo.svg/1200px-SC_Corinthians_Paulista_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/874.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["sao paulo"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6f/S%C3%A3o_Paulo_Futebol_Clube.svg/1200px-S%C3%A3o_Paulo_Futebol_Clube.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/2026.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
-    names: ["santos"],
+    names: ["santos", "santos fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Santos_logo.svg/1200px-Santos_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/2674.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["international", "internacional", "sport club internacional"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6a/SC_Internacional_logo.svg/1200px-SC_Internacional_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/1936.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
-    names: ["cruzeiro"],
+    names: ["cruzeiro", "cruzeiro saf"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/Cruzeiro_Esporte_Clube_%28logo%29.svg/1200px-Cruzeiro_Esporte_Clube_%28logo%29.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/2022.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
-    names: ["vasco da gama", "vasco"],
+    names: ["vasco da gama", "vasco", "vasco da gama saf"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/26/CR_Vasco_da_Gama_logo.svg/1200px-CR_Vasco_da_Gama_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3454.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["bahia"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/a/a8/EC_Bahia_logo.svg/1200px-EC_Bahia_logo.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/9967.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["chapecoense"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/9318.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["ceara"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/9969.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["mirassol"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/9169.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["remo"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/4936.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["vitoria"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3457.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["fortaleza"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/1/10/Fortaleza_Esporte_Clube.svg/1200px-Fortaleza_Esporte_Clube.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6272.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["juventude"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6270.png&scale=crop&cquality=40&location=origin&w=80&h=80",
+  },
+  {
+    names: ["sport", "sport recife"],
+    source:
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/7635.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["goias"],
@@ -818,9 +904,9 @@ const TEAM_AUTO_LOGO_SOURCES = [
       "https://upload.wikimedia.org/wikipedia/en/thumb/5/58/Goi%C3%A1s_Esporte_Clube_logo.svg/1200px-Goi%C3%A1s_Esporte_Clube_logo.svg.png",
   },
   {
-    names: ["coritiba"],
+    names: ["coritiba", "coritiba saf"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Coritiba_FBC.svg/1200px-Coritiba_FBC.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/3456.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   {
     names: ["america mineiro"],
@@ -835,7 +921,7 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["bragantino", "red bull bragantino"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/31/RedBullBragantino.svg/1200px-RedBullBragantino.svg.png",
+      "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/6079.png&scale=crop&cquality=40&location=origin&w=80&h=80",
   },
   
   // Eredivisie (Netherlands)
@@ -933,147 +1019,152 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["la galaxy"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Los_Angeles_Galaxy_logo.svg/1200px-Los_Angeles_Galaxy_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755165/assets/logos/mls-clubs/Club_Logo-LA_Galaxy_fg0wjp.png",
   },
   {
     names: ["los angeles fc", "lafc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Los_Angeles_Football_Club.svg/1200px-Los_Angeles_Football_Club.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755309/assets/logos/mls-clubs/Club_Logo-LAFC_djrhru.png",
   },
   {
-    names: ["seattle sounders"],
+    names: ["seattle sounders", "seattle sounders fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Seattle_Sounders_FC_logo.svg/1200px-Seattle_Sounders_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748265125/assets/logos/mls-clubs/Club_Logo-Seattle_e6jk2x.png",
   },
   {
     names: ["portland timbers"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Portland_Timbers_logo.svg/1200px-Portland_Timbers_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769540/assets/logos/mls-clubs/Club_Logo-Portland_qihpaz.png",
   },
   {
     names: ["sporting kansas city", "skc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Sporting_Kansas_City_logo.svg/1200px-Sporting_Kansas_City_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747754918/assets/logos/mls-clubs/Club_Logo-Kansas_City_cnhd75.png",
   },
   {
-    names: ["st louis city", "stl city"],
+    names: ["st louis city", "stl city", "st. louis city sc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/St._Louis_City_SC_logo.svg/1200px-St._Louis_City_SC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747771858/assets/logos/mls-clubs/Club_Logo-Saint_Louis_guz12c.png",
   },
   {
     names: ["austin fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/Austin_FC_logo.svg/1200px-Austin_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747499975/assets/logos/mls-clubs/Club_Logo-Austin_pa9xtu.png",
   },
   {
     names: ["inter miami", "inter miami cf"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Club_Internacional_de_F%C3%BAtbol_Miami_logo.svg/1200px-Club_Internacional_de_F%C3%BAtbol_Miami_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755405/assets/logos/mls-clubs/Club_Logo-Miami_tyqe64.png",
   },
   {
     names: ["orlando city"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/2c/Orlando_City_2014.svg/1200px-Orlando_City_2014.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769281/assets/logos/mls-clubs/Club_Logo-Orlando_ryyn7a.png",
   },
   {
     names: ["atlanta united"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/fd/Atlanta_United_FC_logo.svg/1200px-Atlanta_United_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747499879/assets/logos/mls-clubs/Club_Logo-Atlanta_jtk7ku.png",
   },
   {
     names: ["new york city fc", "nycfc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f9/New_York_City_FC.svg/1200px-New_York_City_FC.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747756306/assets/logos/mls-clubs/Club_Logo-New_York_City_xu6vax.png",
   },
   {
-    names: ["new york red bulls", "ny red bulls"],
+    names: ["new york red bulls", "ny red bulls", "red bull new york"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/New_York_Red_Bulls_logo.svg/1200px-New_York_Red_Bulls_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747771783/assets/logos/mls-clubs/Club_Logo-RBNY_dwawvt.png",
   },
   {
     names: ["philadelphia union"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/e/ef/Philadelphia_Union_logo.svg/1200px-Philadelphia_Union_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747769446/assets/logos/mls-clubs/Club_Logo-Philadelphia_im7pqg.png",
   },
   {
     names: ["fc cincinnati"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/86/FC_Cincinnati_primary_logo_2018.svg/1200px-FC_Cincinnati_primary_logo_2018.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500249/assets/logos/mls-clubs/Club_Logo-Cincinnati_jwgkps.png",
   },
   {
     names: ["columbus crew"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Columbus_Crew_SC_logo_2021.svg/1200px-Columbus_Crew_SC_logo_2021.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500414/assets/logos/mls-clubs/Club_Logo-Columbus_light_z3eq8l.png",
   },
   {
     names: ["dc united", "d.c. united"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/7/71/D.C._United_logo.svg/1200px-D.C._United_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500504/assets/logos/mls-clubs/Club_Logo-D.C_t03ekm.png",
   },
   {
     names: ["chicago fire"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/7/73/Chicago_Fire_FC_logo.svg/1200px-Chicago_Fire_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500178/assets/logos/mls-clubs/Club_Logo-Chicago_jm2yev.png",
   },
   {
-    names: ["houston dynamo"],
+    names: ["houston dynamo", "houston dynamo fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/Houston_Dynamo_FC_logo.svg/1200px-Houston_Dynamo_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500939/assets/logos/mls-clubs/Club_Logo-Houston_oifm77.png",
   },
   {
     names: ["fc dallas"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6e/FC_Dallas_logo.svg/1200px-FC_Dallas_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500567/assets/logos/mls-clubs/Club_Logo-Dallas_sysmtj.png",
   },
   {
-    names: ["minnesota united"],
+    names: ["minnesota united", "minnesota united fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/1/18/Minnesota_United_FC_logo.svg/1200px-Minnesota_United_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747754826/assets/logos/mls-clubs/Club_Logo-Minnesota_ftweor.png",
   },
   {
     names: ["nashville sc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/Nashville_SC_badge.svg/1200px-Nashville_SC_badge.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755999/assets/logos/mls-clubs/Club_Logo-Nashville_rb9vwu.png",
   },
   {
-    names: ["vancouver whitecaps"],
+    names: ["vancouver whitecaps", "vancouver whitecaps fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Vancouver_Whitecaps_FC_logo.svg/1200px-Vancouver_Whitecaps_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748265547/assets/logos/mls-clubs/Club_Logo-Vancouver_ao9phl.png",
   },
   {
-    names: ["cf montreal", "montreal impact"],
+    names: ["cf montreal", "montreal impact", "cf montreal"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Club_de_Foot_Montr%C3%A9al_logo.svg/1200px-Club_de_Foot_Montr%C3%A9al_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747755806/assets/logos/mls-clubs/Club_Logo-Montreal_beeqnh.png",
   },
   {
     names: ["toronto fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/c/c0/Toronto_FC_2010.svg/1200px-Toronto_FC_2010.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748265251/assets/logos/mls-clubs/Club_Logo-Toronto_vz6hao.png",
   },
   {
     names: ["new england revolution"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/New_England_Revolution_logo_%282021%29.svg/1200px-New_England_Revolution_logo_%282021%29.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1766020750/assets/NE_Logo_PRI_FC_RGB_480x480_fdx2us.png",
   },
   {
     names: ["colorado rapids"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Colorado_Rapids_logo.svg/1200px-Colorado_Rapids_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500322/assets/logos/mls-clubs/Club_Logo-Colorado_n5kpss.png",
   },
   {
     names: ["san jose earthquakes", "san jose"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/San_Jose_Earthquakes_2014.svg/1200px-San_Jose_Earthquakes_2014.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748262048/assets/logos/mls-clubs/Club_Logo-San_Jose_opzlmo.png",
   },
   {
     names: ["real salt lake"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Real_Salt_Lake_2010.svg/1200px-Real_Salt_Lake_2010.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747776403/assets/logos/mls-clubs/Club_Logo-Salt_Lake_City_hpvde5.png",
   },
   {
     names: ["charlotte fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Charlotte_FC_logo.svg/1200px-Charlotte_FC_logo.svg.png",
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1747500045/assets/logos/mls-clubs/Club_Logo-Charlotte_p7sznf.png",
+  },
+  {
+    names: ["san diego fc"],
+    source:
+      "https://images.mlssoccer.com/image/upload/t_club_logo_medium/v1748261519/assets/logos/mls-clubs/Club_Logo-San_Diego_nwpyul.png",
   },
   {
     names: ["miami fusion"],
@@ -1276,47 +1367,47 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["kawasaki frontale"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Kawasaki_Frontale_logo.svg/1200px-Kawasaki_Frontale_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/kawasakif.svg",
   },
   {
-    names: ["yokohama f marinos", "yokohama marinos"],
+    names: ["yokohama f marinos", "yokohama marinos", "yokohama f-marinos"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/2e/Yokohama_F._Marinos_logo.svg/1200px-Yokohama_F._Marinos_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/yokohamafm.svg",
   },
   {
     names: ["urawa reds", "urawa red diamonds"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Urawa_Red_Diamonds_logo.svg/1200px-Urawa_Red_Diamonds_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/urawa.svg",
   },
   {
     names: ["kashima antlers"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Kashima_Antlers.svg/1200px-Kashima_Antlers.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/kashima.svg",
   },
   {
     names: ["gamba osaka"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/6/6a/Gamba_Osaka_logo.svg/1200px-Gamba_Osaka_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/gosaka.svg",
   },
   {
     names: ["cerezo osaka"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/d/d8/Cerezo_Osaka_logo.svg/1200px-Cerezo_Osaka_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/cosaka.svg",
   },
   {
     names: ["nagoya grampus"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/49/Nagoya_Grampus_logo.svg/1200px-Nagoya_Grampus_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/nagoya.svg",
   },
   {
     names: ["vissel kobe"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/fc/Vissel_Kobe_logo.svg/1200px-Vissel_Kobe_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/kobe.svg",
   },
   {
     names: ["sanfrecce hiroshima"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Sanfrecce_Hiroshima_logo.svg/1200px-Sanfrecce_Hiroshima_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/hiroshima.svg",
   },
   {
     names: ["sagan tosu"],
@@ -1326,7 +1417,7 @@ const TEAM_AUTO_LOGO_SOURCES = [
   {
     names: ["kashiwa reysol"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Kashiwa_Reysol_logo.svg/1200px-Kashiwa_Reysol_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/kashiwa.svg",
   },
   {
     names: ["consadole sapporo"],
@@ -1334,34 +1425,54 @@ const TEAM_AUTO_LOGO_SOURCES = [
       "https://upload.wikimedia.org/wikipedia/en/thumb/0/0a/Hokkaido_Consadole_Sapporo_logo.svg/1200px-Hokkaido_Consadole_Sapporo_logo.svg.png",
   },
   {
-    names: ["kyoto sanga"],
+    names: ["kyoto sanga", "kyoto sanga fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/Kyoto_Sanga_F.C._logo.svg/1200px-Kyoto_Sanga_F.C._logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/kyoto.svg",
   },
   {
     names: ["avispa fukuoka"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/Avispa_Fukuoka_logo.svg/1200px-Avispa_Fukuoka_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/fukuoka.svg",
   },
   {
     names: ["albirex niigata"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Albirex_Niigata_logo.svg/1200px-Albirex_Niigata_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/niigata.svg",
   },
   {
     names: ["shonan bellmare"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/Shonan_Bellmare_logo.svg/1200px-Shonan_Bellmare_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/shonan.svg",
   },
   {
     names: ["tokyo fc", "fc tokyo"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/FC_Tokyo_logo.svg/1200px-FC_Tokyo_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/ftokyo.svg",
   },
   {
     names: ["yokohama fc"],
     source:
-      "https://upload.wikimedia.org/wikipedia/en/thumb/2/2d/Yokohama_FC_logo.svg/1200px-Yokohama_FC_logo.svg.png",
+      "https://www.jleague.co/static/images/clubs/emblems/yokohamafc.svg",
+  },
+  {
+    names: ["tokyo verdy"],
+    source:
+      "https://www.jleague.co/static/images/clubs/emblems/tokyov-alt.svg",
+  },
+  {
+    names: ["fc machida zelvia", "machida zelvia", "machida"],
+    source:
+      "https://www.jleague.co/static/images/clubs/emblems/machida.svg",
+  },
+  {
+    names: ["shimizu s-pulse", "shimizu s pulse"],
+    source:
+      "https://www.jleague.co/static/images/clubs/emblems/shimizu.svg",
+  },
+  {
+    names: ["fagiano okayama"],
+    source:
+      "https://www.jleague.co/static/images/clubs/emblems/okayama.svg",
   },
   // Turkish Super Lig
   {
