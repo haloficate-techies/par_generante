@@ -30,6 +30,10 @@ const DEFAULT_IMAGE_PROXY_HOSTS = [
   "ligaportugal.pt",
   "images.mlssoccer.com",
   "www.jleague.co",
+  "kleague.com",
+  "static-files.saudi-pro-league.pulselive.com",
+  "aleagues.com.au",
+  "cdn.nba.com"
 ];
 const IMAGE_PROXY_HOST_ALLOWLIST = Array.from(
   new Set([...DEFAULT_IMAGE_PROXY_HOSTS, ...IMAGE_PROXY_EXTRA_HOSTS].filter(Boolean))

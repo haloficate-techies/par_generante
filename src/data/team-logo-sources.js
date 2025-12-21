@@ -1474,6 +1474,320 @@ const TEAM_AUTO_LOGO_SOURCES = [
     source:
       "https://www.jleague.co/static/images/clubs/emblems/okayama.svg",
   },
+  // K League 1 (South Korea)
+  {
+    names: ["jeonbuk", "jeonbuk hyundai", "jeonbuk hyundai motors"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K05.png",
+  },
+  {
+    names: ["ulsan", "ulsan hyundai", "ulsan hd"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K01.png",
+  },
+  {
+    names: ["daejeon", "daejeon hana citizen", "daejeon hana"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K10.png",
+  },
+  {
+    names: ["fc seoul", "seoul", "seoul fc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K09.png",
+  },
+  {
+    names: ["gangwon", "gangwon fc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K21.png",
+  },
+  {
+    names: ["gimcheon sangmu", "gimcheon", "gimcheon sangmu fc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K35.png",
+  },
+  {
+    names: ["pohang", "pohang steelers"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K03.png",
+  },
+  {
+    names: ["daegu", "daegu fc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K17.png",
+  },
+  {
+    names: ["jeju", "jeju united", "jeju utd", "jeju united fc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K04.png",
+  },
+  {
+    names: ["fc anyang", "anyang"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K27.png",
+  },
+  {
+    names: ["suwon fc", "suwonfc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K29.png",
+  },
+  {
+    names: ["gwangju", "gwangju fc"],
+    source: "https://www.kleague.com/assets/images/emblem/emblem_K22.png",
+  },
+  // Saudi Pro League (Saudi Arabia)
+  {
+    names: ["al ahli", "al-ahli"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/AHL.svg",
+  },
+  {
+    names: ["al ettifaq", "al-ettifaq"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/ITF.svg",
+  },
+  {
+    names: ["al fateh", "al-fateh"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/FAT.svg",
+  },
+  {
+    names: ["al fayha", "al-fayha"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/FEI.svg",
+  },
+  {
+    names: ["al hilal", "al-hilal"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/HIL.svg",
+  },
+  {
+    names: ["al ittihad", "al-ittihad"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/ITH.svg",
+  },
+  {
+    names: ["al khaleej", "al-khaleej"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/KHA.svg",
+  },
+  {
+    names: ["al kholood", "al-kholood"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/KHL2.svg",
+  },
+  {
+    names: ["al najmah", "al-najmah"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/NAJ.svg",
+  },
+  {
+    names: ["al nassr", "al-nassr"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/NSR.svg",
+  },
+  {
+    names: ["al okhdood", "al-okhdood", "al akhdoud", "al-akhdoud"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/AKH.svg",
+  },
+  {
+    names: ["al qadsiah", "al-qadsiah", "al qadisiyah", "al-qadisiyah"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/QAD.svg",
+  },
+  {
+    names: ["al riyadh", "al-riyadh"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/RIY.svg",
+  },
+  {
+    names: ["al shabab", "al-shabab"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/SHA.svg",
+  },
+  {
+    names: ["al taawoun", "al-taawoun", "al taawon", "al-taawon"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/TAA.svg",
+  },
+  {
+    names: ["al hazem", "al-hazem", "al hazm", "al-hazm"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/HAZ.svg",
+  },
+  {
+    names: ["damac"],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/DAM.svg",
+  },
+  {
+    names: ["neom", "neom sc", "neom s.c."],
+    source: "https://static-files.saudi-pro-league.pulselive.com/clubs/logos/NEO.svg",
+  },
+  // A-League (Australia)
+  {
+    names: ["adelaide united"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/adelaide-united.f7bfe7da.png",
+  },
+  {
+    names: ["auckland fc", "auckland"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/auckland.e97123f6.png",
+  },
+  {
+    names: ["brisbane roar"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/brisbane-roar.df4ccb91.png",
+  },
+  {
+    names: ["canberra united"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/canberra-united.66ec04e5.png",
+  },
+  {
+    names: ["central coast mariners", "central coast"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/central-coast-mariners.2b359818.png",
+  },
+  {
+    names: ["macarthur fc", "macarthur"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/macarthur-fc.935d78d3.png",
+  },
+  {
+    names: ["melbourne city", "melbourne city fc"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/melbourne-city.0ae305f1.png",
+  },
+  {
+    names: ["melbourne victory"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/melbourne-victory.cf8dff21.png",
+  },
+  {
+    names: ["newcastle jets", "newcastle jets fc"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/newcastle-jets.0cadef79.png",
+  },
+  {
+    names: ["perth glory"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/perth-glory.377ac197.png",
+  },
+  {
+    names: ["sydney fc", "sydney"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/sydney-fc.1c584b06.png",
+  },
+  {
+    names: ["wellington phoenix"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/wellington-phoenix.51174e3b.png",
+  },
+  {
+    names: ["western sydney wanderers", "wsw"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/western-sydney-wanderers.809cea32.png",
+  },
+  {
+    names: ["western united", "western united fc"],
+    source:
+      "https://aleagues.com.au/wp-content/themes/aleagues/build/images/western-united.b1afb2eb.png",
+  },
+  // NBA (United States)
+  {
+    names: ["atlanta hawks", "hawks"],
+    source: "https://cdn.nba.com/logos/nba/1610612737/global/L/logo.svg",
+  },
+  {
+    names: ["boston celtics", "celtics"],
+    source: "https://cdn.nba.com/logos/nba/1610612738/global/L/logo.svg",
+  },
+  {
+    names: ["brooklyn nets", "nets"],
+    source: "https://cdn.nba.com/logos/nba/1610612751/global/L/logo.svg",
+  },
+  {
+    names: ["new york knicks", "ny knicks", "knicks"],
+    source: "https://cdn.nba.com/logos/nba/1610612752/global/L/logo.svg",
+  },
+  {
+    names: ["philadelphia 76ers", "76ers", "sixers"],
+    source: "https://cdn.nba.com/logos/nba/1610612755/global/L/logo.svg",
+  },
+  {
+    names: ["toronto raptors", "raptors"],
+    source: "https://cdn.nba.com/logos/nba/1610612761/global/L/logo.svg",
+  },
+  {
+    names: ["chicago bulls", "bulls"],
+    source: "https://cdn.nba.com/logos/nba/1610612741/global/L/logo.svg",
+  },
+  {
+    names: ["cleveland cavaliers", "cavaliers", "cavs"],
+    source: "https://cdn.nba.com/logos/nba/1610612739/global/L/logo.svg",
+  },
+  {
+    names: ["detroit pistons", "pistons"],
+    source: "https://cdn.nba.com/logos/nba/1610612765/global/L/logo.svg",
+  },
+  {
+    names: ["indiana pacers", "pacers"],
+    source: "https://cdn.nba.com/logos/nba/1610612754/global/L/logo.svg",
+  },
+  {
+    names: ["milwaukee bucks", "bucks"],
+    source: "https://cdn.nba.com/logos/nba/1610612749/global/L/logo.svg",
+  },
+  {
+    names: ["charlotte hornets", "hornets"],
+    source: "https://cdn.nba.com/logos/nba/1610612766/global/L/logo.svg",
+  },
+  {
+    names: ["miami heat", "heat"],
+    source: "https://cdn.nba.com/logos/nba/1610612748/global/L/logo.svg",
+  },
+  {
+    names: ["orlando magic", "magic"],
+    source: "https://cdn.nba.com/logos/nba/1610612753/global/L/logo.svg",
+  },
+  {
+    names: ["washington wizards", "wizards"],
+    source: "https://cdn.nba.com/logos/nba/1610612764/global/L/logo.svg",
+  },
+  {
+    names: ["denver nuggets", "nuggets"],
+    source: "https://cdn.nba.com/logos/nba/1610612743/global/L/logo.svg",
+  },
+  {
+    names: ["minnesota timberwolves", "timberwolves", "wolves"],
+    source: "https://cdn.nba.com/logos/nba/1610612750/global/L/logo.svg",
+  },
+  {
+    names: ["oklahoma city thunder", "okc thunder", "thunder"],
+    source: "https://cdn.nba.com/logos/nba/1610612760/global/L/logo.svg",
+  },
+  {
+    names: ["portland trail blazers", "trail blazers", "blazers"],
+    source: "https://cdn.nba.com/logos/nba/1610612757/global/L/logo.svg",
+  },
+  {
+    names: ["utah jazz", "jazz"],
+    source: "https://cdn.nba.com/logos/nba/1610612762/global/L/logo.svg",
+  },
+  {
+    names: ["golden state warriors", "warriors"],
+    source: "https://cdn.nba.com/logos/nba/1610612744/global/L/logo.svg",
+  },
+  {
+    names: ["la clippers", "los angeles clippers", "clippers"],
+    source: "https://cdn.nba.com/logos/nba/1610612746/global/L/logo.svg",
+  },
+  {
+    names: ["los angeles lakers", "la lakers", "lakers"],
+    source: "https://cdn.nba.com/logos/nba/1610612747/global/L/logo.svg",
+  },
+  {
+    names: ["phoenix suns", "suns"],
+    source: "https://cdn.nba.com/logos/nba/1610612756/global/L/logo.svg",
+  },
+  {
+    names: ["sacramento kings", "kings"],
+    source: "https://cdn.nba.com/logos/nba/1610612758/global/L/logo.svg",
+  },
+  {
+    names: ["dallas mavericks", "mavericks", "mavs"],
+    source: "https://cdn.nba.com/logos/nba/1610612742/global/L/logo.svg",
+  },
+  {
+    names: ["houston rockets", "rockets"],
+    source: "https://cdn.nba.com/logos/nba/1610612745/global/L/logo.svg",
+  },
+  {
+    names: ["memphis grizzlies", "grizzlies"],
+    source: "https://cdn.nba.com/logos/nba/1610612763/global/L/logo.svg",
+  },
+  {
+    names: ["new orleans pelicans", "pelicans"],
+    source: "https://cdn.nba.com/logos/nba/1610612740/global/L/logo.svg",
+  },
+  {
+    names: ["san antonio spurs", "spurs"],
+    source: "https://cdn.nba.com/logos/nba/1610612759/global/L/logo.svg",
+  },
   // Turkish Super Lig
   {
     names: ["galatasaray"],
