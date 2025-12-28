@@ -1,0 +1,52 @@
+export const MODE_CONFIG = [
+  {
+    id: "football",
+    label: "Sepak Bola",
+    title: "Football Banner Generator",
+    subtitle: "Buat banner jadwal sepakbola berukuran 1080 x 1080 dengan cepat.",
+    pageBackgroundClass: "bg-slate-950",
+    subMenus: [
+      { id: "schedule", label: "Jadwal" },
+      { id: "scores", label: "Skor Bola" },
+      { id: "big_match", label: "Big Match" },
+    ],
+    defaultSubMenuId: "schedule",
+  },
+  {
+    id: "basketball",
+    label: "Bola Basket",
+    title: "Basketball Banner Generator",
+    subtitle: "Layout sama sementara, siap untuk penyesuaian konten basket.",
+    pageBackgroundClass: "bg-gradient-to-br from-orange-950 via-slate-950 to-slate-950",
+    subMenus: [{ id: "schedule", label: "Jadwal" }],
+    defaultSubMenuId: "schedule",
+  },
+  {
+    id: "esports",
+    label: "E-Sports",
+    title: "E-Sports Banner Generator",
+    subtitle: "Gunakan template ini untuk jadwal turnamen gim favoritmu.",
+    pageBackgroundClass: "bg-slate-950",
+    subMenus: [{ id: "schedule", label: "Jadwal" }],
+    defaultSubMenuId: "schedule",
+  },
+  {
+    id: "togel",
+    label: "Togel",
+    title: "Togel Banner Generator",
+    subtitle: "Template siap pakai untuk informasi keluaran dan jadwal togel.",
+    pageBackgroundClass: "bg-slate-950",
+    subMenus: [],
+    defaultSubMenuId: "",
+  },
+  {
+    id: "raffle",
+    label: "Raffle",
+    title: "Raffle Banner Generator",
+    subtitle: "Siapkan banner pengumuman raffle dengan cepat.",
+    pageBackgroundClass: "bg-slate-950",
+    subMenus: [],
+    defaultSubMenuId: "",
+  },
+];
+

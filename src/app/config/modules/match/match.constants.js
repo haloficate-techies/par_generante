@@ -1,0 +1,3 @@
+export const MATCH_COUNT_OPTIONS = [1, 2, 3, 4, 5];
+export const MAX_MATCHES = MATCH_COUNT_OPTIONS[MATCH_COUNT_OPTIONS.length - 1];
+

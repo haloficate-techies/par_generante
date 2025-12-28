@@ -16,7 +16,7 @@
 - `src/app/app-environment.js`
   - Abstraksi singleton agar modul lain dapat mendaftar hooks, komponen, dan mode tanpa bergantung pada `window.*`. Menyimpan data/globals di memori internal.
 - `src/app/config/globals.js`
-  - Menyediakan konstanta lintas mode (default background, streaming lookup, dll) dan menyetorkannya ke `AppEnvironment`.
+  - Re-export dari kumpulan modul domain-specific di `src/app/config/modules/` agar `AppEnvironment` tetap menerima bundle konstan global, sembari membuka pintu ke import langsung per modul.
 
 ### 4. Sistem Mode
 - `src/app/mode-layout-registry.js` & `src/app/mode-modules.js`
