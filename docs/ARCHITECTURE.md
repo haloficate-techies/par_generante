@@ -15,6 +15,14 @@
 - `src/utils/canvas-utils.js`
   - Kumpulan fungsi menggambar background, kartu pertandingan, togel result, footer, dsb. Mengekspor `CanvasUtils` sebagai modul biasa.
 
+### 2.5 Barrel Exports (Index Files)
+- `src/app/index.js` — App configuration & constants
+- `src/hooks/index.js` — Semua custom hooks
+- `src/components/index.js` — Semua komponen UI
+- `src/utils/index.js` — Utilitas (formatter, dll.)
+
+Pattern ini mengurangi boilerplate import dan memudahkan refactor internal struktur tanpa mengubah API publik.
+
 ### 3. Konfigurasi & App Environment
 - `src/app/app-environment.js`
   - Abstraksi singleton agar modul lain dapat mendaftar hooks, komponen, dan mode tanpa bergantung pada `window.*`. Menyimpan data/globals di memori internal.
@@ -40,6 +48,8 @@
   - Mengambil alih logika side-effect (fetch raffle, integrasi layanan hapus background, debounce render, serta kontrol modal preview).
 - `src/hooks/props/use-match-list-form-props.js`, `use-banner-preview-props.js`
   - Membangun props untuk `MatchListForm` dan `BannerPreviewPanel` di luar `App.jsx` sehingga file utama fokus ke orkestrasi.
+- `src/hooks/render/use-render-configuration.js`
+  - Konsolidasi semua konfigurasi render (`assets`, `config`, `state`, `togel/raffle state`, `helpers`) untuk digunakan oleh `useBannerRenderPipeline`.
 
 ### 6. Komponen
 - `src/components/layout/*.jsx`

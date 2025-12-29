@@ -25,6 +25,8 @@
 3. ✅ **Direct imports** (45 min) — migrate key hooks/components to import from the new modules instead of `AppEnvironment`.
 4. ✅ **App-constants migration** (60 min) — moved `app/app-constants.js` entirely onto module imports instead of the `AppGlobals` aggregator.
 5. ✅ **Props extraction** (45 min) — extracted `matchListFormProps` and `bannerPreviewProps` builders from `App.jsx` into dedicated hooks to reduce complexity.
+6. ✅ **Render config consolidation** (30 min) — unified all render configuration useMemo blocks into `useRenderConfiguration` to simplify `App.jsx`.
+7. ✅ **Barrel exports** (60 min) — added `index.js` barrels for app, hooks, components, and utils; reduced `App.jsx` imports from 56 to ~15.
 
 ✅ Run `npm run dev` to verify the refactor before continuing.
 

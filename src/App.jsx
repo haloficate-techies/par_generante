@@ -25,29 +25,37 @@ import {
   resolveAutoTeamLogoSrc,
   resolveFooterSrcForBrand,
   resolveTogelPoolLabel,
-} from "./app/app-constants";
-import useBackgroundManager from "./hooks/background-manager";
-import useBackgroundRemoval from "./hooks/use-background-removal";
-import useBrandSelection from "./hooks/use-brand-selection";
-import useModeNavigation from "./hooks/use-mode-navigation";
-import useStreamingTheme from "./hooks/streaming-theme";
-import useTogelControls from "./hooks/togel-controls";
-import useImageCache from "./hooks/use-image-cache";
-import useRaffleData from "./hooks/use-raffle-data";
-import useBannerState from "./hooks/use-banner-state";
-import usePreviewModal from "./hooks/use-preview-modal";
-import useModeFeatures from "./hooks/use-mode-features";
-import BannerHeader from "./components/layout/BannerHeader";
-import BannerPreviewPanel from "./components/layout/BannerPreviewPanel";
-import PreviewModal from "./components/layout/PreviewModal";
-import MatchListForm from "./components/MatchListForm";
-import { formatMatchDateLabel, formatMatchTimeLabel } from "./utils/formatters/match";
-import { formatRaffleEventLabel } from "./utils/formatters/raffle";
-import useBannerRenderPipeline from "./hooks/render/use-banner-render-pipeline";
-import useBannerExportActions from "./hooks/render/use-banner-export-actions";
-import usePrefetchBannerAssets from "./hooks/assets/use-prefetch-banner-assets";
-import { useMatchListFormProps } from "./hooks/props/use-match-list-form-props";
-import { useBannerPreviewProps } from "./hooks/props/use-banner-preview-props";
+} from "./app/index.js";
+import {
+  useBackgroundManager,
+  useBackgroundRemoval,
+  useBrandSelection,
+  useModeNavigation,
+  useStreamingTheme,
+  useTogelControls,
+  useImageCache,
+  useRaffleData,
+  useBannerState,
+  usePreviewModal,
+  useModeFeatures,
+  useBannerRenderPipeline,
+  useBannerExportActions,
+  useRenderConfiguration,
+  usePrefetchBannerAssets,
+  useMatchListFormProps,
+  useBannerPreviewProps,
+} from "./hooks/index.js";
+import {
+  BannerHeader,
+  BannerPreviewPanel,
+  PreviewModal,
+  MatchListForm,
+} from "./components/index.js";
+import {
+  formatMatchDateLabel,
+  formatMatchTimeLabel,
+  formatRaffleEventLabel,
+} from "./utils/index.js";
 import "./app/mode-registry";
 import "./modes/layouts/match-mode";
 import "./modes/layouts/togel-mode";
@@ -177,104 +185,60 @@ const App = () => {
     close: closePreviewModal,
   } = usePreviewModal();
 
-  const renderAssets = useMemo(
-    () => ({
-      loadCachedOptionalImage,
-      loadMatchLogoImage,
-      computeMiniBannerLayout,
-      defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
-      raffleHeaderLogoSrc: RAFFLE_HEADER_LOGO_SRC,
-    }),
-    [loadCachedOptionalImage, loadMatchLogoImage, computeMiniBannerLayout]
-  );
-
-  const renderConfig = useMemo(
-    () => ({
-      availableBrandLogos: AVAILABLE_BRAND_LOGOS,
-      leagueLogoOptions: LEAGUE_LOGO_OPTIONS,
-      getModeLayoutConfig,
-    }),
-    [AVAILABLE_BRAND_LOGOS, LEAGUE_LOGO_OPTIONS, getModeLayoutConfig]
-  );
-
-  const renderState = useMemo(
-    () => ({
-      matches,
-      activeMatchCount,
-      activeMode,
-      activeSubMenu,
-      brandLogoSrc,
-      footerSrc,
-      footerLink,
-      backgroundSrc,
-      title,
-      includeMiniBanner,
-      shouldSkipHeader,
-      allowCustomTitle,
-      shouldRenderMatches,
-      selectedBrandName,
-      isBigMatchLayout,
-      isScoreModeActive,
-      isTogelMode,
-      isRaffleMode,
-      leagueLogoSrc,
-    }),
-    [
-      matches,
-      activeMatchCount,
-      activeMode,
-      activeSubMenu,
-      brandLogoSrc,
-      footerSrc,
-      footerLink,
-      backgroundSrc,
-      title,
-      includeMiniBanner,
-      shouldSkipHeader,
-      allowCustomTitle,
-      shouldRenderMatches,
-      selectedBrandName,
-      isBigMatchLayout,
-      isScoreModeActive,
-      isTogelMode,
-      isRaffleMode,
-      leagueLogoSrc,
-    ]
-  );
-
-  const renderTogelState = useMemo(
-    () => ({
-      digits: togelDigits,
-      pool: togelPool,
-      variant: togelPoolVariant,
-      drawTime: togelDrawTime,
-      streamingInfo: togelStreamingInfo,
-    }),
-    [togelDigits, togelPool, togelPoolVariant, togelDrawTime, togelStreamingInfo]
-  );
-
-  const renderRaffleState = useMemo(
-    () => ({
-      winners: raffleWinners,
-      info: raffleInfo,
-      eventLabel: raffleEventLabel,
-    }),
-    [raffleWinners, raffleInfo, raffleEventLabel]
-  );
-
-  const renderHelpers = useMemo(
-    () => ({
-      deriveBrandPalette,
-      defaultBrandPalette: DEFAULT_BRAND_PALETTE,
-      buildTogelTitle,
-      resolveTogelPoolLabel,
-      scoreModeTitle: SCORE_MODE_TITLE,
-      bigMatchTitle: BIG_MATCH_TITLE,
-      formatMatchDateLabel,
-      formatMatchTimeLabel,
-    }),
-    [deriveBrandPalette]
-  );
+  const {
+    assets: renderAssets,
+    config: renderConfig,
+    state: renderState,
+    togelState: renderTogelState,
+    raffleState: renderRaffleState,
+    helpers: renderHelpers,
+  } = useRenderConfiguration({
+    loadCachedOptionalImage,
+    loadMatchLogoImage,
+    computeMiniBannerLayout,
+    constants: {
+      DEFAULT_ESPORT_MINI_BANNER,
+      RAFFLE_HEADER_LOGO_SRC,
+      DEFAULT_BRAND_PALETTE,
+      SCORE_MODE_TITLE,
+      BIG_MATCH_TITLE,
+    },
+    matches,
+    activeMatchCount,
+    activeMode,
+    activeSubMenu,
+    brandLogoSrc,
+    footerSrc,
+    footerLink,
+    backgroundSrc,
+    title,
+    selectedBrandName,
+    leagueLogoSrc,
+    includeMiniBanner,
+    shouldSkipHeader,
+    allowCustomTitle,
+    shouldRenderMatches,
+    isBigMatchLayout,
+    isScoreModeActive,
+    isTogelMode,
+    isRaffleMode,
+    togelDigits,
+    togelPool,
+    togelPoolVariant,
+    togelDrawTime,
+    togelStreamingInfo,
+    raffleWinners,
+    raffleInfo,
+    raffleEventLabel,
+    deriveBrandPalette,
+    buildTogelTitle,
+    resolveTogelPoolLabel,
+    formatMatchDateLabel,
+    formatMatchTimeLabel,
+    availableBrandLogos: AVAILABLE_BRAND_LOGOS,
+    leagueLogoOptions: LEAGUE_LOGO_OPTIONS,
+    getModeLayoutConfig,
+  });
 
   const {
     renderBanner,
