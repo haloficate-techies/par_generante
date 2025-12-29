@@ -18,6 +18,8 @@
 ### 3. Konfigurasi & App Environment
 - `src/app/app-environment.js`
   - Abstraksi singleton agar modul lain dapat mendaftar hooks, komponen, dan mode tanpa bergantung pada `window.*`. Menyimpan data/globals di memori internal.
+- `src/app/app-constants.js`
+  - Mengimpor langsung konstanta mode/warna/layout dari modul di `src/app/config/modules/*` sehingga App.jsx tidak lagi bergantung pada `AppGlobals` dan tetap mendapatkan data yang eksplisit.
 - `src/app/config/globals.js`
   - Re-export dari kumpulan modul domain-specific di `src/app/config/modules/` agar `AppEnvironment` tetap menerima bundle konstan global, sembari membuka pintu ke import langsung per modul.
 

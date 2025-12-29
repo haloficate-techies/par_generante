@@ -23,6 +23,7 @@
 1. ✅ **Domain organization** (30 min) — moved domain-specific data (`team-logo-*`, `togel-data`, `brand-assets`) into `src/domains/`.
 2. ✅ **Registry consolidation** (30 min) — merged `mode-layout-registry.js` and `mode-modules.js` into `src/app/mode-registry.js`.
 3. ✅ **Direct imports** (45 min) — migrate key hooks/components to import from the new modules instead of `AppEnvironment`.
+4. ✅ **App-constants migration** (60 min) — moved `app/app-constants.js` entirely onto module imports instead of the `AppGlobals` aggregator.
 
 ✅ Run `npm run dev` to verify the refactor before continuing.
 

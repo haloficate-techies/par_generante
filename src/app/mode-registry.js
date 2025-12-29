@@ -58,3 +58,4 @@ registry.registerModeModule = registerModeModule;
 registry.getModeModule = getModeModule;
 registry.modules = modules;
 
+export { registerModeLayout, getModeLayoutConfig, registerModeModule, getModeModule };
