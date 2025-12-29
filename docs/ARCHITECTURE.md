@@ -9,6 +9,9 @@
 - `src/data/app-data.js`
   - Menyediakan data global (brand, pool, opsi game), helper warna/kanvas (`applyFittedFont`, `drawLogoTile`, `hexToRgb`, dsb), serta fungsi pemuatan gambar.
   - Mengekspor bundle yang langsung disimpan ke `AppEnvironment` sehingga bisa diimpor atau diambil melalui adaptor.
+- `src/domains/*`
+  - Sumber data per-domain (mis. **brand**, **togel**, **teams**) yang menjadi input untuk `src/data/app-data.js`.
+  - Tujuannya agar data besar dan aturan domain tidak tercampur di folder `src/data/` dan lebih mudah di-maintain/diuji.
 - `src/utils/canvas-utils.js`
   - Kumpulan fungsi menggambar background, kartu pertandingan, togel result, footer, dsb. Mengekspor `CanvasUtils` sebagai modul biasa.
 
@@ -19,8 +22,8 @@
   - Re-export dari kumpulan modul domain-specific di `src/app/config/modules/` agar `AppEnvironment` tetap menerima bundle konstan global, sembari membuka pintu ke import langsung per modul.
 
 ### 4. Sistem Mode
-- `src/app/mode-layout-registry.js` & `src/app/mode-modules.js`
-  - Registry untuk layout dan metadata fitur setiap mode. Resolver dan pendaftarnya diatur melalui `AppEnvironment`.
+- `src/app/mode-registry.js`
+  - Registry terpadu untuk layout dan metadata fitur setiap mode. Resolver dan pendaftarnya diatur melalui `AppEnvironment`.
 - `src/modes/layouts/*.js` & `src/modes/modules/*.js`
   - Implementasi renderer per mode (match/togel) beserta fitur defaultnya.
 

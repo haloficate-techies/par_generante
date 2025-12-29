@@ -1,14 +1,12 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import AppEnvironment from "../app/app-environment";
+import { BANNER_BACKGROUND_LOOKUP, BANNER_BACKGROUND_FILES } from "../domains/brand";
+import { MODE_BACKGROUND_DEFAULTS } from "../app/config/modules/assets/asset.constants";
+import { resolveImageAssetSrc } from "../app/config/modules/assets/asset.resolvers";
+import { TOGEL_BACKGROUND_EXTENSION_PRIORITY } from "../app/config/modules/togel/togel.constants";
 
-const AppData = AppEnvironment.getData();
-const AppGlobals = AppEnvironment.getGlobals();
-const BACKGROUND_LOOKUP = AppData.BANNER_BACKGROUND_LOOKUP || {};
-const AVAILABLE_BANNER_BACKGROUNDS = AppData.BANNER_BACKGROUND_FILES || [];
-const MODE_BACKGROUND_DEFAULTS = AppGlobals.MODE_BACKGROUND_DEFAULTS || {};
-const resolveImageAssetSrc = AppGlobals.resolveImageAssetSrc || ((src) => Promise.resolve(src));
-const TOGEL_BACKGROUND_EXTENSION_PRIORITY =
-  AppGlobals.TOGEL_BACKGROUND_EXTENSION_PRIORITY || ["webp", "png", "jpg", "jpeg"];
+const BACKGROUND_LOOKUP = BANNER_BACKGROUND_LOOKUP || {};
+const AVAILABLE_BANNER_BACKGROUNDS = BANNER_BACKGROUND_FILES || [];
 
 const useBackgroundManager = (activeMode) => {
   const togelBackgroundRequestIdRef = useRef(0);

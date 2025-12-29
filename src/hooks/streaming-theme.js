@@ -1,12 +1,7 @@
 import { useState, useEffect } from "react";
 import AppEnvironment from "../app/app-environment";
-
-const AppData = AppEnvironment.getData();
-const AppGlobals = AppEnvironment.getGlobals();
-const deriveBrandPalette =
-  AppData.deriveBrandPalette || AppData.DERIVE_BRAND_PALETTE || (() => AppData.DEFAULT_BRAND_PALETTE);
-const resolveStreamingThemeFromPalette =
-  AppGlobals.resolveStreamingThemeFromPalette || (() => "dark");
+import { deriveBrandPalette, DEFAULT_BRAND_PALETTE } from "../utils/color-utils";
+import { resolveStreamingThemeFromPalette } from "../app/config/modules/theme/theme.utils";
 
 const useStreamingTheme = ({ isTogelMode, brandLogoSrc, loadCachedOptionalImage }) => {
   const [streamingTheme, setStreamingTheme] = useState("dark");
@@ -25,7 +20,7 @@ const useStreamingTheme = ({ isTogelMode, brandLogoSrc, loadCachedOptionalImage 
           return;
         }
         try {
-          const palette = deriveBrandPalette(image) || AppData.DEFAULT_BRAND_PALETTE;
+          const palette = deriveBrandPalette(image) || DEFAULT_BRAND_PALETTE;
           const theme = resolveStreamingThemeFromPalette(palette);
           if (!isCancelled) {
             setStreamingTheme(theme);

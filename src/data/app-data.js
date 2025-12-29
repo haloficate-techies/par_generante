@@ -7,14 +7,14 @@ import {
   BRAND_LOGO_OPTIONS,
   ESPORT_GAME_OPTIONS,
   ESPORT_MINI_BANNER_FOOTER,
-} from "./brand-assets";
+} from "../domains/brand";
 import {
   INDONESIAN_DAY_NAMES,
   TOGEL_DRAW_TIME_LOOKUP,
   TOGEL_POOL_OPTIONS,
   resolveTogelDrawTimeConfig,
   resolveTotoSingaporeDrawTimeConfig,
-} from "./togel-data";
+} from "../domains/togel";
 import {
   loadOptionalImage,
   loadTeamLogoImage,
@@ -24,7 +24,7 @@ import {
   getAutoTeamLogoSrc,
   normalizeTeamName,
   resolveAutoTeamLogoSrc as resolveAutoTeamLogoSrcHelper,
-} from "./team-logo-lookup";
+} from "../domains/teams";
 import {
   DEFAULT_BRAND_PALETTE as COLOR_DEFAULT_BRAND_PALETTE,
   clamp as clampHelper,

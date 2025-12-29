@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import AppEnvironment from "../app/app-environment";
-
-const AppGlobals = AppEnvironment.getGlobals();
-const MODE_BACKGROUND_DEFAULTS = AppGlobals.MODE_BACKGROUND_DEFAULTS || {};
-const TOGEL_VARIANT_DIGIT_LENGTH = AppGlobals.TOGEL_VARIANT_DIGIT_LENGTH || {};
-const TOGEL_POOL_BACKGROUND_LOOKUP = AppGlobals.TOGEL_POOL_BACKGROUND_LOOKUP || {};
-const resolveTogelDrawTimeConfig =
-  AppGlobals.resolveTogelDrawTimeConfig || (() => ({ options: [] }));
-const resolveTogelPoolLabel = AppGlobals.resolveTogelPoolLabel || (() => "");
-const resolveTogelStreamingInfo =
-  AppGlobals.resolveTogelStreamingInfo || (() => null);
+import { MODE_BACKGROUND_DEFAULTS } from "../app/config/modules/assets/asset.constants";
+import {
+  TOGEL_VARIANT_DIGIT_LENGTH,
+  TOGEL_POOL_BACKGROUND_LOOKUP,
+} from "../app/config/modules/togel/togel.constants";
+import { resolveTogelDrawTimeConfig } from "../domains/togel";
+import {
+  resolveTogelPoolLabel,
+  resolveTogelStreamingInfo,
+} from "../app/config/modules/togel/togel.utils";
 
 const useTogelControls = ({ isTogelMode, applyTogelBackgroundPath, streamingTheme }) => {
   const [togelPool, setTogelPool] = useState("");

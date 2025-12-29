@@ -1,4 +1,4 @@
-import TEAM_AUTO_LOGO_SOURCES from "./team-logo-sources";
+import TEAM_AUTO_LOGO_SOURCES from "./logo-sources";
 
 export const normalizeTeamName = (name) => {
   if (!name) return "";

@@ -7,7 +7,7 @@ Web app untuk membuat banner (match/togel/raffle), render ke canvas, dan export 
 - Render banner berbasis canvas + caching layer (`src/services/banner-renderer.js`)
 - Export `Download PNG` & `Download ZIP` (JSZip) (`src/services/banner-exporter.js`)
 - Mode/fitur terstruktur via hooks (state, scheduler, modal preview, background removal, raffle, dll) (`src/hooks/`)
-- Auto logo tim dari mapping sumber (`src/data/team-logo-sources.js`)
+- Auto logo tim dari mapping sumber (`src/domains/teams/logo-sources.js`)
 - Aman untuk canvas: load gambar memakai proxy + `crossOrigin="anonymous"` (lihat bagian CORS)
 
 ## Quick Start
@@ -67,7 +67,7 @@ Konfigurasi & allowlist host berada di `src/data/image-proxy.js` (lihat `DEFAULT
 - `src/data/app-data.js` — data global + helper canvas + aggregator AppData
 - `src/data/image-proxy.js` — konfigurasi proxy + builder URL (CORS allowlist/SVG handling)
 - `src/utils/image-loader.js` — loader gambar (proxy fallback, SVG convert, cache logo otomatis)
-- `src/data/team-logo-sources.js` — sumber auto logo tim (`{ names: string[], source: string }`)
+- `src/domains/teams/logo-sources.js` — sumber auto logo tim (`{ names: string[], source: string }`)
 - `src/utils/canvas-utils.js` — helper menggambar layout ke canvas
 - `src/app/` + `src/modes/` — registry + konfigurasi global/mode (mode layouts & modules)
 - `src/components/` — UI utama (terutama `MatchListForm` + layout components)

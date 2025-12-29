@@ -1,8 +1,8 @@
 import React, { memo } from "react";
 import AppEnvironment from "../../app/app-environment";
+import { MODE_CONFIG } from "../../app/config/modules/mode/mode.config";
 
-const AppGlobals = AppEnvironment.getGlobals() || {};
-const DEFAULT_MODE_OPTIONS = Array.isArray(AppGlobals.MODE_CONFIG) ? AppGlobals.MODE_CONFIG : [];
+const DEFAULT_MODE_OPTIONS = MODE_CONFIG;
 
 const BannerHeaderComponent = ({
   activeModeConfig,
