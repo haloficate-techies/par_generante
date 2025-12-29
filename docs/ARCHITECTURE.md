@@ -38,6 +38,8 @@
   - Menyediakan kalkulasi flag per mode (esports/togel/raffle, big match, dsb.) dengan membaca konfigurasi di `AppGlobals` + registry mode.
 - `src/hooks/use-raffle-data.js`, `use-background-removal.js`, `use-render-scheduler.js`, `use-preview-modal.js`
   - Mengambil alih logika side-effect (fetch raffle, integrasi layanan hapus background, debounce render, serta kontrol modal preview).
+- `src/hooks/props/use-match-list-form-props.js`, `use-banner-preview-props.js`
+  - Membangun props untuk `MatchListForm` dan `BannerPreviewPanel` di luar `App.jsx` sehingga file utama fokus ke orkestrasi.
 
 ### 6. Komponen
 - `src/components/layout/*.jsx`

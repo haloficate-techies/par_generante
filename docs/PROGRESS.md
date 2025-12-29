@@ -24,6 +24,7 @@
 2. ✅ **Registry consolidation** (30 min) — merged `mode-layout-registry.js` and `mode-modules.js` into `src/app/mode-registry.js`.
 3. ✅ **Direct imports** (45 min) — migrate key hooks/components to import from the new modules instead of `AppEnvironment`.
 4. ✅ **App-constants migration** (60 min) — moved `app/app-constants.js` entirely onto module imports instead of the `AppGlobals` aggregator.
+5. ✅ **Props extraction** (45 min) — extracted `matchListFormProps` and `bannerPreviewProps` builders from `App.jsx` into dedicated hooks to reduce complexity.
 
 ✅ Run `npm run dev` to verify the refactor before continuing.
 
