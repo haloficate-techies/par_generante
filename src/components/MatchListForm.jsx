@@ -1,11 +1,18 @@
-import React, { useCallback } from "react";
+import React from "react";
+import PropTypes from "prop-types";
 import AppEnvironment from "../app/app-environment";
-import RaffleWinnersSection from "./match-list-form/sections/RaffleWinnersSection";
-import BannerMetadataSection from "./match-list-form/sections/BannerMetadataSection";
-import MatchesSection from "./match-list-form/sections/MatchesSection";
-import TogelControlsSection from "./match-list-form/sections/TogelControlsSection";
-import TogelDigitsSection from "./match-list-form/sections/TogelDigitsSection";
-import matchListFormEnv from "./match-list-form/env";
+import RaffleWinnersSection from "./match-form/sections/RaffleWinnersSection";
+import BannerMetadataSection from "./match-form/sections/BannerMetadataSection";
+import MatchesSection from "./match-form/sections/MatchesSection";
+import TogelControlsSection from "./match-form/sections/TogelControlsSection";
+import TogelDigitsSection from "./match-form/sections/TogelDigitsSection";
+import {
+  useMatchCountAdjuster,
+  useMatchFormState,
+  useTogelControls,
+} from "./match-form/hooks";
+import { MatchFormProvider } from "./match-form/contexts";
+import matchFormEnv from "./match-form/env";
 
 const {
   AVAILABLE_TOGEL_POOL_OPTIONS,
@@ -14,26 +21,51 @@ const {
   resolveAutoLogoSrc,
   readFileAsDataURL,
   getTogelDrawTimeConfig,
-} = matchListFormEnv;
+} = matchFormEnv;
+
+const optionShape = PropTypes.shape({
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+});
+
+const backgroundRemovalStateShape = PropTypes.shape({
+  loading: PropTypes.bool,
+  error: PropTypes.string,
+});
+
+const matchShape = PropTypes.shape({
+  teamHome: PropTypes.string,
+  teamAway: PropTypes.string,
+  date: PropTypes.string,
+  time: PropTypes.string,
+  scoreHome: PropTypes.string,
+  scoreAway: PropTypes.string,
+  teamHomeLogo: PropTypes.string,
+  teamAwayLogo: PropTypes.string,
+  teamHomePlayerImage: PropTypes.string,
+  teamAwayPlayerImage: PropTypes.string,
+  gameLogo: PropTypes.string,
+  gameName: PropTypes.string,
+});
 
 const MatchListForm = ({
-  title,
+  title = "",
   onTitleChange,
-  matches,
+  matches = [],
   onMatchFieldChange,
   onAutoLogoRequest,
   onLogoAdjust,
   onPlayerImageAdjust,
   onPlayerImageFlipToggle,
-  brandLogoSrc,
+  brandLogoSrc = "",
   onBrandLogoChange,
-  brandOptions,
-  backgroundSrc,
-  footerSrc,
+  brandOptions = [],
+  backgroundSrc = "",
+  footerSrc = "",
   activeSubMenu,
   matchCount,
   onMatchCountChange,
-  matchCountOptions,
+  matchCountOptions = [],
   activeMode,
   togelPool,
   onTogelPoolChange,
@@ -62,168 +94,217 @@ const MatchListForm = ({
   isFetchingRaffle = false,
   raffleFetchError = "",
 }) => {
-  const resolveFeatureFlag = (value, fallback) =>
-    typeof value === "boolean" ? value : fallback;
-  const isTogelMode = resolveFeatureFlag(modeFeatures.showTogelControls, activeMode === "togel");
-  const isEsportsMode = resolveFeatureFlag(modeFeatures.showGameOptions, activeMode === "esports");
-  const isFootballMode = activeMode === "football";
-  const isRaffleMode = activeMode === "raffle";
-  const isScoreLayoutActive = isFootballMode && activeSubMenu === "scores";
-  const shouldShowMatches = resolveFeatureFlag(modeFeatures.showMatches, !isTogelMode);
-  const effectiveMatchCount =
-    typeof matchCount === "number" ? matchCount : matches.length;
-  const availableMatchCountOptions =
-    Array.isArray(matchCountOptions) && matchCountOptions.length > 0
-      ? matchCountOptions
-      : [1, 2, 3, 4, 5];
-  const minMatchCount = Math.min(...availableMatchCountOptions);
-  const maxMatchCount = Math.max(...availableMatchCountOptions);
+  const {
+    effectiveMatchCount,
+    minMatchCount,
+    maxMatchCount,
+    adjustMatchCount,
+  } = useMatchCountAdjuster({
+    matchCount,
+    matchCountOptions,
+    matchesLength: matches.length,
+    onMatchCountChange,
+  });
 
-  const adjustMatchCount = (nextCount) => {
-    if (!onMatchCountChange) return;
-    const normalized = Math.min(Math.max(nextCount, minMatchCount), maxMatchCount);
-    if (normalized !== effectiveMatchCount) {
-      onMatchCountChange(normalized);
-    }
-  };
+  const {
+    selectedPool: resolvedTogelPool,
+    selectedVariant: resolvedTogelVariant,
+    selectedPoolOption,
+    poolVariants,
+    shouldShowVariantSelector,
+    handlePoolChange,
+    handleVariantChange,
+  } = useTogelControls({
+    pools: AVAILABLE_TOGEL_POOL_OPTIONS,
+    selectedPool: togelPool,
+    selectedVariant: togelPoolVariant,
+    onPoolChange: onTogelPoolChange,
+    onVariantChange: onTogelPoolVariantChange,
+  });
 
-  const selectedPoolOption = AVAILABLE_TOGEL_POOL_OPTIONS.find(
-    (option) => option.value === togelPool
-  );
-  const poolVariantOptions = selectedPoolOption?.modes ?? [];
-  const shouldShowVariantSelector =
-    isTogelMode && poolVariantOptions.length > 1;
-  const drawTimeConfig = getTogelDrawTimeConfig(togelPool, togelPoolVariant);
-  const isTotoSingaporeHoliday =
-    togelPool === "toto_singapore" && Boolean(drawTimeConfig.disabledReason);
-  const shouldShowDigits =
-    isTogelMode &&
-    Boolean(togelPoolVariant) &&
-    Array.isArray(togelDigits) &&
-    togelDigits.length > 0 &&
-    !isTotoSingaporeHoliday;
-  const digitCount = shouldShowDigits ? togelDigits.length : 0;
-  const digitGridClass =
-    digitCount === 3
-      ? "sm:grid-cols-3 md:grid-cols-3"
-      : digitCount === 4
-        ? "sm:grid-cols-4 md:grid-cols-4"
-        : "sm:grid-cols-4 md:grid-cols-5";
-
-  const handleTogelPoolChange = useCallback(
-    (event) => {
-      const nextPool = event.target.value;
-      onTogelPoolChange?.(nextPool);
-      const option = AVAILABLE_TOGEL_POOL_OPTIONS.find(
-        (item) => item.value === nextPool
-      );
-      const modes = option?.modes ?? [];
-      if (modes.length === 1) {
-        onTogelPoolVariantChange?.(modes[0]);
-      } else {
-        onTogelPoolVariantChange?.("");
-      }
-    },
-    [onTogelPoolChange, onTogelPoolVariantChange]
+  const drawTimeConfig = getTogelDrawTimeConfig(
+    resolvedTogelPool,
+    resolvedTogelVariant
   );
 
-  const handleTogelVariantChange = useCallback(
-    (event) => {
-      onTogelPoolVariantChange?.(event.target.value);
-    },
-    [onTogelPoolVariantChange]
-  );
-
-  const drawTimeOptions = drawTimeConfig.options ?? [];
-  const shouldShowDrawTimeSelector =
-    isTogelMode &&
-    (drawTimeOptions.length > 0 || Boolean(drawTimeConfig.disabledReason));
-  const availableGameOptions = isEsportsMode ? AVAILABLE_ESPORT_GAME_OPTIONS : [];
-  const isBigMatchLayoutActive = Boolean(isBigMatchLayout);
-  const resolvedShowTitle = resolveFeatureFlag(
-    modeFeatures.showTitle,
-    !isTogelMode && !isEsportsMode
-  );
-  const shouldShowTitleField =
-    typeof showTitleFieldOverride === "boolean"
-      ? showTitleFieldOverride
-      : !isTogelMode && resolvedShowTitle;
+  const {
+    isTogelMode,
+    isEsportsMode,
+    isRaffleMode,
+    isScoreLayoutActive,
+    shouldShowMatches,
+    drawTimeOptions,
+    shouldShowDrawTimeSelector,
+    shouldShowDigits,
+    digitGridClass,
+    availableGameOptions,
+    isBigMatchLayoutActive,
+    shouldShowTitleField,
+  } = useMatchFormState({
+    modeFeatures,
+    activeMode,
+    activeSubMenu,
+    showTitleFieldOverride,
+    isBigMatchLayout,
+    togelPool: resolvedTogelPool,
+    togelPoolVariant: resolvedTogelVariant,
+    togelDigits,
+    drawTimeConfig,
+    availableEsportGameOptions: AVAILABLE_ESPORT_GAME_OPTIONS,
+  });
   return (
-    <form className="grid gap-6">
-      <BannerMetadataSection
-        showTitleField={shouldShowTitleField}
-        title={title}
-        onTitleChange={onTitleChange}
-        brandLogoSrc={brandLogoSrc}
-        footerSrc={footerSrc}
-        onBrandLogoChange={onBrandLogoChange}
-        brandOptions={brandOptions}
-        backgroundSrc={backgroundSrc}
-        showLeagueLogoInput={isBigMatchLayoutActive}
-        leagueLogoSrc={leagueLogoSrc}
-        onLeagueLogoChange={onLeagueLogoChange}
-        leagueLogoOptions={leagueLogoOptions}
-      />
-      {isRaffleMode && (
-        <RaffleWinnersSection
-          slugValue={raffleSlug}
-          onSlugChange={onRaffleSlugChange}
-          onFetch={onFetchRaffleData}
-          isLoading={isFetchingRaffle}
-          winners={raffleWinners}
-          fetchError={raffleFetchError}
-          raffleInfo={raffleInfo}
+    <MatchFormProvider
+      onMatchFieldChange={onMatchFieldChange}
+      onAutoLogoRequest={onAutoLogoRequest}
+      onLogoAdjust={onLogoAdjust}
+      onPlayerImageAdjust={onPlayerImageAdjust}
+      onPlayerImageFlipToggle={onPlayerImageFlipToggle}
+      onRemovePlayerBackground={onRemovePlayerBackground}
+      playerBackgroundRemovalState={playerBackgroundRemovalState}
+      canUseBackgroundRemoval={isBackgroundRemovalAvailable}
+      onRemoveLogoBackground={onRemoveLogoBackground}
+      logoBackgroundRemovalState={logoBackgroundRemovalState}
+      resolveAutoLogoSrc={resolveAutoLogoSrc}
+      readFileAsDataURL={readFileAsDataURL}
+    >
+      <form className="grid gap-6">
+        <BannerMetadataSection
+          showTitleField={shouldShowTitleField}
+          title={title}
+          onTitleChange={onTitleChange}
+          brandLogoSrc={brandLogoSrc}
+          footerSrc={footerSrc}
+          onBrandLogoChange={onBrandLogoChange}
+          brandOptions={brandOptions}
+          backgroundSrc={backgroundSrc}
+          showLeagueLogoInput={isBigMatchLayoutActive}
+          leagueLogoSrc={leagueLogoSrc}
+          onLeagueLogoChange={onLeagueLogoChange}
+          leagueLogoOptions={leagueLogoOptions}
         />
-      )}
-      <MatchesSection
-        shouldShowMatches={shouldShowMatches}
-        effectiveMatchCount={effectiveMatchCount}
-        minMatchCount={minMatchCount}
-        maxMatchCount={maxMatchCount}
-        adjustMatchCount={adjustMatchCount}
-        matches={matches}
-        onMatchFieldChange={onMatchFieldChange}
-        onAutoLogoRequest={onAutoLogoRequest}
-        onLogoAdjust={onLogoAdjust}
-        onPlayerImageAdjust={onPlayerImageAdjust}
-        onPlayerImageFlipToggle={onPlayerImageFlipToggle}
-        isEsportsMode={isEsportsMode}
-        availableGameOptions={availableGameOptions}
-        showScoreInputs={isScoreLayoutActive}
-        showBigMatchExtras={isBigMatchLayoutActive}
+        {isRaffleMode && (
+          <RaffleWinnersSection
+            slugValue={raffleSlug}
+            onSlugChange={onRaffleSlugChange}
+            onFetch={onFetchRaffleData}
+            isLoading={isFetchingRaffle}
+            winners={raffleWinners}
+            fetchError={raffleFetchError}
+            raffleInfo={raffleInfo}
+          />
+        )}
+        <MatchesSection
+          shouldShowMatches={shouldShowMatches}
+          effectiveMatchCount={effectiveMatchCount}
+          minMatchCount={minMatchCount}
+          maxMatchCount={maxMatchCount}
+          adjustMatchCount={adjustMatchCount}
+          matches={matches}
+          isEsportsMode={isEsportsMode}
+          availableGameOptions={availableGameOptions}
+          showScoreInputs={isScoreLayoutActive}
+          showBigMatchExtras={isBigMatchLayoutActive}
         disableMatchCountAdjuster={isBigMatchLayoutActive}
-        onRemovePlayerBackground={onRemovePlayerBackground}
-        playerBackgroundRemovalState={playerBackgroundRemovalState}
-        canUseBackgroundRemoval={isBackgroundRemovalAvailable}
-        onRemoveLogoBackground={onRemoveLogoBackground}
-        logoBackgroundRemovalState={logoBackgroundRemovalState}
-        resolveAutoLogoSrc={resolveAutoLogoSrc}
-        readFileAsDataURL={readFileAsDataURL}
-      />
-      <TogelControlsSection
-        isTogelMode={isTogelMode}
-        pools={AVAILABLE_TOGEL_POOL_OPTIONS}
-        selectedPool={togelPool}
-        onPoolChange={handleTogelPoolChange}
-        showVariantSelector={shouldShowVariantSelector}
-        poolVariants={poolVariantOptions}
-        selectedVariant={togelPoolVariant}
-        onVariantChange={handleTogelVariantChange}
-        selectedPoolOption={selectedPoolOption}
-        drawTimeConfig={drawTimeConfig}
-        drawTimeOptions={drawTimeOptions}
-        togelDrawTime={togelDrawTime}
-        onTogelDrawTimeChange={onTogelDrawTimeChange}
-        shouldShowDrawTimeSelector={shouldShowDrawTimeSelector}
-      />
-      <TogelDigitsSection
-        shouldShowDigits={shouldShowDigits}
-        digitGridClass={digitGridClass}
-        togelDigits={togelDigits}
-        onTogelDigitChange={onTogelDigitChange}
-      />
-    </form>
+        />
+        <TogelControlsSection
+          isTogelMode={isTogelMode}
+          pools={AVAILABLE_TOGEL_POOL_OPTIONS}
+          selectedPool={resolvedTogelPool}
+          onPoolChange={handlePoolChange}
+          showVariantSelector={shouldShowVariantSelector}
+          poolVariants={poolVariants}
+          selectedVariant={resolvedTogelVariant}
+          onVariantChange={handleVariantChange}
+          selectedPoolOption={selectedPoolOption}
+          drawTimeConfig={drawTimeConfig}
+          drawTimeOptions={drawTimeOptions}
+          togelDrawTime={togelDrawTime}
+          onTogelDrawTimeChange={onTogelDrawTimeChange}
+          shouldShowDrawTimeSelector={shouldShowDrawTimeSelector}
+        />
+        <TogelDigitsSection
+          shouldShowDigits={shouldShowDigits}
+          digitGridClass={digitGridClass}
+          togelDigits={togelDigits}
+          onTogelDigitChange={onTogelDigitChange}
+        />
+      </form>
+    </MatchFormProvider>
   );
+};
+
+MatchListForm.propTypes = {
+  // Metadata
+  title: PropTypes.string,
+  onTitleChange: PropTypes.func,
+  brandLogoSrc: PropTypes.string,
+  onBrandLogoChange: PropTypes.func,
+  brandOptions: PropTypes.arrayOf(optionShape),
+  backgroundSrc: PropTypes.string,
+  footerSrc: PropTypes.string,
+  leagueLogoSrc: PropTypes.string,
+  onLeagueLogoChange: PropTypes.func,
+  leagueLogoOptions: PropTypes.arrayOf(optionShape),
+  isBigMatchLayout: PropTypes.bool,
+  showTitleFieldOverride: PropTypes.bool,
+
+  // Matches
+  matches: PropTypes.arrayOf(matchShape),
+  onMatchFieldChange: PropTypes.func,
+  onAutoLogoRequest: PropTypes.func,
+  onLogoAdjust: PropTypes.func,
+  onPlayerImageAdjust: PropTypes.func,
+  onPlayerImageFlipToggle: PropTypes.func,
+  activeSubMenu: PropTypes.string,
+  matchCount: PropTypes.number,
+  onMatchCountChange: PropTypes.func,
+  matchCountOptions: PropTypes.arrayOf(PropTypes.number),
+
+  // Mode & toggles
+  activeMode: PropTypes.string,
+  modeFeatures: PropTypes.shape({
+    showTogelControls: PropTypes.bool,
+    showGameOptions: PropTypes.bool,
+    showMatches: PropTypes.bool,
+    showTitle: PropTypes.bool,
+  }),
+
+  // Togel controls
+  togelPool: PropTypes.string,
+  onTogelPoolChange: PropTypes.func,
+  togelPoolVariant: PropTypes.string,
+  onTogelPoolVariantChange: PropTypes.func,
+  togelDigits: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  ),
+  onTogelDigitChange: PropTypes.func,
+  togelDrawTime: PropTypes.string,
+  onTogelDrawTimeChange: PropTypes.func,
+
+  // Background removal
+  onRemovePlayerBackground: PropTypes.func,
+  playerBackgroundRemovalState: PropTypes.objectOf(
+    backgroundRemovalStateShape
+  ),
+  onRemoveLogoBackground: PropTypes.func,
+  logoBackgroundRemovalState: PropTypes.objectOf(
+    backgroundRemovalStateShape
+  ),
+  isBackgroundRemovalAvailable: PropTypes.bool,
+
+  // Raffle
+  raffleSlug: PropTypes.string,
+  onRaffleSlugChange: PropTypes.func,
+  onFetchRaffleData: PropTypes.func,
+  raffleWinners: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      prize: PropTypes.string,
+    })
+  ),
+  raffleInfo: PropTypes.object,
+  isFetchingRaffle: PropTypes.bool,
+  raffleFetchError: PropTypes.string,
 };
 
 AppEnvironment.registerComponent("MatchListForm", MatchListForm);
