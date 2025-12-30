@@ -1,13 +1,15 @@
-import { CanvasUtils } from "../utils/canvas-utils";
+import {
+  drawBackground as defaultDrawBackground,
+  drawOverlay as defaultDrawOverlay,
+  drawBrandLogo as defaultDrawBrandLogo,
+  drawHeader as defaultDrawHeader,
+  drawFooter as defaultDrawFooter,
+} from "../utils/canvas";
 
-const {
-  drawBackground: defaultDrawBackground = () => {},
-  drawOverlay: defaultDrawOverlay = () => {},
-  drawBrandLogo: defaultDrawBrandLogo = () => 0,
-  drawHeader: defaultDrawHeader = () => 0,
-  drawFooter: defaultDrawFooter = () => {},
-} = CanvasUtils || {};
-
+/**
+ * Waits for document fonts to be ready before drawing.
+ * @returns {Promise<void>}
+ */
 const waitForFonts = async () => {
   if (document.fonts && document.fonts.ready) {
     try {
@@ -18,6 +20,11 @@ const waitForFonts = async () => {
   }
 };
 
+/**
+ * Enforces a maximum size on cache Map objects.
+ * @param {import("react").MutableRefObject<Map<any, any>>} cacheRef
+ * @param {number} limit
+ */
 const ensureCacheLimit = (cacheRef, limit) => {
   const cache = cacheRef?.current;
   if (!cache || typeof cache.size !== "number") return;
@@ -28,6 +35,13 @@ const ensureCacheLimit = (cacheRef, limit) => {
   }
 };
 
+/**
+ * Resolves a friendly brand name for the currently selected logo.
+ * @param {Array<{value?: string; brand?: string; label?: string}>} availableBrandLogos
+ * @param {string} logoValue
+ * @param {string} fallbackName
+ * @returns {string}
+ */
 const resolveBrandDisplayName = (availableBrandLogos, logoValue, fallbackName = "") => {
   if (!logoValue) {
     return fallbackName;
@@ -36,6 +50,24 @@ const resolveBrandDisplayName = (availableBrandLogos, logoValue, fallbackName = 
   return matched?.brand || matched?.label || fallbackName || "";
 };
 
+/**
+ * Renders the current banner configuration to the canvas reference, reusing caches and assets.
+ *
+ * @param {Object} params
+ * @param {Object} params.overrides - overrides applied during bulk rendering (brand/logo/background etc)
+ * @param {import("react").MutableRefObject<HTMLCanvasElement>} params.canvasRef
+ * @param {number} [params.baseSize=1080]
+ * @param {Object} params.drawConfig - canvas drawing helpers (background, header, footer, overlay)
+ * @param {Object} params.caches - Mutable refs used for caching palettes and layers
+ * @param {Object} params.assets - Asset loaders such as `loadCachedOptionalImage`
+ * @param {Object} params.config - Mode configurations and lookup tables
+ * @param {Object} params.state - Banner state managed via `useBannerState`
+ * @param {Object} params.togel - Togel-specific inputs
+ * @param {Object} params.raffle - Raffle-specific inputs
+ * @param {Object} params.helpers - Formatting helpers consumed by renderer
+ * @param {Function} params.setLastRenderAt - Optional callback to timestamp renders
+ * @returns {Promise<HTMLCanvasElement|null>}
+ */
 export const renderBanner = async ({
   overrides = {},
   canvasRef,
