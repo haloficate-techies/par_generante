@@ -1,0 +1,31 @@
+const BRAND_NAMES = [
+  "303VIP",
+  "7METER",
+  "ADOBET88",
+  "AIRASIABET",
+  "BIGDEWA",
+  "BOLA88",
+  "DEWABET",
+  "DEWACASH",
+  "DEWAGG",
+  "DEWAHUB",
+  "DEWASCORE",
+  "GOLBOS",
+  "IDNGOAL",
+  "JAVAPLAY88",
+  "KLIKFIFA",
+  "KOINVEGAS",
+  "MESINGG",
+  "NYALABET",
+  "PLAYSLOTS88",
+  "PROPLAY88",
+  "SIGAPBET",
+  "SKOR88",
+  "TIGERASIA88",
+  "VEGASSLOTS",
+];
+
+export { BRAND_NAMES };
+
+export default BRAND_NAMES;
+
