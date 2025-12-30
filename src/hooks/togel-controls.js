@@ -11,6 +11,24 @@ import {
   resolveTogelStreamingInfo,
 } from "../app/config/modules/togel/togel.utils";
 
+/**
+ * Manages togel-specific state: pool, digits, draw time, and streaming info.
+ *
+ * @param {Object} config
+ * @param {boolean} config.isTogelMode
+ * @param {Function} config.applyTogelBackgroundPath
+ * @param {string|null} config.streamingTheme
+ * @returns {Object} Togel controls
+ * @returns {string} return.togelPool
+ * @returns {Function} return.setTogelPool
+ * @returns {string} return.togelPoolVariant
+ * @returns {Function} return.setTogelPoolVariant
+ * @returns {Array<string>} return.togelDigits
+ * @returns {Function} return.setTogelDigits
+ * @returns {string} return.togelDrawTime
+ * @returns {Function} return.setTogelDrawTime
+ * @returns {Object|null} return.togelStreamingInfo
+ */
 const useTogelControls = ({ isTogelMode, applyTogelBackgroundPath, streamingTheme }) => {
   const [togelPool, setTogelPool] = useState("");
   const [togelPoolVariant, setTogelPoolVariant] = useState("");

@@ -8,6 +8,19 @@ import { TOGEL_BACKGROUND_EXTENSION_PRIORITY } from "../app/config/modules/togel
 const BACKGROUND_LOOKUP = BANNER_BACKGROUND_LOOKUP || {};
 const AVAILABLE_BANNER_BACKGROUNDS = BANNER_BACKGROUND_FILES || [];
 
+/**
+ * Manages background assets per mode and exposes setters for each supported mode.
+ *
+ * @param {string} activeMode
+ * @returns {Object} Background manager helpers
+ * @returns {string} return.footballDefaultBackground
+ * @returns {string} return.backgroundSrc
+ * @returns {Function} return.setSelectedFootballBackground
+ * @returns {Function} return.setSelectedBasketballBackground
+ * @returns {Function} return.setSelectedEsportsBackground
+ * @returns {string} return.togelBackgroundSrc
+ * @returns {Function} return.applyTogelBackgroundPath
+ */
 const useBackgroundManager = (activeMode) => {
   const togelBackgroundRequestIdRef = useRef(0);
   const footballDefaultBackground = useMemo(

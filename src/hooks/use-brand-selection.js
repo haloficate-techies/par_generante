@@ -1,5 +1,27 @@
 import { useCallback, useEffect } from "react";
 
+/**
+ * Coordinates brand selection side effects such as footers, background overrides, and prefetching.
+ *
+ * @param {Object} params
+ * @param {string} params.activeMode
+ * @param {Array} params.availableBrandLogos
+ * @param {string} params.brandLogoSrc
+ * @param {string} params.defaultRaffleFooter
+ * @param {string} params.footballDefaultBackground
+ * @param {boolean} params.isRaffleMode
+ * @param {Object} params.modeBackgroundDefaults
+ * @param {Function} params.prefetchImages
+ * @param {Function} params.resolveFooterSrcForBrand
+ * @param {Function} params.setBrandLogo
+ * @param {Function} params.setFooter
+ * @param {Function} params.setSelectedBasketballBackground
+ * @param {Function} params.setSelectedEsportsBackground
+ * @param {Function} params.setSelectedFootballBackground
+ * @param {Function} params.createBrandSlug
+ * @returns {Object} Helpers
+ * @returns {Function} return.handleBrandLogoSelection
+ */
 const useBrandSelection = ({
   activeMode,
   availableBrandLogos,

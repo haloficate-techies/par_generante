@@ -3,6 +3,20 @@ import { extractRaffleSlug, mapRaffleWinners } from "../utils/formatters/raffle"
 
 const DEFAULT_RAFFLE_ENDPOINT = "https://idnraffle.com/api/detail";
 
+/**
+ * Fetches raffle winners/info from the configured endpoint and normalizes the payload.
+ *
+ * @param {Object} options
+ * @param {string} [options.endpoint=DEFAULT_RAFFLE_ENDPOINT]
+ * @returns {Object} Raffle data hook
+ * @returns {string} return.slug
+ * @returns {Function} return.setSlug
+ * @returns {Array} return.winners
+ * @returns {Object|null} return.info
+ * @returns {boolean} return.isFetching
+ * @returns {string} return.error
+ * @returns {Function} return.fetchData
+ */
 const useRaffleData = ({ endpoint = DEFAULT_RAFFLE_ENDPOINT } = {}) => {
   const [slug, setSlugState] = useState("");
   const [winners, setWinners] = useState([]);

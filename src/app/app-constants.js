@@ -20,14 +20,6 @@ import {
 } from "./config/modules/shared/string.utils";
 import { computeMiniBannerLayout as MODULES_COMPUTE_MINI_BANNER_LAYOUT } from "./config/modules/layout/layout.utils";
 import { MODE_CONFIG as MODULES_MODE_CONFIG } from "./config/modules/mode/mode.config";
-import {
-  getModeLayoutConfig as MODULES_MODE_LAYOUT_CONFIG,
-  getModeModule as MODULES_MODE_MODULE,
-} from "./mode-registry";
-
-export const getModeLayoutConfig = MODULES_MODE_LAYOUT_CONFIG;
-export const getModeModule = MODULES_MODE_MODULE;
-
 export const AVAILABLE_BRAND_LOGOS = Array.isArray(AppData.BRAND_LOGO_OPTIONS)
   ? AppData.BRAND_LOGO_OPTIONS
   : [];

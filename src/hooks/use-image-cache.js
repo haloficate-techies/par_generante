@@ -58,6 +58,14 @@ const withTimeout = (promise, src) =>
       });
   });
 
+/**
+ * Provides an image cache with a queue and eviction policy to keep parallel loads in check.
+ *
+ * @param {Function} loader - Async image loader (should return a Promise).
+ * @returns {Object} Cache helpers
+ * @returns {Function} return.loadImage - Loads or returns a cached image.
+ * @returns {Function} return.prefetchImages - Prefetches several sources concurrently.
+ */
 const useImageCache = (loader = () => Promise.resolve(null)) => {
   const cacheRef = useRef(globalImageCache);
 

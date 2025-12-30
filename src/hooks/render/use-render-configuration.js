@@ -1,6 +1,56 @@
 import { useMemo } from "react";
 
-// Consolidates all render configuration objects for the banner pipeline into one place.
+/**
+ * Consolidates render configuration for the banner pipeline into structured slices.
+ *
+ * @param {Object} params
+ * @param {Function} params.loadCachedOptionalImage
+ * @param {Function} params.loadMatchLogoImage
+ * @param {Function} params.computeMiniBannerLayout
+ * @param {Object} params.constants
+ * @param {Array} params.matches
+ * @param {number} params.activeMatchCount
+ * @param {string} params.activeMode
+ * @param {string} params.activeSubMenu
+ * @param {string} params.brandLogoSrc
+ * @param {string} params.footerSrc
+ * @param {string} params.footerLink
+ * @param {string} params.backgroundSrc
+ * @param {string} params.title
+ * @param {string} params.selectedBrandName
+ * @param {string} params.leagueLogoSrc
+ * @param {boolean} params.includeMiniBanner
+ * @param {boolean} params.shouldSkipHeader
+ * @param {boolean} params.allowCustomTitle
+ * @param {boolean} params.shouldRenderMatches
+ * @param {boolean} params.isBigMatchLayout
+ * @param {boolean} params.isScoreModeActive
+ * @param {boolean} params.isTogelMode
+ * @param {boolean} params.isRaffleMode
+ * @param {Array} params.togelDigits
+ * @param {string} params.togelPool
+ * @param {string} params.togelPoolVariant
+ * @param {string} params.togelDrawTime
+ * @param {Object} params.togelStreamingInfo
+ * @param {Array} params.raffleWinners
+ * @param {Object} params.raffleInfo
+ * @param {string} params.raffleEventLabel
+ * @param {Function} params.deriveBrandPalette
+ * @param {Function} params.buildTogelTitle
+ * @param {Function} params.resolveTogelPoolLabel
+ * @param {Function} params.formatMatchDateLabel
+ * @param {Function} params.formatMatchTimeLabel
+ * @param {Array} params.availableBrandLogos
+ * @param {Array} params.leagueLogoOptions
+ * @param {Function} params.getModeLayoutConfig
+ * @returns {Object} render configuration slices
+ * @returns {Object} return.assets - Asset loaders and constants
+ * @returns {Object} return.config - Mode configuration lookups
+ * @returns {Object} return.state - Snapshot of banner state
+ * @returns {Object} return.togelState - Togel-specific state
+ * @returns {Object} return.raffleState - Raffle-specific state
+ * @returns {Object} return.helpers - Helpers passed to render pipeline
+ */
 export const useRenderConfiguration = ({
   loadCachedOptionalImage,
   loadMatchLogoImage,

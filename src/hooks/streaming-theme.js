@@ -3,6 +3,15 @@ import AppEnvironment from "../app/app-environment";
 import { deriveBrandPalette, DEFAULT_BRAND_PALETTE } from "../utils/color-utils";
 import { resolveStreamingThemeFromPalette } from "../app/config/modules/theme/theme.utils";
 
+/**
+ * Derives a streaming theme (light/dark/gold) based on brand logo or togel mode.
+ *
+ * @param {Object} config
+ * @param {boolean} config.isTogelMode
+ * @param {string} config.brandLogoSrc
+ * @param {Function} config.loadCachedOptionalImage
+ * @returns {string} The computed theme name
+ */
 const useStreamingTheme = ({ isTogelMode, brandLogoSrc, loadCachedOptionalImage }) => {
   const [streamingTheme, setStreamingTheme] = useState("dark");
 

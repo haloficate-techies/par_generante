@@ -1,5 +1,17 @@
 import { useEffect } from "react";
 
+/**
+ * Controls submenu defaults and match count adjustments per mode.
+ *
+ * @param {Object} params
+ * @param {Object} params.activeModeConfig
+ * @param {boolean} params.isBigMatchLayout
+ * @param {number} params.activeMatchCount
+ * @param {Function} params.setMatchCount
+ * @param {Function} params.setActiveSubMenu
+ * @returns {Object} UI helpers
+ * @returns {string} return.pageBackgroundClass
+ */
 const useModeNavigation = ({
   activeModeConfig,
   isBigMatchLayout,

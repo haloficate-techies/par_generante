@@ -257,6 +257,36 @@ const reducer = (state, action) => {
   }
 };
 
+/**
+ * Manages banner state via a reducer that understands 15 action types.
+ * Handles matches, logos, players, and auto-logo behavior while exposing memoized action helpers.
+ *
+ * @param {Object} config
+ * @param {Array} [config.initialMatches=[]] - Seed array of match objects.
+ * @param {number} [config.maxMatches=5] - Maximum allowed match slots.
+ * @param {Function} [config.createInitialMatches] - Factory used when expanding match slots.
+ * @param {Function} [config.resolveAutoTeamLogoSrc] - Resolver that supplies auto-logo URLs.
+ * @returns {Object} The current banner state and memoized action creators.
+ * @returns {Object} return.state - Banner state slice.
+ * @returns {string} return.state.title
+ * @returns {Array} return.state.matches
+ * @returns {number} return.state.activeMatchCount
+ * @returns {string} return.state.brandLogoSrc
+ * @returns {string} return.state.leagueLogoSrc
+ * @returns {string} return.state.footerSrc
+ * @returns {string} return.state.footerLink
+ * @returns {Object} return.actions - Action helpers.
+ * @returns {Function} return.actions.setTitle
+ * @returns {Function} return.actions.setBrandLogo
+ * @returns {Function} return.actions.setLeagueLogo
+ * @returns {Function} return.actions.setFooter
+ * @returns {Function} return.actions.setMatchCount
+ * @returns {Function} return.actions.updateMatchField
+ * @returns {Function} return.actions.autoLogo
+ * @returns {Function} return.actions.adjustLogo
+ * @returns {Function} return.actions.adjustPlayer
+ * @returns {Function} return.actions.togglePlayerFlip
+ */
 const useBannerState = ({
   initialMatches = [],
   maxMatches = 5,

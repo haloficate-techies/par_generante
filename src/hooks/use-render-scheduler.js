@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
 
+/**
+ * Debounces calls to the provided render function, respecting an optional render lock ref.
+ *
+ * @param {Function} renderFn
+ * @param {Object} [options]
+ * @param {number} [options.delay=80]
+ * @param {import("react").MutableRefObject<boolean>} [options.renderLockRef]
+ * @returns {Function} schedule function that queues the next render call
+ */
 const useRenderScheduler = (renderFn, options = {}) => {
   const { delay = 80, renderLockRef = null } = options;
   const timeoutRef = useRef(null);
