@@ -1,10 +1,25 @@
-import { CanvasUtils } from "../../utils/canvas-utils";
 import AppEnvironment from "../../app/app-environment";
+import {
+  drawMatches,
+  drawMiniFooterBanner,
+  drawBigMatchLayout,
+} from "../../utils/canvas";
 
-const { drawMatches, drawMiniFooterBanner, drawBigMatchLayout } = typeof CanvasUtils === "object"
-  ? CanvasUtils
-  : window;
-
+/**
+ * Renders match mode layout (football/basketball/esports) handling both grid and big match variants.
+ *
+ * @param {Object} params
+ * @param {CanvasRenderingContext2D} params.ctx
+ * @param {Array} params.matchesWithImages
+ * @param {number} params.matchesStartY
+ * @param {Object} params.brandPalette
+ * @param {string} params.brandDisplayName
+ * @param {string} params.activeMode
+ * @param {string} params.activeSubMenu
+ * @param {Object} params.miniBannerLayout
+ * @param {HTMLImageElement|null} params.miniBannerImage
+ * @param {Object|null} params.bigMatchDetails
+ */
 const renderMatchModeLayout = ({
   ctx,
   matchesWithImages = [],

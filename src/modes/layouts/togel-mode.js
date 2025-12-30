@@ -1,8 +1,21 @@
-import { CanvasUtils } from "../../utils/canvas-utils";
 import AppEnvironment from "../../app/app-environment";
+import { drawTogelResult } from "../../utils/canvas";
 
-const { drawTogelResult } = typeof CanvasUtils === "object" ? CanvasUtils : window;
-
+/**
+ * Renders togel mode layout with result digits, pool labels, and streaming info.
+ *
+ * @param {Object} params
+ * @param {CanvasRenderingContext2D} params.ctx
+ * @param {number} params.matchesStartY
+ * @param {Object} params.brandPalette
+ * @param {Object} params.togelData
+ * @param {Array} params.togelData.digits
+ * @param {string} params.togelData.poolCode
+ * @param {string} params.togelData.poolLabel
+ * @param {string} params.togelData.variantLabel
+ * @param {string} params.togelData.drawTime
+ * @param {Object} params.togelData.streamingInfo
+ */
 const renderTogelModeLayout = ({
   ctx,
   matchesStartY = 0,

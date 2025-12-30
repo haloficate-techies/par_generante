@@ -1,9 +1,21 @@
-import { CanvasUtils } from "../../utils/canvas-utils";
 import AppEnvironment from "../../app/app-environment";
+import {
+  drawRaffleWinnersTable,
+  drawRaffleDateCapsule,
+} from "../../utils/canvas";
 
-const { drawRaffleWinnersTable, drawRaffleDateCapsule } =
-  typeof CanvasUtils === "object" ? CanvasUtils : window;
-
+/**
+ * Renders raffle mode layout with event capsule and winners table.
+ *
+ * @param {Object} params
+ * @param {CanvasRenderingContext2D} params.ctx
+ * @param {number} params.matchesStartY
+ * @param {Object} params.brandPalette
+ * @param {Object} params.raffleData
+ * @param {string} params.raffleData.eventLabel
+ * @param {Array} params.raffleData.winners
+ * @param {Object} params.raffleData.info
+ */
 const renderRaffleModeLayout = ({
   ctx,
   matchesStartY = 0,
