@@ -1,6 +1,6 @@
 import React, { memo } from "react";
 import AppEnvironment from "../../app/app-environment";
-import { MODE_CONFIG } from "../../app/config/modules/mode/mode.config";
+import { MODE_CONFIG } from "../../app/index.js";
 
 const DEFAULT_MODE_OPTIONS = MODE_CONFIG;
 

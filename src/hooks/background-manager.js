@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import AppEnvironment from "../app/app-environment";
-import { BANNER_BACKGROUND_LOOKUP, BANNER_BACKGROUND_FILES } from "../domains/brand";
-import { MODE_BACKGROUND_DEFAULTS } from "../app/config/modules/assets/asset.constants";
-import { resolveImageAssetSrc } from "../app/config/modules/assets/asset.resolvers";
-import { TOGEL_BACKGROUND_EXTENSION_PRIORITY } from "../app/config/modules/togel/togel.constants";
-
-const BACKGROUND_LOOKUP = BANNER_BACKGROUND_LOOKUP || {};
+import {
+  BACKGROUND_LOOKUP,
+  BANNER_BACKGROUND_FILES,
+  MODE_BACKGROUND_DEFAULTS,
+  resolveImageAssetSrc,
+  TOGEL_BACKGROUND_EXTENSION_PRIORITY,
+} from "../app/index.js";
 const AVAILABLE_BANNER_BACKGROUNDS = BANNER_BACKGROUND_FILES || [];
 
 /**

@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import AppEnvironment from "../app/app-environment";
-import { deriveBrandPalette, DEFAULT_BRAND_PALETTE } from "../utils/color-utils";
-import { resolveStreamingThemeFromPalette } from "../app/config/modules/theme/theme.utils";
+import {
+  deriveBrandPalette,
+  DEFAULT_BRAND_PALETTE,
+  resolveStreamingThemeFromPalette,
+} from "../app/index.js";
 
 /**
  * Derives a streaming theme (light/dark/gold) based on brand logo or togel mode.

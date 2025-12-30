@@ -2,7 +2,7 @@ import { TOGEL_POOL_OPTIONS, resolveTogelDrawTimeConfig } from "../../domains/to
 import { ESPORT_GAME_OPTIONS } from "../../domains/brand";
 import { getAutoTeamLogoSrc } from "../../domains/teams";
 import { readFileAsDataURL } from "../../utils/image-loader";
-import { LEAGUE_LOGO_OPTIONS } from "../../app/config/modules/match/match.config";
+import { LEAGUE_LOGO_OPTIONS } from "../../app/index.js";
 
 const AVAILABLE_TOGEL_POOL_OPTIONS = Array.isArray(TOGEL_POOL_OPTIONS) ? TOGEL_POOL_OPTIONS : [];
 const AVAILABLE_LEAGUE_LOGO_OPTIONS = Array.isArray(LEAGUE_LOGO_OPTIONS)
