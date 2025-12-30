@@ -1,8 +1,7 @@
-import AppEnvironment from "../../../app-environment";
 import { TOGEL_STREAMING_LINK_LOOKUP } from "./togel.streaming";
+import { TOGEL_POOL_OPTIONS } from "../../../../domains/togel";
 
-const AppData = (typeof AppEnvironment.getData === "function" && AppEnvironment.getData()) || {};
-const AVAILABLE_TOGEL_POOL_OPTIONS = Array.isArray(AppData.TOGEL_POOL_OPTIONS) ? AppData.TOGEL_POOL_OPTIONS : [];
+const AVAILABLE_TOGEL_POOL_OPTIONS = Array.isArray(TOGEL_POOL_OPTIONS) ? TOGEL_POOL_OPTIONS : [];
 
 export const normalizeStreamingDisplayUrl = (url) => {
   if (!url || typeof url !== "string") {

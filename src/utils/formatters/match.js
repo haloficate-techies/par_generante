@@ -1,30 +1,15 @@
-import AppData from "../../data/app-data";
+import { formatDate, formatTime } from "../../data/helpers/date-time-formatters";
 
-const formatMatchDateLabel =
-  AppData.formatDate ||
-  ((dateString) => {
-    if (!dateString) return "";
-    const date = new Date(`${dateString}T00:00:00`);
-    if (Number.isNaN(date.getTime())) {
-      return dateString;
-    }
-    try {
-      return date.toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-    } catch (error) {
-      return dateString;
-    }
-  });
+const formatMatchDateLabel = (dateString) => {
+  if (!dateString) return "";
+  const formatted = formatDate(dateString);
+  return typeof formatted === "string" ? formatted : "";
+};
 
-const formatMatchTimeLabel =
-  AppData.formatTime ||
-  ((timeString) => {
-    if (!timeString) return "";
-    return timeString;
-  });
+const formatMatchTimeLabel = (timeString) => {
+  if (!timeString) return "";
+  const formatted = formatTime(timeString);
+  return typeof formatted === "string" ? formatted : timeString;
+};
 
 export { formatMatchDateLabel, formatMatchTimeLabel };

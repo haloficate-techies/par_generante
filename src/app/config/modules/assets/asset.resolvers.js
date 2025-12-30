@@ -1,4 +1,4 @@
-import AppEnvironment from "../../../app-environment";
+import { BANNER_FOOTER_OPTIONS, BRAND_LOGO_OPTIONS } from "../../../../domains/brand";
 import {
   DEFAULT_IMAGE_EXTENSION_PRIORITY,
   DEFAULT_RAFFLE_FOOTER,
@@ -6,11 +6,8 @@ import {
   FOOTER_DIRECTORY_DEFAULT,
 } from "./asset.constants";
 
-const AppData = (typeof AppEnvironment.getData === "function" && AppEnvironment.getData()) || {};
-const AVAILABLE_BRAND_LOGOS = Array.isArray(AppData.BRAND_LOGO_OPTIONS) ? AppData.BRAND_LOGO_OPTIONS : [];
-const AVAILABLE_FOOTER_LOGOS = Array.isArray(AppData.BANNER_FOOTER_OPTIONS)
-  ? AppData.BANNER_FOOTER_OPTIONS
-  : [];
+const AVAILABLE_BRAND_LOGOS = Array.isArray(BRAND_LOGO_OPTIONS) ? BRAND_LOGO_OPTIONS : [];
+const AVAILABLE_FOOTER_LOGOS = Array.isArray(BANNER_FOOTER_OPTIONS) ? BANNER_FOOTER_OPTIONS : [];
 
 export const HEADER_TO_FOOTER_LOOKUP = AVAILABLE_BRAND_LOGOS.reduce((acc, option) => {
   if (!option || !option.value) {

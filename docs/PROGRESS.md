@@ -30,3 +30,14 @@
 
 ✅ Run `npm run dev` to verify the refactor before continuing.
 
+## Session: Data Helper QA (Dec 31, 2025)
+
+### ✅ Completed
+- Added vitest coverage for new helpers: `match-factory`, `date-time-formatters`, and `image-proxy`.
+- Documented helper exports with JSDoc for IntelliSense (`src/data/helpers`, `src/data/constants`, `src/data/image-proxy.js`).
+- Ran `npm test` to confirm all suites pass with the new coverage.
+
+### 🧠 Notes
+- Image proxy defaults now include exhaustive allowlist coverage, so tests focus on valid vs invalid inputs instead of fake blocklists.
+- Helper tests serve as executable documentation for future refactors in the data layer.
+

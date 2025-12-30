@@ -1,6 +1,4 @@
-import AppEnvironment from "../../../app-environment";
-
-const AppData = (typeof AppEnvironment.getData === "function" && AppEnvironment.getData()) || {};
+import { ESPORT_MINI_BANNER_FOOTER } from "../../../../domains/brand";
 
 export const MODE_BACKGROUND_DEFAULTS = {
   basketball: "assets/BASKET/banner_background/BACKGROUND.webp",
@@ -9,7 +7,7 @@ export const MODE_BACKGROUND_DEFAULTS = {
   raffle: "assets/RAFFLE/banner_background/BACKGROUND.webp",
 };
 
-export const DEFAULT_ESPORT_MINI_BANNER = AppData.ESPORT_MINI_BANNER_FOOTER || null;
+export const DEFAULT_ESPORT_MINI_BANNER = ESPORT_MINI_BANNER_FOOTER || null;
 
 export const FOOTER_DIRECTORY_DEFAULT = "assets/BOLA/banner_footer";
 export const FOOTER_DIRECTORY_BY_MODE = {

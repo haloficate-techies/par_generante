@@ -40,6 +40,12 @@ const IMAGE_PROXY_HOST_ALLOWLIST = Array.from(
 );
 const PROXY_URL_PLACEHOLDER = "{url}";
 
+/**
+ * Extracts the hostname component from a URL string.
+ *
+ * @param {string} value - URL to inspect.
+ * @returns {string} Hostname in lowercase or empty string when invalid.
+ */
 const getProxyHostFromUrl = (value) => {
   if (typeof value !== "string" || !value) {
     return "";
@@ -51,6 +57,15 @@ const getProxyHostFromUrl = (value) => {
   }
 };
 
+/**
+ * Checks whether a hostname satisfies an allowlist rule.
+ *
+ * Supports exact matches, wildcard (*), and subdomains.
+ *
+ * @param {string} hostname - Hostname to test.
+ * @param {string} allowedHost - Rule entry (e.g., "*", "example.com").
+ * @returns {boolean} True when hostname is allowed.
+ */
 const matchesAllowlistedHost = (hostname, allowedHost) => {
   if (!hostname || !allowedHost) {
     return false;
@@ -64,6 +79,12 @@ const matchesAllowlistedHost = (hostname, allowedHost) => {
   return hostname.endsWith(`.${allowedHost.replace(/^\*\./, "")}`);
 };
 
+/**
+ * Determines whether a hostname should be routed through the proxy.
+ *
+ * @param {string} hostname - Hostname extracted from candidate URL.
+ * @returns {boolean} True if host is allowed to proxy.
+ */
 const shouldProxyHost = (hostname) => {
   if (!hostname) {
     return false;
@@ -76,6 +97,15 @@ const shouldProxyHost = (hostname) => {
   );
 };
 
+/**
+ * Builds a proxied image URL for allowlisted hosts.
+ *
+ * Returns null for invalid URLs, blobs, data URIs,
+ * or hosts outside the allowlist.
+ *
+ * @param {string} src - Original image source.
+ * @returns {string|null} Proxied URL or null when not applicable.
+ */
 const buildProxiedImageUrl = (src) => {
   if (
     !IMAGE_PROXY_BASE_URL ||
@@ -100,6 +130,12 @@ const buildProxiedImageUrl = (src) => {
   return `${IMAGE_PROXY_BASE_URL}${encoded}`;
 };
 
+/**
+ * Generates a list of image source candidates, preferring proxied URLs.
+ *
+ * @param {string} src - Provided image source (URL/data/blob).
+ * @returns {Array<string>} Ordered list of image sources to try.
+ */
 const buildImageSourceCandidates = (src) => {
   if (typeof src !== "string") {
     return src ? [src] : [];

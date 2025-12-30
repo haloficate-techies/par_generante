@@ -1,6 +1,7 @@
-import AppEnvironment from "../../../app-environment";
-
-const AppData = (typeof AppEnvironment.getData === "function" && AppEnvironment.getData()) || {};
+import {
+  loadOptionalImage as loadOptionalImageHelper,
+  loadTeamLogoImage as loadTeamLogoImageHelper,
+} from "../../../../utils/image-loader";
 
 export const createBrandSlug = (brandName, { uppercase = false } = {}) => {
   if (!brandName) return "";
@@ -10,11 +11,12 @@ export const createBrandSlug = (brandName, { uppercase = false } = {}) => {
 
 export const loadMatchLogoImage = (src, isAuto) => {
   if (!src) return Promise.resolve(null);
-  if (typeof AppData.loadTeamLogoImage === "function") {
-    return AppData.loadTeamLogoImage(src, { applyAutoProcessing: Boolean(isAuto) });
+  if (typeof loadTeamLogoImageHelper === "function") {
+    return loadTeamLogoImageHelper(src, { applyAutoProcessing: Boolean(isAuto) });
   }
-  const loadOptionalImage =
-    typeof AppData.loadOptionalImage === "function" ? AppData.loadOptionalImage : () => Promise.resolve(null);
-  return loadOptionalImage(src);
+  if (typeof loadOptionalImageHelper === "function") {
+    return loadOptionalImageHelper(src);
+  }
+  return Promise.resolve(null);
 };
 

@@ -6,12 +6,12 @@
 - Tailwind/PostCSS dikompilasi ke `src/index.css`.
 
 ### 2. Layer Data & Utilitas
-- `src/data/app-data.js`
-  - Menyediakan data global (brand, pool, opsi game), helper warna/kanvas (`applyFittedFont`, `drawLogoTile`, `hexToRgb`, dsb), serta fungsi pemuatan gambar.
-  - Mengekspor bundle yang langsung disimpan ke `AppEnvironment` sehingga bisa diimpor atau diambil melalui adaptor.
+- `src/data/helpers/*`
+  - Kumpulan helper kecil yang bisa diimpor langsung, mis. `match-factory.js` (generator match kosong) dan `date-time-formatters.js` (formatter tanggal/waktu).
+- `src/data/constants/placeholders.js`
+  - Menyediakan konstanta placeholder (warna logo, dsb.) sebagai sumber tunggal.
 - `src/domains/*`
-  - Sumber data per-domain (mis. **brand**, **togel**, **teams**) yang menjadi input untuk `src/data/app-data.js`.
-  - Tujuannya agar data besar dan aturan domain tidak tercampur di folder `src/data/` dan lebih mudah di-maintain/diuji.
+  - Sumber data per-domain (mis. **brand**, **togel**, **teams**). Seluruh konsumen kini mengimpor langsung dari domain masing-masing tanpa perantara `app-data`.
 - `src/utils/canvas-utils.js`
   - Kumpulan fungsi menggambar background, kartu pertandingan, togel result, footer, dsb. Mengekspor `CanvasUtils` sebagai modul biasa.
 
@@ -69,7 +69,7 @@ Pattern ini mengurangi boilerplate import dan memudahkan refactor internal struk
   - Menghubungkan registry mode untuk menggambar layout, serta meneruskan handler/actions ke `MatchListForm` dan komponen lain.
 
 ### 9. Alur Data Singkat
-1. Data global dan helper diekspor dari `app-data.js` & `canvas-utils.js`, kemudian disimpan di `AppEnvironment`.
+1. Data domain (brand/togel/teams) dan helper (`src/data/helpers/*`, `src/data/constants/*`) diimpor langsung oleh modul yang membutuhkan, lalu dikemas ulang saat diperlukan melalui `AppEnvironment`.
 2. `App.jsx` mengimpor hooks, komponen, dan resolver mode sebagai modul umum.
 3. Saat render, `drawMatches/drawTogelResult` menggunakan helper warna/kanvas dari bundle tersebut.
 4. Hasil kanvas dipakai untuk preview, download PNG, atau ZIP multi-brand.

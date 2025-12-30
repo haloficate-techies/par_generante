@@ -1,4 +1,5 @@
 import AppEnvironment from "../app-environment";
+import { resolveTogelDrawTimeConfig as resolveTogelDrawTimeConfigHelper } from "../../domains/togel";
 
 export * from "./modules/togel/togel.constants";
 export * from "./modules/togel/togel.streaming";
@@ -46,10 +47,9 @@ import { hexToRgbForTheme, resolveStreamingThemeFromPalette } from "./modules/th
 import { createBrandSlug, loadMatchLogoImage } from "./modules/shared/string.utils";
 import { MODE_CONFIG } from "./modules/mode/mode.config";
 
-const AppData = (typeof AppEnvironment.getData === "function" && AppEnvironment.getData()) || {};
 const resolveTogelDrawTimeConfig =
-  typeof AppData.resolveTogelDrawTimeConfig === "function"
-    ? AppData.resolveTogelDrawTimeConfig
+  typeof resolveTogelDrawTimeConfigHelper === "function"
+    ? resolveTogelDrawTimeConfigHelper
     : () => ({ options: [] });
 
 const APP_GLOBALS_BUNDLE = {
