@@ -138,5 +138,4 @@ const brasileiraoTeams = [
 
 export { brasileiraoTeams };
 
-export default brasileiraoTeams;
 

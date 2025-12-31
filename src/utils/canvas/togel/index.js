@@ -1,5 +1,1 @@
-export {
-  drawTogelInfoPill,
-  drawDigitOrb,
-  drawTogelResult,
-} from "./render";
+export { drawTogelResult } from "./render";

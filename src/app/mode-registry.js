@@ -111,4 +111,4 @@ if (isDevelopment) {
   });
 }
 
-export { registerModeLayout, getModeLayoutConfig, registerModeModule, getModeModule };
+export { getModeLayoutConfig, getModeModule };

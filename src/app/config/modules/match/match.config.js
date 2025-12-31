@@ -1,11 +1,3 @@
-export const FOOTBALL_SUB_MENUS = [
-  { id: "schedule", label: "Jadwal" },
-  { id: "scores", label: "Skor Bola" },
-  { id: "big_match", label: "Big Match" },
-];
-
-export const DEFAULT_SUB_MENUS = [{ id: "schedule", label: "Jadwal" }];
-
 export const LEAGUE_LOGO_OPTIONS = [
   { label: "UEFA Champions League", value: "assets/BOLA/logo_liga/EUROPEAN_CHAMPIONS_LEAGUE.webp" },
   { label: "UEFA Europa League", value: "assets/BOLA/logo_liga/EUROPA_LEAGUE.webp" },

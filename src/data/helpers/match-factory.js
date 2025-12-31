@@ -58,7 +58,3 @@ export const createInitialMatches = (count) =>
     };
   });
 
-export default {
-  createInitialMatches,
-};
-

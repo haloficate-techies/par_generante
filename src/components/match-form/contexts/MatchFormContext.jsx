@@ -69,5 +69,3 @@ export const useMatchForm = () => {
   return context;
 };
 
-export default MatchFormContext;
-

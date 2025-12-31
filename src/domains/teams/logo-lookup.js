@@ -1,6 +1,6 @@
 import TEAM_AUTO_LOGO_SOURCES from "./logo-sources";
 
-export const normalizeTeamName = (name) => {
+const normalizeTeamName = (name) => {
   if (!name) return "";
   return name
     .toLowerCase()
@@ -11,7 +11,7 @@ export const normalizeTeamName = (name) => {
     .trim();
 };
 
-export const TEAM_AUTO_LOGO_LOOKUP = TEAM_AUTO_LOGO_SOURCES.reduce(
+const TEAM_AUTO_LOGO_LOOKUP = TEAM_AUTO_LOGO_SOURCES.reduce(
   (acc, entry) => {
     entry.names.forEach((name) => {
       const key = normalizeTeamName(name);
@@ -32,9 +32,3 @@ export const getAutoTeamLogoSrc = (teamName) => {
 
 export const resolveAutoTeamLogoSrc = (teamName) => getAutoTeamLogoSrc(teamName);
 
-export default {
-  normalizeTeamName,
-  TEAM_AUTO_LOGO_LOOKUP,
-  getAutoTeamLogoSrc,
-  resolveAutoTeamLogoSrc,
-};

@@ -7,7 +7,7 @@ const srgbChannelToLinear = (value) => {
     : Math.pow((normalized + 0.055) / 1.055, 2.4);
 };
 
-export const blendHexColors = (sourceHex, targetHex, ratio = 0.4) => {
+const blendHexColors = (sourceHex, targetHex, ratio = 0.4) => {
   if (!sourceHex || !targetHex) {
     return sourceHex || targetHex || "#0f172a";
   }
@@ -44,7 +44,7 @@ export const getRelativeLuminanceSafe = (hex) => {
   }
 };
 
-export const averageHexColor = (startHex, endHex) => {
+const averageHexColor = (startHex, endHex) => {
   if (typeof hexToRgb !== "function" || typeof rgbToHex !== "function") {
     return "#000000";
   }

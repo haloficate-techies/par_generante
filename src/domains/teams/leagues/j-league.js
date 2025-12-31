@@ -93,5 +93,4 @@ const jLeagueTeams = [
 
 export { jLeagueTeams };
 
-export default jLeagueTeams;
 

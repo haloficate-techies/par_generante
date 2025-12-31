@@ -102,5 +102,4 @@ const serieATeams = [
 
 export { serieATeams };
 
-export default serieATeams;
 

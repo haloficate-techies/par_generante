@@ -90,10 +90,4 @@ const mapRaffleWinners = (prizes = []) =>
     };
   });
 
-export {
-  extractRaffleSlug,
-  formatPrizeAmountLabel,
-  formatRaffleDateLabel,
-  formatRaffleEventLabel,
-  mapRaffleWinners,
-};
+export { extractRaffleSlug, formatRaffleEventLabel, mapRaffleWinners };

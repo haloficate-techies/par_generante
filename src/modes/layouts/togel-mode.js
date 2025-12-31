@@ -44,4 +44,3 @@ const registerLayouts = () => {
 
 registerLayouts();
 
-export default renderTogelModeLayout;

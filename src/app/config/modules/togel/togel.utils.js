@@ -3,7 +3,7 @@ import { TOGEL_POOL_OPTIONS } from "../../../../domains/togel";
 
 const AVAILABLE_TOGEL_POOL_OPTIONS = Array.isArray(TOGEL_POOL_OPTIONS) ? TOGEL_POOL_OPTIONS : [];
 
-export const normalizeStreamingDisplayUrl = (url) => {
+const normalizeStreamingDisplayUrl = (url) => {
   if (!url || typeof url !== "string") {
     return "";
   }

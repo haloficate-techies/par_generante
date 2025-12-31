@@ -85,5 +85,4 @@ const premierLeagueTeams = [
 
 export { premierLeagueTeams };
 
-export default premierLeagueTeams;
 

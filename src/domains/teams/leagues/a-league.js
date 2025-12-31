@@ -68,5 +68,4 @@ const aLeagueTeams = [
 
 export { aLeagueTeams };
 
-export default aLeagueTeams;
 

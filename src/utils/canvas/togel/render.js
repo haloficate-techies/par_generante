@@ -7,7 +7,7 @@ import { resolveTogelDateLabel, getTodayDateLabel } from "../date";
 import { normalizeTogelDigits } from "./digits";
 import { resolveStreamingUrlCanvasStyle } from "./streaming-style";
 
-export const drawTogelInfoPill = (
+const drawTogelInfoPill = (
   ctx,
   {
     x,
@@ -79,7 +79,7 @@ export const drawTogelInfoPill = (
   ctx.restore();
 };
 
-export const drawDigitOrb = (
+const drawDigitOrb = (
   ctx,
   x,
   y,

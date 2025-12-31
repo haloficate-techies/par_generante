@@ -77,5 +77,4 @@ const bundesligaTeams = [
 
 export { bundesligaTeams };
 
-export default bundesligaTeams;
 

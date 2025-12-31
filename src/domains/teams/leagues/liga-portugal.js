@@ -118,5 +118,4 @@ const ligaPortugalTeams = [
 
 export { ligaPortugalTeams };
 
-export default ligaPortugalTeams;
 

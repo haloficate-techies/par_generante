@@ -34,8 +34,3 @@ export const formatTime = (timeString) => {
   return `${timeString} WIB`;
 };
 
-export default {
-  formatDate,
-  formatTime,
-};
-

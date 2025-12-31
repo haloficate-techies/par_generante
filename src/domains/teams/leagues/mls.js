@@ -158,5 +158,4 @@ const mlsTeams = [
 
 export { mlsTeams };
 
-export default mlsTeams;
 

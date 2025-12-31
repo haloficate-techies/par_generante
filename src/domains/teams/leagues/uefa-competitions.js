@@ -228,12 +228,6 @@ const uefaCompetitionTeams = [
   ...europaConferenceLeagueTeams,
 ];
 
-export {
-  championsLeagueTeams,
-  europaConferenceLeagueTeams,
-  europaLeagueTeams,
-  uefaCompetitionTeams,
-};
+export { uefaCompetitionTeams };
 
-export default uefaCompetitionTeams;
 

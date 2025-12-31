@@ -75,5 +75,4 @@ const saudiProLeagueTeams = [
 
 export { saudiProLeagueTeams };
 
-export default saudiProLeagueTeams;
 

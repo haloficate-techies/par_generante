@@ -123,5 +123,4 @@ const nbaTeams = [
 
 export { nbaTeams };
 
-export default nbaTeams;
 

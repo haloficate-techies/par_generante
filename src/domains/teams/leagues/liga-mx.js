@@ -93,5 +93,4 @@ const ligaMxTeams = [
 
 export { ligaMxTeams };
 
-export default ligaMxTeams;
 

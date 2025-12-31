@@ -103,5 +103,4 @@ const ligaArgentinaTeams = [
 
 export { ligaArgentinaTeams };
 
-export default ligaArgentinaTeams;
 

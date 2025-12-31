@@ -52,4 +52,3 @@ const registerLayouts = () => {
 
 registerLayouts();
 
-export default renderRaffleModeLayout;

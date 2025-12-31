@@ -27,5 +27,3 @@ const BRAND_NAMES = [
 
 export { BRAND_NAMES };
 
-export default BRAND_NAMES;
-

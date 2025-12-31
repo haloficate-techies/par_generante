@@ -10,5 +10,3 @@ const INDONESIAN_DAY_NAMES = [
 
 export { INDONESIAN_DAY_NAMES };
 
-export default INDONESIAN_DAY_NAMES;
-

@@ -107,5 +107,4 @@ const ligue1Teams = [
 
 export { ligue1Teams };
 
-export default ligue1Teams;
 

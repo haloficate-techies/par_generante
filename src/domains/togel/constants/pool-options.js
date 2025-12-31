@@ -14,5 +14,3 @@ const TOGEL_POOL_OPTIONS = [
 
 export { TOGEL_POOL_OPTIONS };
 
-export default TOGEL_POOL_OPTIONS;
-

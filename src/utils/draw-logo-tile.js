@@ -131,9 +131,3 @@ export const drawLogoTile = (
   ctx.restore();
 };
 
-export default {
-  PLACEHOLDER_COLORS,
-  applyFittedFont,
-  clampMin,
-  drawLogoTile,
-};

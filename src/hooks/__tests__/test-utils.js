@@ -47,22 +47,9 @@ export const createTestMatches = (count = 2, overrides = {}) =>
     createTestMatch(typeof overrides === "function" ? overrides(index) : overrides)
   );
 
-export const mockImageLoader = (returnValue = { width: 100, height: 100 }) => vi.fn().mockResolvedValue(returnValue);
-
 export const mockAutoLogoResolver = (mapping = {}) => {
   const lookup = new Map(Object.entries(mapping));
   return vi.fn((teamName) => lookup.get(teamName) || "");
-};
-
-export const waitForUpdate = async (waitForNextUpdate, timeout = 250) => {
-  const timer = setTimeout(() => {
-    throw new Error(`Timed out waiting for hook update after ${timeout}ms`);
-  }, timeout);
-  try {
-    return await waitForNextUpdate();
-  } finally {
-    clearTimeout(timer);
-  }
 };
 
 export const createModeConfig = (overrides = {}) => ({

@@ -146,5 +146,4 @@ const championshipTeams = [
 
 export { championshipTeams };
 
-export default championshipTeams;
 

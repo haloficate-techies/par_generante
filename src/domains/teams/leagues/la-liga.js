@@ -99,5 +99,4 @@ const laLigaTeams = [
 
 export { laLigaTeams };
 
-export default laLigaTeams;
 

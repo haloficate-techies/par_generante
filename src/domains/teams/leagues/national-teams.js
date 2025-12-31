@@ -99,5 +99,4 @@ const nationalTeamFallbacks = [
 
 export { nationalTeamFallbacks };
 
-export default nationalTeamFallbacks;
 

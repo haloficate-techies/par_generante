@@ -143,8 +143,3 @@ export const removeLogoBackground = async (imageDataUrl, { signal } = {}) => {
   return callBackgroundRemoval(endpoint, imageDataUrl, { signal });
 };
 
-/**
- * Returns a copy of the current removal service configuration.
- * @returns {typeof backgroundRemovalConfig}
- */
-export const getBackgroundRemovalConfig = () => ({ ...backgroundRemovalConfig });

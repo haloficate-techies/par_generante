@@ -72,4 +72,3 @@ const registerLayouts = () => {
 
 registerLayouts();
 
-export default renderMatchModeLayout;

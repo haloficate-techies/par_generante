@@ -51,5 +51,4 @@ const kLeagueTeams = [
 
 export { kLeagueTeams };
 
-export default kLeagueTeams;
 

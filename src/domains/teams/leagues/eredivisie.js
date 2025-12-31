@@ -93,5 +93,4 @@ const eredivisieTeams = [
 
 export { eredivisieTeams };
 
-export default eredivisieTeams;
 

@@ -98,5 +98,4 @@ const belgianProLeagueTeams = [
 
 export { belgianProLeagueTeams };
 
-export default belgianProLeagueTeams;
 

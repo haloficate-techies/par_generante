@@ -22,5 +22,3 @@ const resolveTotoSingaporeDrawTimeConfig = () => {
 
 export { resolveTotoSingaporeDrawTimeConfig };
 
-export default resolveTotoSingaporeDrawTimeConfig;
-

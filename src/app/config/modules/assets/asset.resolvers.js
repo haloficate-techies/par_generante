@@ -13,7 +13,7 @@ const AVAILABLE_FOOTER_LOGOS = Array.isArray(BANNER_FOOTER_OPTIONS) ? BANNER_FOO
  * Lookup table mapping header logo values to footer logo assets.
  * @type {Record<string, string>}
  */
-export const HEADER_TO_FOOTER_LOOKUP = AVAILABLE_BRAND_LOGOS.reduce((acc, option) => {
+const HEADER_TO_FOOTER_LOOKUP = AVAILABLE_BRAND_LOGOS.reduce((acc, option) => {
   if (!option || !option.value) {
     return acc;
   }
@@ -47,7 +47,7 @@ export const HEADER_TO_FOOTER_LOOKUP = AVAILABLE_BRAND_LOGOS.reduce((acc, option
  * @param {string} mode - Registered mode identifier (football, basketball, raffle, etc.).
  * @returns {string} Footer asset path or empty string if no match.
  */
-export const resolveModeFooterPath = (brandName, mode) => {
+const resolveModeFooterPath = (brandName, mode) => {
   const directory = FOOTER_DIRECTORY_BY_MODE[mode];
   if (!directory) {
     return mode === "raffle" ? DEFAULT_RAFFLE_FOOTER : "";
@@ -85,7 +85,7 @@ export const resolveFooterSrcForBrand = (brandName, headerValue, mode) => {
  * @param {string} path - Raw asset path that may contain query strings.
  * @returns {{basePath: string, extension: string}} Parsed asset parts.
  */
-export const splitAssetExtension = (path) => {
+const splitAssetExtension = (path) => {
   if (!path || typeof path !== "string") {
     return { basePath: "", extension: "" };
   }

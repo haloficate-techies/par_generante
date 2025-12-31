@@ -9,7 +9,3 @@ export const TEAM_LOGO_PLACEHOLDER_COLORS = {
   text: "#0f172a",
 };
 
-export default {
-  TEAM_LOGO_PLACEHOLDER_COLORS,
-};
-

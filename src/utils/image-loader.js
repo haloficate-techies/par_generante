@@ -416,8 +416,3 @@ export const loadTeamLogoImage = async (src, { applyAutoProcessing = false } = {
   return loader;
 };
 
-export default {
-  readFileAsDataURL,
-  loadOptionalImage,
-  loadTeamLogoImage,
-};

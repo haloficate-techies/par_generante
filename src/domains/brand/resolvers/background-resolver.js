@@ -40,13 +40,5 @@ export {
   createBrandBackgroundFiles,
   createBrandBackgroundLookup,
   createBrandBackgroundResolver,
-  normalizeBrandKey,
-};
-
-export default {
-  createBrandBackgroundFiles,
-  createBrandBackgroundLookup,
-  createBrandBackgroundResolver,
-  normalizeBrandKey,
 };
 

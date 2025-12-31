@@ -103,5 +103,4 @@ const superLigTeams = [
 
 export { superLigTeams };
 
-export default superLigTeams;
 

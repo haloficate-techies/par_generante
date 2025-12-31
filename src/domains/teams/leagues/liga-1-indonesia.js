@@ -93,5 +93,4 @@ const liga1IndonesiaTeams = [
 
 export { liga1IndonesiaTeams };
 
-export default liga1IndonesiaTeams;
 

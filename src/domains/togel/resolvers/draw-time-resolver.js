@@ -41,7 +41,5 @@ const resolveTogelDrawTimeConfig = (pool, variant) => {
   return normalizeDrawTimeResult(variantEntry);
 };
 
-export { DYNAMIC_SINGAPORE_FLAG, resolveTogelDrawTimeConfig };
-
-export default resolveTogelDrawTimeConfig;
+export { resolveTogelDrawTimeConfig };
 

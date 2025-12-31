@@ -91,25 +91,6 @@ export {
   BANNER_BACKGROUND_FILES,
   BANNER_BACKGROUND_LOOKUP,
   BANNER_FOOTER_OPTIONS,
-  BASKETBALL_BRAND_BACKGROUND_LOOKUP,
-  BRAND_ASSET_ENTRIES,
   BRAND_LOGO_OPTIONS,
-  ESPORT_BRAND_BACKGROUND_LOOKUP,
-  resolveBasketballBrandBackgroundPath,
-  resolveBrandBackgroundPath,
-  resolveEsportBrandBackgroundPath,
-};
-
-export default {
-  BANNER_BACKGROUND_FILES,
-  BANNER_BACKGROUND_LOOKUP,
-  BANNER_FOOTER_OPTIONS,
-  BASKETBALL_BRAND_BACKGROUND_LOOKUP,
-  BRAND_ASSET_ENTRIES,
-  BRAND_LOGO_OPTIONS,
-  ESPORT_BRAND_BACKGROUND_LOOKUP,
-  resolveBasketballBrandBackgroundPath,
-  resolveBrandBackgroundPath,
-  resolveEsportBrandBackgroundPath,
 };
 

@@ -1,4 +1,4 @@
-export const hexToRgbForTheme = (hex) => {
+const hexToRgbForTheme = (hex) => {
   if (typeof hex !== "string" || !hex) {
     return { r: 31, g: 41, b: 55 };
   }

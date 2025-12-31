@@ -63,5 +63,4 @@ const danishSuperligaTeams = [
 
 export { danishSuperligaTeams };
 
-export default danishSuperligaTeams;
 

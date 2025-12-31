@@ -157,25 +157,7 @@ const buildImageSourceCandidates = (src) => {
 export {
   buildImageSourceCandidates,
   buildProxiedImageUrl,
-  DEFAULT_IMAGE_PROXY_BASE_URL,
-  DEFAULT_IMAGE_PROXY_HOSTS,
   getProxyHostFromUrl,
-  IMAGE_PROXY_BASE_URL,
-  IMAGE_PROXY_HOST_ALLOWLIST,
   matchesAllowlistedHost,
-  PROXY_URL_PLACEHOLDER,
-  shouldProxyHost,
-};
-
-export default {
-  buildImageSourceCandidates,
-  buildProxiedImageUrl,
-  DEFAULT_IMAGE_PROXY_BASE_URL,
-  DEFAULT_IMAGE_PROXY_HOSTS,
-  getProxyHostFromUrl,
-  IMAGE_PROXY_BASE_URL,
-  IMAGE_PROXY_HOST_ALLOWLIST,
-  matchesAllowlistedHost,
-  PROXY_URL_PLACEHOLDER,
   shouldProxyHost,
 };
