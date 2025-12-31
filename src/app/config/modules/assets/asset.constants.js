@@ -1,4 +1,4 @@
-import { ESPORT_MINI_BANNER_FOOTER } from "../../../../domains/brand";
+import { BRAND_LOGO_OPTIONS, ESPORT_MINI_BANNER_FOOTER } from "../../../../domains/brand";
 
 export const MODE_BACKGROUND_DEFAULTS = {
   basketball: "assets/BASKET/banner_background/BACKGROUND.webp",
@@ -21,3 +21,6 @@ export const DEFAULT_RAFFLE_FOOTER = "assets/RAFFLE/banner_footer/FOOTER.webp";
 
 export const DEFAULT_IMAGE_EXTENSION_PRIORITY = ["webp", "png", "jpg", "jpeg"];
 
+export const AVAILABLE_BRAND_LOGOS = Array.isArray(BRAND_LOGO_OPTIONS) ? BRAND_LOGO_OPTIONS : [];
+
+export const RAFFLE_HEADER_LOGO_SRC = "assets/RAFFLE/logo_mode/IDNRAFFLE.png";

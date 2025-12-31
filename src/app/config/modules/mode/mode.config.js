@@ -1,3 +1,24 @@
+/**
+ * @typedef {Object} ModeSubMenu
+ * @property {string} id Unique identifier for submenu selection.
+ * @property {string} label Display label shown in the UI.
+ */
+
+/**
+ * @typedef {Object} ModeConfigItem
+ * @property {string} id Unique mode identifier (e.g., "football").
+ * @property {string} label Label used in selectors or tabs.
+ * @property {string} title Primary heading shown on the generator page.
+ * @property {string} subtitle Supporting description for the mode.
+ * @property {string} pageBackgroundClass Tailwind classes applied to page background.
+ * @property {ModeSubMenu[]} subMenus Available sub menu options for the mode.
+ * @property {string} defaultSubMenuId Sub menu that should be active initially.
+ */
+
+/**
+ * Complete list of modes supported by the banner generator.
+ * @type {ModeConfigItem[]}
+ */
 export const MODE_CONFIG = [
   {
     id: "football",

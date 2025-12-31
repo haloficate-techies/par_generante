@@ -38,6 +38,15 @@ const resolveTogelDrawTimeConfig =
     ? resolveTogelDrawTimeConfigHelper
     : () => ({ options: [] });
 
+const isDevelopment = import.meta.env.DEV;
+
+/**
+ * @deprecated Use direct imports from `@app/*` modules instead of relying on AppGlobals.
+ *
+ * Examples:
+ * import { MODE_BACKGROUND_DEFAULTS } from "@app/assets/asset.constants";
+ * import { MODE_CONFIG } from "@app/mode/mode.config";
+ */
 const APP_GLOBALS_BUNDLE = {
   MODE_BACKGROUND_DEFAULTS,
   DEFAULT_ESPORT_MINI_BANNER,
@@ -71,6 +80,13 @@ const APP_GLOBALS_BUNDLE = {
   FOOTBALL_SUB_MENUS,
   DEFAULT_SUB_MENUS,
 };
+
+if (isDevelopment) {
+  console.warn(
+    "[DEPRECATION] APP_GLOBALS_BUNDLE will be removed in a future major release. " +
+      "Please import needed helpers directly from their module (e.g., @app/assets, @app/mode, @app/togel)."
+  );
+}
 
 AppEnvironment.setGlobals(APP_GLOBALS_BUNDLE);
 

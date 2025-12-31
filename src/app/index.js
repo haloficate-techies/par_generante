@@ -1,7 +1,4 @@
-import {
-  BANNER_BACKGROUND_LOOKUP,
-  BRAND_LOGO_OPTIONS,
-} from "../domains/brand";
+import { BANNER_BACKGROUND_LOOKUP } from "../domains/brand";
 
 export * from "./config/modules/assets/asset.constants";
 export * from "./config/modules/assets/asset.resolvers";
@@ -24,8 +21,4 @@ export * from "../data/helpers/match-factory";
 export { default as AppEnvironment } from "./app-environment";
 export * from "./mode-registry";
 
-export const AVAILABLE_BRAND_LOGOS = Array.isArray(BRAND_LOGO_OPTIONS) ? BRAND_LOGO_OPTIONS : [];
 export const BACKGROUND_LOOKUP = BANNER_BACKGROUND_LOOKUP || {};
-export const RAFFLE_HEADER_LOGO_SRC = "assets/RAFFLE/logo_mode/IDNRAFFLE.png";
-export const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
-export const BIG_MATCH_TITLE = "BIG MATCH";

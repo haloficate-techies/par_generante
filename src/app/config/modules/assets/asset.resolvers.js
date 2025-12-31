@@ -9,6 +9,10 @@ import {
 const AVAILABLE_BRAND_LOGOS = Array.isArray(BRAND_LOGO_OPTIONS) ? BRAND_LOGO_OPTIONS : [];
 const AVAILABLE_FOOTER_LOGOS = Array.isArray(BANNER_FOOTER_OPTIONS) ? BANNER_FOOTER_OPTIONS : [];
 
+/**
+ * Lookup table mapping header logo values to footer logo assets.
+ * @type {Record<string, string>}
+ */
 export const HEADER_TO_FOOTER_LOOKUP = AVAILABLE_BRAND_LOGOS.reduce((acc, option) => {
   if (!option || !option.value) {
     return acc;
@@ -37,6 +41,12 @@ export const HEADER_TO_FOOTER_LOOKUP = AVAILABLE_BRAND_LOGOS.reduce((acc, option
   return acc;
 }, {});
 
+/**
+ * Resolve a footer asset path for a given mode + brand combination.
+ * @param {string} brandName - Canonical brand identifier, e.g. "DEWABET".
+ * @param {string} mode - Registered mode identifier (football, basketball, raffle, etc.).
+ * @returns {string} Footer asset path or empty string if no match.
+ */
 export const resolveModeFooterPath = (brandName, mode) => {
   const directory = FOOTER_DIRECTORY_BY_MODE[mode];
   if (!directory) {
@@ -48,6 +58,14 @@ export const resolveModeFooterPath = (brandName, mode) => {
   return `${directory}/${brandName}.webp`;
 };
 
+/**
+ * Resolve footer source with multi-step fallback logic.
+ * Priority: mode-specific asset → header lookup → default footer directory.
+ * @param {string} brandName - Brand identifier for directory-based lookup.
+ * @param {string} headerValue - Selected header logo path (used for lookup table).
+ * @param {string} mode - Mode identifier (football, raffle, etc.).
+ * @returns {string} Footer asset path or empty string.
+ */
 export const resolveFooterSrcForBrand = (brandName, headerValue, mode) => {
   const modeSpecificFooter = resolveModeFooterPath(brandName, mode);
   if (modeSpecificFooter) {
@@ -62,6 +80,11 @@ export const resolveFooterSrcForBrand = (brandName, headerValue, mode) => {
   return "";
 };
 
+/**
+ * Split an asset path into base path and extension (if any).
+ * @param {string} path - Raw asset path that may contain query strings.
+ * @returns {{basePath: string, extension: string}} Parsed asset parts.
+ */
 export const splitAssetExtension = (path) => {
   if (!path || typeof path !== "string") {
     return { basePath: "", extension: "" };
@@ -79,6 +102,20 @@ export const splitAssetExtension = (path) => {
   };
 };
 
+/**
+ * Resolve the best available asset source across multiple extensions.
+ * Automatically caches the asynchronous resolution per unique combination.
+ *
+ * @param {string} rawPath - Base path or asset path (with or without extension).
+ * @param {string[]} [extensionPriority=DEFAULT_IMAGE_EXTENSION_PRIORITY] - Preferred extension order.
+ * @returns {Promise<string>} Promise resolving to the first successfully loaded asset path.
+ *
+ * @example
+ * const logo = await resolveImageAssetSrc(\"assets/BOLA/logo_liga/EPL\");
+ *
+ * @example
+ * const pngFirst = await resolveImageAssetSrc(\"assets/teams/logo\", [\"png\", \"webp\"]);
+ */
 export const resolveImageAssetSrc = (() => {
   const cache = new Map();
 

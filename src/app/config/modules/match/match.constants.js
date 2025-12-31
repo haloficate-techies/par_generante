@@ -1,3 +1,5 @@
 export const MATCH_COUNT_OPTIONS = [1, 2, 3, 4, 5];
 export const MAX_MATCHES = MATCH_COUNT_OPTIONS[MATCH_COUNT_OPTIONS.length - 1];
 
+export const SCORE_MODE_TITLE = "HASIL SKOR SEPAK BOLA";
+export const BIG_MATCH_TITLE = "BIG MATCH";
