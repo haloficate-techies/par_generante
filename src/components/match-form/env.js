@@ -25,4 +25,3 @@ export const matchListFormEnv = {
   getTogelDrawTimeConfig,
 };
 
-export default matchListFormEnv;

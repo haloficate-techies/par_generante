@@ -104,5 +104,3 @@ export const useMatchFormState = ({
   return state;
 };
 
-export default useMatchFormState;
-

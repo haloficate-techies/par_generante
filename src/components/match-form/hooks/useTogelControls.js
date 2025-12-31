@@ -61,5 +61,3 @@ export const useTogelControls = ({
   };
 };
 
-export default useTogelControls;
-

@@ -208,5 +208,3 @@ export const useRenderConfiguration = ({
   };
 };
 
-export default useRenderConfiguration;
-

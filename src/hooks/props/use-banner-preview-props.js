@@ -32,5 +32,3 @@ export const useBannerPreviewProps = ({
   );
 };
 
-export default useBannerPreviewProps;
-

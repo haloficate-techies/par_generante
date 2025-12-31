@@ -12,7 +12,7 @@ import {
   useTogelControls,
 } from "./match-form/hooks";
 import { MatchFormProvider } from "./match-form/contexts";
-import matchFormEnv from "./match-form/env";
+import { matchListFormEnv } from "./match-form/env";
 
 const {
   AVAILABLE_TOGEL_POOL_OPTIONS,
@@ -21,7 +21,7 @@ const {
   resolveAutoLogoSrc,
   readFileAsDataURL,
   getTogelDrawTimeConfig,
-} = matchFormEnv;
+} = matchListFormEnv;
 
 const optionShape = PropTypes.shape({
   label: PropTypes.string.isRequired,

@@ -147,5 +147,3 @@ export const useMatchListFormProps = ({
   );
 };
 
-export default useMatchListFormProps;
-

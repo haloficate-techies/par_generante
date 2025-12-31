@@ -52,5 +52,3 @@ export const useMatchCountAdjuster = ({
   };
 };
 
-export default useMatchCountAdjuster;
-

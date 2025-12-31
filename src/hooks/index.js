@@ -18,12 +18,12 @@ export { default as usePreviewModal } from "./use-preview-modal";
 // === Render Hooks ===
 export { default as useBannerRenderPipeline } from "./render/use-banner-render-pipeline";
 export { default as useBannerExportActions } from "./render/use-banner-export-actions";
-export { default as useRenderConfiguration } from "./render/use-render-configuration";
+export { useRenderConfiguration } from "./render/use-render-configuration";
 
 // === Asset Hooks ===
 export { default as usePrefetchBannerAssets } from "./assets/use-prefetch-banner-assets";
 
 // === Props Hooks ===
-export { default as useMatchListFormProps } from "./props/use-match-list-form-props";
-export { default as useBannerPreviewProps } from "./props/use-banner-preview-props";
+export { useMatchListFormProps } from "./props/use-match-list-form-props";
+export { useBannerPreviewProps } from "./props/use-banner-preview-props";
 
