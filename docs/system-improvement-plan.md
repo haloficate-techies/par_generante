@@ -10,7 +10,19 @@
 - **App utama**: `src/App.jsx`.
 - **Aset**: `public/assets`.
 
-### 2. Fokus Refactor Berikutnya
+### 2. Boundary Enforcement (Phase 2B–2E)
+- ✅ Phase 2B complete
+- ✅ Phase 2C complete
+- ✅ Phase 2D complete
+- ✅ Phase 2E complete
+
+### 3. Outcome
+- Batas arsitektur terdokumentasi jelas dan konsisten lint enforcement (Rule #1–#5).
+- Arah import antarlayer lebih eksplisit; app layer tidak lagi menjadi barrel lintas layer.
+- Risiko regresi boundary berkurang lewat aturan lint yang memblokir import terlarang.
+- Komponen kritikal (BannerHeader) menerima konfigurasi via props sesuai boundary rules.
+
+### 4. Fokus Refactor Berikutnya
 1. **Penguatan Modul ESM**
    - Pastikan setiap hook/komponen besar dipecah menjadi modul kecil sehingga konsumennya tidak saling bergantung (lanjutkan refactor `MatchListForm` & layout panel).
    - Sediakan titik ekspor tunggal untuk data/globals agar reuse di test/CLI lebih mudah.
@@ -23,12 +35,12 @@
 5. **Asset Pipeline**
    - Dokumentasikan proses penambahan aset baru di repo (lihat `docs/ASSETS.md`) serta siapkan skrip untuk memvalidasi berkas `.webp`.
 
-### 3. Tugas Kebersihan (Sudah Dilakukan / Sedang Berjalan)
+### 5. Tugas Kebersihan (Sudah Dilakukan / Sedang Berjalan)
 - Migrasi penuh ke Vite + Tailwind CLI.
 - Registrasi komponen/hooks/mode melalui `AppEnvironment`.
 - Pembersihan console log dan event legacy (`matchlistformready`).
 
-### 4. Dokumentasi Lanjutan
+### 6. Dokumentasi Lanjutan
 - **docs/ARCHITECTURE.md**: menggambarkan arsitektur terbaru (Vite + modul ESM).
 - **docs/ASSETS.md**: panduan struktur aset di `public/assets`.
 - Tambahkan catatan changelog jika ada fitur besar / refactor signifikan.

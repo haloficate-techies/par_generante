@@ -23,6 +23,22 @@
 
 Pattern ini mengurangi boilerplate import dan memudahkan refactor internal struktur tanpa mengubah API publik.
 
+## Architectural Boundaries
+Aturan berikut ditegakkan oleh lint (lihat `docs/BOUNDARY-ENFORCEMENT.md`):
+1. Rule #1: App layer tidak boleh mengimpor dari components/domains/utils/data/hooks/services/modes. Pengecualian: `src/app/index.js` dan `src/app/config/**`.
+2. Rule #2: Components tidak boleh mengimpor `app/app-environment` (gunakan props).
+3. Rule #3: Di luar app/, dilarang deep-import `app/config/modules/**` (gunakan entrypoint config yang disetujui atau pass via props).
+4. Rule #4: Utils harus murni, tidak boleh mengimpor dari app/domains/hooks/components/modes/services.
+5. Rule #5: Domains terisolasi: tidak boleh mengimpor dari app/components, dan tidak boleh saling silang antar brand/teams/togel.
+
+Allowed dependencies by layer (ringkas):
+- app/**: hanya app/** (kecuali `app/index.js` + `app/config/**` sebagai adapter/aggregator).
+- components/**: hooks, domains, utils, data, services; tanpa `app/app-environment` dan tanpa deep `app/config/modules`.
+- hooks/**: app/index (tanpa deep `app/config/modules`), domains, utils, data, services.
+- utils/**: utils lain + data/helpers yang murni.
+- domains/**: utils/data/helpers; tanpa app/components dan tanpa cross-domain.
+- modes/**, services/**: app/index (tanpa deep `app/config/modules`), domains, utils, data.
+
 ### 3. Konfigurasi & App Environment
 - `src/app/app-environment.js`
   - Abstraksi singleton agar modul lain dapat mendaftar hooks, komponen, dan mode tanpa bergantung pada `window.*`. Menyimpan data/globals di memori internal.
