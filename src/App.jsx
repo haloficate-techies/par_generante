@@ -3,7 +3,6 @@ import {
   AVAILABLE_BRAND_LOGOS,
   BACKGROUND_LOOKUP,
   BIG_MATCH_TITLE,
-  DEFAULT_BRAND_PALETTE,
   DEFAULT_ESPORT_MINI_BANNER,
   DEFAULT_RAFFLE_FOOTER,
   LEAGUE_LOGO_OPTIONS,
@@ -16,16 +15,16 @@ import {
   buildTogelTitle,
   computeMiniBannerLayout,
   createBrandSlug,
-  createInitialMatches,
-  deriveBrandPalette,
   getModeLayoutConfig,
   getModeModule,
   loadMatchLogoImage,
-  loadOptionalImage,
-  resolveAutoTeamLogoSrc,
   resolveFooterSrcForBrand,
   resolveTogelPoolLabel,
 } from "./app/index.js";
+import { createInitialMatches } from "./data/helpers/match-factory";
+import { resolveAutoTeamLogoSrc } from "./domains/teams";
+import { loadOptionalImage } from "./utils/image-loader";
+import { DEFAULT_BRAND_PALETTE, deriveBrandPalette } from "./utils/color-utils";
 import {
   useBackgroundManager,
   useBackgroundRemoval,
