@@ -15,12 +15,7 @@ export * from "./config/modules/shared/string.utils";
 export * from "./config/modules/layout/layout.utils";
 export { resolveStreamingThemeFromPalette } from "./config/modules/theme/theme.utils";
 export * from "./config/modules/mode/mode.config";
-export * from "../domains/brand";
-export * from "../domains/teams";
-export * from "../domains/togel";
-export * from "../utils/image-loader";
 export * from "../utils/color-utils";
-export * from "../data/helpers/match-factory";
 
 export * from "./app-environment";
 export * from "./mode-registry";
