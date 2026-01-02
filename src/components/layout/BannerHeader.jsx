@@ -1,7 +1,4 @@
 import React, { memo } from "react";
-import { MODE_CONFIG } from "../../app/index.js";
-
-const DEFAULT_MODE_OPTIONS = MODE_CONFIG;
 
 const BannerHeaderComponent = ({
   activeModeConfig,
@@ -10,8 +7,10 @@ const BannerHeaderComponent = ({
   onModeChange,
   onSubMenuChange,
   lastRenderAt,
-  options = DEFAULT_MODE_OPTIONS,
+  modeConfig,
+  options = modeConfig,
 }) => {
+  const resolvedOptions = Array.isArray(options) ? options : [];
   const subMenus = Array.isArray(activeModeConfig?.subMenus) ? activeModeConfig.subMenus : [];
   const showSubMenus = subMenus.length > 0;
 
@@ -33,7 +32,7 @@ const BannerHeaderComponent = ({
         </div>
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-2">
           <div className="flex flex-wrap gap-2">
-            {options.map((mode) => {
+            {resolvedOptions.map((mode) => {
               const isActive = activeMode === mode.id;
               return (
                 <button

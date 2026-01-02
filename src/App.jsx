@@ -437,6 +437,7 @@ const App = () => {
           onModeChange={setActiveMode}
           onSubMenuChange={setActiveSubMenu}
           lastRenderAt={lastRenderAt}
+          modeConfig={MODE_CONFIG}
         />
 
         <main className="mx-auto max-w-6xl px-4 py-10">
