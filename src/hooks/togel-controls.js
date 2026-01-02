@@ -1,13 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { MODE_BACKGROUND_DEFAULTS } from "../app/config/modules/assets/asset.constants";
 import {
+  MODE_BACKGROUND_DEFAULTS,
   TOGEL_POOL_BACKGROUND_LOOKUP,
   TOGEL_VARIANT_DIGIT_LENGTH,
-} from "../app/config/modules/togel/togel.constants";
-import {
   resolveTogelPoolLabel,
   resolveTogelStreamingInfo,
-} from "../app/config/modules/togel/togel.utils";
+} from "../app/index.js";
 import { resolveTogelDrawTimeConfig } from "../domains/togel";
 
 /**
