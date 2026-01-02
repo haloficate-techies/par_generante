@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
+import { MODE_BACKGROUND_DEFAULTS } from "../app/config/modules/assets/asset.constants";
 import {
-  MODE_BACKGROUND_DEFAULTS,
-  TOGEL_VARIANT_DIGIT_LENGTH,
   TOGEL_POOL_BACKGROUND_LOOKUP,
-  resolveTogelDrawTimeConfig,
+  TOGEL_VARIANT_DIGIT_LENGTH,
+} from "../app/config/modules/togel/togel.constants";
+import {
   resolveTogelPoolLabel,
   resolveTogelStreamingInfo,
-} from "../app/index.js";
+} from "../app/config/modules/togel/togel.utils";
+import { resolveTogelDrawTimeConfig } from "../domains/togel";
 
 /**
  * Manages togel-specific state: pool, digits, draw time, and streaming info.
