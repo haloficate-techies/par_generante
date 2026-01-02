@@ -1,5 +1,4 @@
 import React from "react";
-import AppEnvironment from "../../app/app-environment";
 
 const PreviewModal = ({ isOpen, imageSrc, onClose }) => {
   if (!isOpen) return null;
@@ -43,7 +42,5 @@ const PreviewModal = ({ isOpen, imageSrc, onClose }) => {
     </div>
   );
 };
-
-AppEnvironment.registerComponent("PreviewModal", PreviewModal);
 
 export default PreviewModal;

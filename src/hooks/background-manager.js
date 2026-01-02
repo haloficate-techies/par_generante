@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import AppEnvironment from "../app/app-environment";
 import {
   BACKGROUND_LOOKUP,
   BANNER_BACKGROUND_FILES,
@@ -110,7 +109,5 @@ const useBackgroundManager = (activeMode) => {
     applyTogelBackgroundPath,
   };
 };
-
-AppEnvironment.registerHook("useBackgroundManager", useBackgroundManager);
 
 export default useBackgroundManager;

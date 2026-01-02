@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import AppEnvironment from "../app/app-environment";
 import RaffleWinnersSection from "./match-form/sections/RaffleWinnersSection";
 import BannerMetadataSection from "./match-form/sections/BannerMetadataSection";
 import MatchesSection from "./match-form/sections/MatchesSection";
@@ -306,7 +305,5 @@ MatchListForm.propTypes = {
   isFetchingRaffle: PropTypes.bool,
   raffleFetchError: PropTypes.string,
 };
-
-AppEnvironment.registerComponent("MatchListForm", MatchListForm);
 
 export default MatchListForm;

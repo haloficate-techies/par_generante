@@ -1,5 +1,4 @@
 import React from "react";
-import AppEnvironment from "../../app/app-environment";
 
 const BannerPreviewPanel = ({
   canvasRef,
@@ -71,7 +70,5 @@ const BannerPreviewPanel = ({
     ) : null}
   </section>
 );
-
-AppEnvironment.registerComponent("BannerPreviewPanel", BannerPreviewPanel);
 
 export default BannerPreviewPanel;

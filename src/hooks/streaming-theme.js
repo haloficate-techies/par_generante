@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import AppEnvironment from "../app/app-environment";
 import {
   deriveBrandPalette,
   DEFAULT_BRAND_PALETTE,
@@ -55,7 +54,5 @@ const useStreamingTheme = ({ isTogelMode, brandLogoSrc, loadCachedOptionalImage 
 
   return streamingTheme;
 };
-
-AppEnvironment.registerHook("useStreamingTheme", useStreamingTheme);
 
 export default useStreamingTheme;

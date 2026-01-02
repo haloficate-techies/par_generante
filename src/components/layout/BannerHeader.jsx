@@ -1,5 +1,4 @@
 import React, { memo } from "react";
-import AppEnvironment from "../../app/app-environment";
 import { MODE_CONFIG } from "../../app/index.js";
 
 const DEFAULT_MODE_OPTIONS = MODE_CONFIG;
@@ -76,6 +75,5 @@ const BannerHeaderComponent = ({
 };
 
 const BannerHeader = memo(BannerHeaderComponent);
-AppEnvironment.registerComponent("BannerHeader", BannerHeader);
 
 export default BannerHeader;

@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import AppEnvironment from "../app/app-environment";
 import {
   MODE_BACKGROUND_DEFAULTS,
   TOGEL_VARIANT_DIGIT_LENGTH,
@@ -121,7 +120,5 @@ const useTogelControls = ({ isTogelMode, applyTogelBackgroundPath, streamingThem
     togelStreamingInfo,
   };
 };
-
-AppEnvironment.registerHook("useTogelControls", useTogelControls);
 
 export default useTogelControls;
