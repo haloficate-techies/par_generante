@@ -2,7 +2,7 @@
 
 ### 1. Inventaris Struktur & Dependensi
 - **Entry**: `index.html` + `src/main.jsx` (Vite dev server). Tailwind/PostCSS dikompilasi ke `src/index.css`.
-- **Data & Utilities**: `src/data/app-data.js`, `src/utils/canvas-utils.js`.
+- **Data & Utilities**: `src/data/app-data.js`, `src/utils/canvas/`.
 - **Globals & Registry**: `src/app/app-environment.js`, `src/app/config/globals.js`.
 - **Mode**: `src/app/mode-*.js`, `src/modes/**`.
 - **Hooks**: `src/hooks/*`.
@@ -46,3 +46,4 @@
 - Tambahkan catatan changelog jika ada fitur besar / refactor signifikan.
 
 Dokumen ini diperbarui untuk menggambarkan kondisi pasca-migrasi serta daftar pekerjaan lanjutan supaya sistem semakin modular dan bebas dari ketergantungan global.
+

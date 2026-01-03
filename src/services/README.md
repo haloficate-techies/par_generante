@@ -11,7 +11,7 @@ Core services that orchestrate rendering, exporting, and background removal for 
 ## Architecture
 
 ```
-App.jsx / hooks --> render configuration --> render_banner --> canvas utils
+App.jsx / hooks --> render configuration --> render_banner --> utils/canvas
                                |
                                +--> exporter (PNG/ZIP)
                                |
@@ -81,7 +81,7 @@ if (isBackgroundRemovalConfigured()) {
 
 ## Best Practices
 
-- Continue to import canvas helpers directly from `../utils/canvas` instead of `canvas-utils`; the README already collects legacy information.
+- Import canvas helpers directly from `../utils/canvas`.
 - Keep `renderBanner` side-effect free by passing `overrides` for batching instead of mutating `state`.
 - Use the `onProgress` callback in `exportZip` to update UI when exporting many brands.
 - Wrap background removal calls in `try/catch` because it performs network requests.

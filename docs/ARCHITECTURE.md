@@ -12,8 +12,8 @@
   - Menyediakan konstanta placeholder (warna logo, dsb.) sebagai sumber tunggal.
 - `src/domains/*`
   - Sumber data per-domain (mis. **brand**, **togel**, **teams**). Seluruh konsumen kini mengimpor langsung dari domain masing-masing tanpa perantara `app-data`.
-- `src/utils/canvas-utils.js`
-  - Kumpulan fungsi menggambar background, kartu pertandingan, togel result, footer, dsb. Mengekspor `CanvasUtils` sebagai modul biasa.
+- `src/utils/canvas/*`
+  - Kumpulan fungsi menggambar background, kartu pertandingan, togel result, footer, dsb. Entry utamanya di `src/utils/canvas/index.js`.
 
 ### 2.5 Barrel Exports (Index Files)
 - `src/app/index.js` — App configuration & constants

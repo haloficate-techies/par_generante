@@ -50,5 +50,5 @@ Each renderer expects a `ctx` (the banner canvas context), palette data, and mod
 
 - **No rendering occurs** – confirm the layout file is imported/registered; check browser console for `Mode layout "<mode>" belum terdaftar`.
 - **Mode shares wrong features** – update the module feature object (e.g., `includeMiniBanner`) and restart the app so the registry reinitializes.
-- **Canvas utilities fail** – ensure renderer imports from `src/utils/canvas` rather than the legacy `canvas-utils`.
+- **Canvas utilities fail** - ensure renderer imports from `src/utils/canvas`.
 

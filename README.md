@@ -68,7 +68,7 @@ Konfigurasi & allowlist host berada di `src/data/image-proxy.js` (lihat `DEFAULT
 - `src/data/image-proxy.js` — konfigurasi proxy + builder URL (CORS allowlist/SVG handling)
 - `src/utils/image-loader.js` — loader gambar (proxy fallback, SVG convert, cache logo otomatis)
 - `src/domains/teams/logo-sources.js` — sumber auto logo tim (`{ names: string[], source: string }`)
-- `src/utils/canvas-utils.js` — helper menggambar layout ke canvas
+- `src/utils/canvas/` — helper menggambar layout ke canvas
 - `src/app/` + `src/modes/` — registry + konfigurasi global/mode (mode layouts & modules)
 - `src/components/` — UI utama (terutama `MatchListForm` + layout components)
 - `docs/` — `ARCHITECTURE.md`, `ASSETS.md`, `CHANGELOG.md`
@@ -78,3 +78,4 @@ Konfigurasi & allowlist host berada di `src/data/image-proxy.js` (lihat `DEFAULT
 - `docs/ARCHITECTURE.md` — ringkasan arsitektur & alur data
 - `docs/ASSETS.md` — pedoman struktur aset di `public/assets/`
 - `docs/CHANGELOG.md` — catatan perubahan
+

@@ -32,7 +32,7 @@ src/utils/
 ├── formatters/                  # Data formatters
 │   ├── match.js                # Match date/time formatting
 │   └── raffle.js               # Raffle date/prize formatting
-├── canvas-utils.js             # ⚠️ Legacy aggregator
+├── canvas/                    # Canvas rendering helpers
 ├── color-utils.js              # Color manipulation utilities
 ├── draw-logo-tile.js           # Logo tile rendering
 ├── image-loader.js             # Image loading & processing
@@ -89,17 +89,16 @@ drawMatches(ctx, {
 });
 ```
 
-### Canvas Utilities (Legacy Approach)
+### Canvas Utilities
 
 ```javascript
-import { CanvasUtils } from '../utils/canvas-utils';
+import { drawBackground, drawHeader } from '../utils/canvas';
 
-// Same API, aggregated in single object
-CanvasUtils.drawBackground(ctx, backgroundImage, width, height);
-CanvasUtils.drawHeader(ctx, options);
+drawBackground(ctx, backgroundImage, width, height);
+drawHeader(ctx, options);
 ```
 
-⚠️ **Note:** `canvas-utils.js` is maintained for backward compatibility. New code should use direct imports from `canvas/` modules.
+Note: import canvas helpers from `../utils/canvas` to keep rendering helpers centralized.
 
 ### Color Utilities
 
@@ -393,8 +392,8 @@ const palette = deriveBrandPalette(brandLogo);
 ### ❌ DON'T
 
 ```javascript
-// Avoid importing from canvas-utils.js in new code
-import { CanvasUtils } from '../utils/canvas-utils'; // Legacy
+// Avoid reimplementing canvas helpers
+// Use exports from '../utils/canvas' instead
 
 // Don't duplicate color conversion logic
 // Use existing utilities instead of reimplementing
@@ -407,17 +406,8 @@ import { CanvasUtils } from '../utils/canvas-utils'; // Legacy
 
 ## 🔄 Migration Guide
 
-### From `canvas-utils.js` to Direct Imports
+### Direct Imports
 
-**Before:**
-```javascript
-import { CanvasUtils } from '../utils/canvas-utils';
-
-CanvasUtils.drawBackground(ctx, bg, w, h);
-CanvasUtils.drawHeader(ctx, config);
-```
-
-**After:**
 ```javascript
 import { drawBackground, drawHeader } from '../utils/canvas';
 
@@ -466,7 +456,7 @@ drawHeader(ctx, config);
 | `color-utils.js` | ✅ Stable | Core color manipulation |
 | `image-loader.js` | ✅ Stable | Handles SVG, CORS, processing |
 | `draw-logo-tile.js` | ✅ Stable | Widely used for logos |
-| `canvas-utils.js` | ⚠️ Legacy | Use direct imports for new code |
+| `canvas/` | ✅ Stable | Canvas rendering helpers |
 
 ---
 
