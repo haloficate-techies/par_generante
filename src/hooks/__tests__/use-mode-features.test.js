@@ -16,7 +16,14 @@ const renderFeatures = ({
   modeConfigList = baseModeConfigs,
   resolveModeModule = () => null,
 } = {}) =>
-  renderHook(() => useModeFeatures(activeMode, activeSubMenu, { modeConfigList, resolveModeModule }));
+  renderHook(() =>
+    useModeFeatures(activeMode, activeSubMenu, {
+      modeContext: {
+        modeConfig: modeConfigList,
+        registry: { getModeModule: resolveModeModule },
+      },
+    })
+  );
 
 describe("useModeFeatures", () => {
   describe("football mode", () => {

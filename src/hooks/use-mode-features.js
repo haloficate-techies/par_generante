@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 const useModeFeatures = (activeMode, activeSubMenu, options = {}) => {
-  const { modeConfigList = [], resolveModeModule = () => null } = options;
+  const { modeContext } = options;
+  const modeConfigList = options.modeConfigList || modeContext?.modeConfig || [];
+  const resolveModeModule =
+    options.resolveModeModule || modeContext?.registry?.getModeModule || (() => null);
 
   const activeModeConfig = useMemo(
     () => modeConfigList.find((mode) => mode.id === activeMode) || modeConfigList[0] || {},

@@ -9,14 +9,12 @@ import {
   MATCH_COUNT_OPTIONS,
   MAX_MATCHES,
   MODE_BACKGROUND_DEFAULTS,
-  MODE_CONFIG,
   RAFFLE_HEADER_LOGO_SRC,
   SCORE_MODE_TITLE,
   buildTogelTitle,
   computeMiniBannerLayout,
   createBrandSlug,
-  getModeLayoutConfig,
-  getModeModule,
+  createModeContext,
   loadMatchLogoImage,
   resolveFooterSrcForBrand,
   resolveTogelPoolLabel,
@@ -94,6 +92,7 @@ const App = () => {
   });
   const [activeMode, setActiveMode] = useState("football");
   const [activeSubMenu, setActiveSubMenu] = useState("");
+  const modeContext = useMemo(() => createModeContext(), []);
   const {
     activeModeConfig,
     modeFeatures,
@@ -107,9 +106,7 @@ const App = () => {
     shouldShowTitleInput,
     shouldRenderMatches,
   } = useModeFeatures(activeMode, activeSubMenu, {
-    modeConfigList: MODE_CONFIG,
-    resolveModeModule: (mode) =>
-      (typeof getModeModule === "function" ? getModeModule(mode) : null) || null,
+    modeContext,
   });
   const selectedBrandOption = useMemo(
     () =>
@@ -236,7 +233,7 @@ const App = () => {
     formatMatchTimeLabel,
     availableBrandLogos: AVAILABLE_BRAND_LOGOS,
     leagueLogoOptions: LEAGUE_LOGO_OPTIONS,
-    getModeLayoutConfig,
+    modeContext,
   });
 
   const {
@@ -436,7 +433,7 @@ const App = () => {
           onModeChange={setActiveMode}
           onSubMenuChange={setActiveSubMenu}
           lastRenderAt={lastRenderAt}
-          modeConfig={MODE_CONFIG}
+          modeConfig={modeContext.modeConfig}
         />
 
         <main className="mx-auto max-w-6xl px-4 py-10">

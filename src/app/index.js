@@ -19,5 +19,6 @@ export * from "../utils/color-utils";
 
 export * from "./app-environment";
 export * from "./mode-registry";
+export { createModeContext } from "./mode-context";
 
 export const BACKGROUND_LOOKUP = BANNER_BACKGROUND_LOOKUP || {};

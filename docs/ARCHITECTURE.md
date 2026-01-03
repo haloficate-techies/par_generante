@@ -53,6 +53,13 @@ Allowed dependencies by layer (ringkas):
 - `src/modes/layouts/*.js` & `src/modes/modules/*.js`
   - Implementasi renderer per mode (match/togel) beserta fitur defaultnya.
 
+#### 4.1 Mode Registry Refactor (Phase 3 target)
+- Target: registry core murni dengan ModeContext injection; tidak ada import dari `app/` atau `components/`.
+- ModeContext (draft): `modeConfig`, `brandConfig`, `assets`, `featureFlags`, `timeProvider`, opsional `envDerived` + `logger`.
+- Registry core (PR-2): `src/app/mode-registry-core.js` sebagai modul murni tanpa dependensi ke `AppEnvironment`.
+- Compatibility/adapter layer: `src/app/mode-registry.js` tetap menjadi adapter legacy selama migrasi 3B-3C, lalu dihapus di 3D.
+- ModeContext assembly (PR-3): `src/app/mode-context.js` membuat konteks yang disuntikkan ke hooks/services untuk akses registry secara eksplisit.
+
 ### 5. Hooks
 - `src/hooks/background-manager.js`, `streaming-theme.js`, `togel-controls.js`
   - Hook stateful khusus banner/togel. Masing-masing diekspor sebagai modul dan juga diregistrasikan ke `AppEnvironment` untuk kompatibilitas.

@@ -8,3 +8,8 @@
 - Updated `docs/ARCHITECTURE.md` to describe the new hooks/services and the refined application flow.
 - Added render scheduling guards to prevent infinite re-render loops during bulk export.
 
+## 2026-01-04
+
+- Refactor/internal: extracted a pure mode registry core and kept a legacy adapter in `src/app/mode-registry.js`.
+- Refactor/internal: added ModeContext assembly and injected registry access into hooks/services.
+

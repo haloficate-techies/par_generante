@@ -1,5 +1,29 @@
 # Modularization Progress
 
+## Session: Phase 3 Kickoff (2026-01-04)
+- PR-1: Audit & Mapping + plan hardening
+- Scope: Audit mode registry dependencies, define ModeContext draft, expand Phase 3 plan.
+- Files changed (high level): `docs/ARCHITECTURE.md`, `docs/PHASE-3-PLAN.md`, `docs/PROGRESS.md`.
+- Verification (pnpm): `pnpm lint` (pass), `pnpm test` (pass with ReactDOM warnings), `pnpm dev` (started on :5174, terminated due to timeout; manual mode switch pending).
+- Notes/Risks: No runtime changes; plan assumes legacy adapter during migration. React 18 test warnings observed in hooks suites.
+- Next: PR-2 extract registry core + adapter.
+
+## Session: Phase 3 PR-2 (2026-01-04)
+- PR-2: Extract registry core + adapter
+- Scope: Introduce pure registry core module and rewire legacy adapter in app layer.
+- Files changed (high level): `src/app/mode-registry-core.js`, `src/app/mode-registry.js`, `src/app/__tests__/mode-registry-core.test.js`, `docs/ARCHITECTURE.md`, `docs/PHASE-3-PLAN.md`, `docs/PROGRESS.md`.
+- Verification (pnpm): `pnpm lint` (pass), `pnpm test` (pass with ReactDOM warnings + mode registry stdout), `pnpm dev` (started on :5175, terminated due to timeout; manual mode switch pending).
+- Notes/Risks: No behavior changes expected; adapter still owns runtime wiring. React 18 test warnings observed in hooks suites.
+- Next: PR-3 migrate callers to injected registry/context.
+
+## Session: Phase 3 PR-3 (2026-01-04)
+- PR-3: Migrate callers to injected registry/context
+- Scope: Introduce ModeContext and pass registry access through hooks/services.
+- Files changed (high level): `src/app/mode-context.js`, `src/app/index.js`, `src/App.jsx`, `src/hooks/use-mode-features.js`, `src/hooks/render/use-render-configuration.js`, `src/hooks/__tests__/use-mode-features.test.js`, `src/hooks/README.md`, `docs/ARCHITECTURE.md`, `docs/PHASE-3-PLAN.md`, `docs/PROGRESS.md`.
+- Verification (pnpm): `pnpm lint` (pass), `pnpm test` (pass with ReactDOM warnings + mode registry stdout), `pnpm dev` (started on :5176, terminated due to timeout; manual mode switch pending).
+- Notes/Risks: ModeContext still uses legacy adapter for registry; layouts/modules migration deferred to PR-4. React 18 test warnings observed in hooks suites.
+- Next: PR-4 migrate layouts/modules to injected registry.
+
 ## Session: Quick Wins (Dec 28, 2025)
 
 ### ✅ Completed

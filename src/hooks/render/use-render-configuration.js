@@ -43,6 +43,7 @@ import { useMemo } from "react";
  * @param {Array} params.availableBrandLogos
  * @param {Array} params.leagueLogoOptions
  * @param {Function} params.getModeLayoutConfig
+ * @param {Object} params.modeContext
  * @returns {Object} render configuration slices
  * @returns {Object} return.assets - Asset loaders and constants
  * @returns {Object} return.config - Mode configuration lookups
@@ -91,7 +92,11 @@ export const useRenderConfiguration = ({
   availableBrandLogos,
   leagueLogoOptions,
   getModeLayoutConfig,
+  modeContext,
 }) => {
+  const resolvedGetModeLayoutConfig =
+    modeContext?.registry?.getModeLayoutConfig || getModeLayoutConfig;
+
   const renderAssets = useMemo(
     () => ({
       loadCachedOptionalImage,
@@ -107,9 +112,9 @@ export const useRenderConfiguration = ({
     () => ({
       availableBrandLogos,
       leagueLogoOptions,
-      getModeLayoutConfig,
+      getModeLayoutConfig: resolvedGetModeLayoutConfig,
     }),
-    [availableBrandLogos, leagueLogoOptions, getModeLayoutConfig]
+    [availableBrandLogos, leagueLogoOptions, resolvedGetModeLayoutConfig]
   );
 
   const renderState = useMemo(

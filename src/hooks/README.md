@@ -122,9 +122,10 @@ import { createModeConfig } from "./test-utils";
 test("respects module feature overrides", () => {
   const modeConfigList = [createModeConfig({ id: "esports" })];
   const resolveModeModule = () => ({ features: { includeMiniBanner: false } });
+  const modeContext = { modeConfig: modeConfigList, registry: { getModeModule: resolveModeModule } };
 
   const { result } = renderHook(() =>
-    useModeFeatures("esports", "default", { modeConfigList, resolveModeModule })
+    useModeFeatures("esports", "default", { modeContext })
   );
 
   expect(result.current.includeMiniBanner).toBe(false);
