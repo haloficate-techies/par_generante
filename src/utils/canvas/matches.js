@@ -49,10 +49,13 @@ export const drawMatches = (
   const footerGuard = FOOTER_HEIGHT + FOOTER_SPACING;
   const bottomLimit = ctx.canvas.height - footerGuard;
   const isFootballMode = options?.mode === "football";
+  const isBasketballMode = options?.mode === "basketball";
   const isFootballScheduleLayout =
     isFootballMode && (options?.activeSubMenu || "schedule") === "schedule";
   const isFootballScoresLayout =
     isFootballMode && options?.activeSubMenu === "scores";
+  const isBasketballScheduleLayout =
+    isBasketballMode && (options?.activeSubMenu || "schedule") === "schedule";
   const matchCount = Math.max(matches.length, 1);
   const shouldApplyScorePadding =
     isFootballScoresLayout && matchCount <= 3;
@@ -62,6 +65,225 @@ export const drawMatches = (
   const paddedTop = startY + layoutPaddingY;
   const paddedBottom = bottomLimit - layoutPaddingY;
   const availableHeight = Math.max(paddedBottom - paddedTop, 240);
+
+  const drawBasketballScheduleRows = () => {
+    const baseRowHeight = 90;
+    const baseRowGap = 26;
+    const baseRibbonHeight = 26;
+    const baseRibbonOverlap = 10;
+    const baseInset = Math.max(60, ctx.canvas.width * 0.08);
+    const frontWidth = ctx.canvas.width - baseInset * 2;
+    const rowGap = clampMin(baseRowGap, 14);
+    const rawRowTotal = matchCount * baseRowHeight + Math.max(matchCount - 1, 0) * rowGap;
+    const scale = rawRowTotal > availableHeight ? availableHeight / rawRowTotal : 1;
+
+    const rowHeight = clampMin(baseRowHeight * scale, 72);
+    const accentExtra = Math.max(8, 10 * scale);
+    const accentOffset = Math.max(4, 6 * scale);
+    const accentHeight = rowHeight + accentExtra;
+    const ribbonHeight = clampMin(baseRibbonHeight * scale, 18);
+    const ribbonOverlap = Math.max(6, baseRibbonOverlap * scale);
+    const gap = clampMin(rowGap * scale, 12);
+    const layoutHeight =
+      matchCount * accentHeight + Math.max(matchCount - 1, 0) * gap;
+    const verticalOffset =
+      layoutHeight < availableHeight ? (availableHeight - layoutHeight) / 2 : 0;
+
+    const frontColor = "#edf2f0";
+    const accentColor = "#c0392b";
+    const logoHolderColor = "#2e86de";
+    const vsColor = "#f1c40f";
+    const ribbonColor = "#c9a88c";
+    const nameColor = "#111827";
+    const vsTextColor = "#111827";
+    const ribbonTextColor = "#1f2937";
+
+    const vsWidth = Math.max(70, 90 * scale);
+    const logoSize = rowHeight;
+    const paddingX = Math.max(16, 20 * scale);
+    const gapBetweenLogoAndText = Math.max(12, 16 * scale);
+
+    const drawTrapezoid = (x, y, width, height, bottomInset) => {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + width, y);
+      ctx.lineTo(x + width - bottomInset, y + height);
+      ctx.lineTo(x + bottomInset, y + height);
+      ctx.closePath();
+    };
+
+    const drawLogoHolder = (image, x, y, size, fallbackName, adjustments = {}) => {
+  const hasImage = !!image;
+
+  // ✅ Background biru hanya kalau tidak ada logo image
+  if (!hasImage) {
+    ctx.save();
+    ctx.fillStyle = logoHolderColor;
+    ctx.fillRect(x, y, size, size); // sharp
+    ctx.restore();
+  }
+
+  if (hasImage) {
+    // draw image (tanpa background biru)
+    const padding = size * 0.1;
+    const slot = size - padding * 2;
+    const naturalWidth = image.naturalWidth || image.width || slot;
+    const naturalHeight = image.naturalHeight || image.height || slot;
+    const baseScale = Math.min(slot / naturalWidth, slot / naturalHeight);
+    const userScale = clamp(adjustments.scale ?? 1, 0.7, 1.5);
+    const renderWidth = naturalWidth * baseScale * userScale;
+    const renderHeight = naturalHeight * baseScale * userScale;
+    const offsetRangeX = Math.max((slot - renderWidth) / 2, 0);
+    const offsetRangeY = Math.max((slot - renderHeight) / 2, 0);
+    const offsetX = clamp(adjustments.offsetX ?? 0, -0.75, 0.75);
+    const offsetY = clamp(adjustments.offsetY ?? 0, -0.75, 0.75);
+    const renderX =
+      x + padding + (slot - renderWidth) / 2 + offsetX * offsetRangeX;
+    const renderY =
+      y + padding + (slot - renderHeight) / 2 + offsetY * offsetRangeY;
+
+    ctx.drawImage(image, renderX, renderY, renderWidth, renderHeight);
+  } else {
+    // fallback initials (di atas background biru)
+    const fallback = (fallbackName || "FC").trim().toUpperCase();
+    ctx.save();
+    ctx.fillStyle = "#f8fafc";
+    ctx.font = `800 ${Math.round(size * 0.28)}px "Poppins", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const initials = fallback
+      .split(/\s+/)
+      .map((word) => word[0])
+      .filter(Boolean)
+      .join("")
+      .slice(0, 2);
+
+    ctx.fillText(initials || "FC", x + size / 2, y + size / 2);
+    ctx.restore();
+    }
+  };
+
+
+    const renderTeamName = (label, fallback, x, width, centerY) => {
+      if (width <= 0) return;
+      const text = (label && label.trim()) || fallback || "Tim TBD";
+      const upper = text.toUpperCase();
+      const layout = layoutTeamName(ctx, upper, {
+        maxWidth: width,
+        maxFontSize: Math.max(22, 30 * scale),
+        minFontSize: 16,
+        fontWeight: 900,
+        fontFamily: '"Poppins", sans-serif',
+      });
+      const lines = layout.lines && layout.lines.length ? layout.lines : [upper];
+      const lineHeight = layout.fontSize * (lines.length > 1 ? 1.05 : 1);
+      const firstLineY = centerY - ((lines.length - 1) * lineHeight) / 2;
+      ctx.save();
+      ctx.fillStyle = nameColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = `900 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x + width / 2, firstLineY + index * lineHeight);
+      });
+      ctx.restore();
+    };
+
+    matches.forEach((match, index) => {
+      const rowTop = paddedTop + verticalOffset + index * (accentHeight + gap);
+      const gapX = Math.max(18, 24 * scale);
+      const frontInsetY = Math.max(8, 10 * scale);
+      const accentWidth = frontWidth + gapX * 2;
+      const accentY = rowTop;
+      const frontY = rowTop + accentExtra - accentOffset + frontInsetY;
+      const accentX = ctx.canvas.width / 2 - accentWidth / 2;
+      const frontX = accentX + gapX;
+      const centerY = frontY + rowHeight / 2;
+
+      const accentBottomInset = Math.max(16, accentWidth * 0.04);
+      const frontBottomInset = Math.max(12, frontWidth * 0.035);
+
+      ctx.save();
+      drawTrapezoid(accentX, accentY, accentWidth, accentHeight, accentBottomInset);
+      ctx.fillStyle = accentColor;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      drawTrapezoid(frontX, frontY, frontWidth, rowHeight, frontBottomInset);
+      ctx.fillStyle = frontColor;
+      ctx.fill();
+      ctx.restore();
+
+      const leftColX = frontX;
+      const leftColW = (frontWidth - vsWidth) / 2;
+      const rightColX = frontX + leftColW + vsWidth;
+      const logoY = frontY;
+
+      const EDGE_INSET_PX = 14;
+      const CENTER_PULL_PX = 16;
+      const homeLogoX = frontX + EDGE_INSET_PX + CENTER_PULL_PX;
+      const awayLogoX = frontX + frontWidth - logoSize - EDGE_INSET_PX - CENTER_PULL_PX;
+
+      drawLogoHolder(match.homeLogoImage, homeLogoX, logoY, logoSize, match.teamHome, {
+        scale: match.teamHomeLogoScale,
+        offsetX: match.teamHomeLogoOffsetX,
+        offsetY: match.teamHomeLogoOffsetY,
+      });
+      drawLogoHolder(match.awayLogoImage, awayLogoX, logoY, logoSize, match.teamAway, {
+        scale: match.teamAwayLogoScale,
+        offsetX: match.teamAwayLogoOffsetX,
+        offsetY: match.teamAwayLogoOffsetY,
+      });
+
+      const leftTextSlotX = homeLogoX + logoSize + gapBetweenLogoAndText;
+      const leftTextSlotW = Math.max(40, leftColX + leftColW - leftTextSlotX);
+      const rightTextSlotX = rightColX;
+      const rightTextSlotW = Math.max(40, awayLogoX - gapBetweenLogoAndText - rightTextSlotX);
+
+      renderTeamName(match.teamHome, "Tuan Rumah", leftTextSlotX, leftTextSlotW, centerY);
+      renderTeamName(match.teamAway, "Tim Tamu", rightTextSlotX, rightTextSlotW, centerY);
+
+      const vsX = frontX + (frontWidth - vsWidth) / 2;
+      const vsY = frontY;
+      const vsHeight = rowHeight;
+      ctx.save();
+      ctx.fillStyle = vsColor;
+      ctx.fillRect(vsX, vsY, vsWidth, vsHeight);
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = vsTextColor;
+      ctx.font = `900 ${Math.round(Math.max(28, 40 * scale))}px "Poppins", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("VS", vsX + vsWidth / 2, vsY + vsHeight / 2 + 1);
+      ctx.restore();
+
+      const dateLabel = (formatDate(match.date) || "Jadwal TBD").toUpperCase();
+      const timeLabel = match.time ? formatTime(match.time) : "WAKTU TBD";
+      const ribbonText = `${dateLabel} - ${timeLabel}`.toUpperCase();
+      ctx.save();
+      ctx.font = `700 ${Math.round(Math.max(12, 16 * scale))}px "Poppins", sans-serif`;
+      const textWidth = ctx.measureText(ribbonText).width;
+      const ribbonPaddingX = Math.max(18, 24 * scale);
+      const ribbonWidth = Math.min(
+        frontWidth - paddingX * 2,
+        Math.max(200, textWidth + ribbonPaddingX * 2)
+      );
+      const ribbonX = frontX + frontWidth / 2 - ribbonWidth / 2;
+      const ribbonY = frontY + rowHeight - ribbonOverlap;
+      const ribbonBottomInset = Math.max(10, ribbonHeight * 0.35);
+      drawTrapezoid(ribbonX, ribbonY, ribbonWidth, ribbonHeight, ribbonBottomInset);
+      ctx.fillStyle = ribbonColor;
+      ctx.fill();
+      ctx.fillStyle = ribbonTextColor;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(ribbonText, ribbonX + ribbonWidth / 2, ribbonY + ribbonHeight / 2 + 1);
+      ctx.restore();
+    });
+  };
 
   if (isFootballScheduleLayout || isFootballScoresLayout) {
     const baseRowHeight = 118;
@@ -676,6 +898,12 @@ export const drawMatches = (
     return;
   }
 
+  if (isBasketballScheduleLayout) {
+    drawBasketballScheduleRows();
+    ctx.restore();
+    return;
+  }
+
   const baseDateHeight = 36;
   const baseCardHeight = 132;
   const baseBetweenBarAndCard = 8;
@@ -728,7 +956,6 @@ export const drawMatches = (
         : 0;
 
   const isEsportsMode = options?.mode === "esports";
-  const isBasketballMode = options?.mode === "basketball";
   const baseInset = isEsportsMode ? 130 : 90;
   const cardWidth = ctx.canvas.width - baseInset * 2;
   const dateTimeGap = Math.max(16, 26 * spacingScale);

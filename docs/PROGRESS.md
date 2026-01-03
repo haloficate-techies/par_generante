@@ -24,6 +24,14 @@
 - Notes/Risks: ModeContext still uses legacy adapter for registry; layouts/modules migration deferred to PR-4. React 18 test warnings observed in hooks suites.
 - Next: PR-4 migrate layouts/modules to injected registry.
 
+## Session: Basketball Row Layout (2026-01-04)
+- PR-UX-1: Basketball schedule row layout update
+- Scope: Update basketball schedule match row rendering to trapezoid layout (canvas) per Canva spec.
+- Files changed (high level): `src/utils/canvas/matches.js`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+- Verification (pnpm): `pnpm lint` (pass), `pnpm test` (pass with ReactDOM warnings + mode registry stdout), `pnpm dev` (started on :5177, terminated due to timeout; manual review pending).
+- Notes/Risks: UI change applied only for basketball schedule rows; other modes untouched. React 18 test warnings observed in hooks suites.
+- Next: Manual visual review in dev, then decide whether to proceed with PR-4.
+
 ## Session: Quick Wins (Dec 28, 2025)
 
 ### ✅ Completed

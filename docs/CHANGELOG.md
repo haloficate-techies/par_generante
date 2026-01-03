@@ -12,4 +12,5 @@
 
 - Refactor/internal: extracted a pure mode registry core and kept a legacy adapter in `src/app/mode-registry.js`.
 - Refactor/internal: added ModeContext assembly and injected registry access into hooks/services.
+- UI: updated basketball schedule match row layout to trapezoid design (canvas).
 
