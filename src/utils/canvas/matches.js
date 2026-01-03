@@ -90,10 +90,28 @@ export const drawMatches = (
       layoutHeight < availableHeight ? (availableHeight - layoutHeight) / 2 : 0;
 
     const frontColor = "#edf2f0";
-    const accentColor = "#c0392b";
+    const accentStartColor = ensureSubduedGradientColor(
+      paletteSafe?.headerStart ?? DEFAULT_BRAND_PALETTE.headerStart,
+      DEFAULT_BRAND_PALETTE.headerStart,
+      0.35
+    );
+    const accentEndColor = ensureSubduedGradientColor(
+      paletteSafe?.headerEnd ?? DEFAULT_BRAND_PALETTE.headerEnd,
+      DEFAULT_BRAND_PALETTE.headerEnd,
+      0.35
+    );
     const logoHolderColor = "#2e86de";
     const vsColor = "#f1c40f";
-    const ribbonColor = "#c9a88c";
+    const ribbonStartColor = ensureSubduedGradientColor(
+      paletteSafe?.footerStart ?? DEFAULT_BRAND_PALETTE.footerStart,
+      DEFAULT_BRAND_PALETTE.footerStart,
+      0.4
+    );
+    const ribbonEndColor = ensureSubduedGradientColor(
+      paletteSafe?.footerEnd ?? DEFAULT_BRAND_PALETTE.footerEnd,
+      DEFAULT_BRAND_PALETTE.footerEnd,
+      0.4
+    );
     const nameColor = "#111827";
     const vsTextColor = "#111827";
     const ribbonTextColor = "#1f2937";
@@ -205,7 +223,15 @@ export const drawMatches = (
 
       ctx.save();
       drawTrapezoid(accentX, accentY, accentWidth, accentHeight, accentBottomInset);
-      ctx.fillStyle = accentColor;
+      const accentGradient = ctx.createLinearGradient(
+        accentX,
+        accentY,
+        accentX + accentWidth,
+        accentY + accentHeight
+      );
+      accentGradient.addColorStop(0, accentStartColor);
+      accentGradient.addColorStop(1, accentEndColor);
+      ctx.fillStyle = accentGradient;
       ctx.fill();
       ctx.restore();
 
@@ -275,7 +301,15 @@ export const drawMatches = (
       const ribbonY = frontY + rowHeight - ribbonOverlap;
       const ribbonBottomInset = Math.max(10, ribbonHeight * 0.35);
       drawTrapezoid(ribbonX, ribbonY, ribbonWidth, ribbonHeight, ribbonBottomInset);
-      ctx.fillStyle = ribbonColor;
+      const ribbonGradient = ctx.createLinearGradient(
+        ribbonX,
+        ribbonY,
+        ribbonX + ribbonWidth,
+        ribbonY + ribbonHeight
+      );
+      ribbonGradient.addColorStop(0, ribbonStartColor);
+      ribbonGradient.addColorStop(1, ribbonEndColor);
+      ctx.fillStyle = ribbonGradient;
       ctx.fill();
       ctx.fillStyle = ribbonTextColor;
       ctx.textAlign = "center";
