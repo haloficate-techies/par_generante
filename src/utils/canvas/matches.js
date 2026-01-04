@@ -101,7 +101,21 @@ export const drawMatches = (
       0.35
     );
     const logoHolderColor = "#2e86de";
-    const vsColor = "#f1c40f";
+    const vsGradientStart = ensureSubduedGradientColor(
+      paletteSafe?.headerStart ?? DEFAULT_BRAND_PALETTE.headerStart,
+      DEFAULT_BRAND_PALETTE.headerStart,
+      0.2
+    );
+    const vsGradientMid = ensureSubduedGradientColor(
+      paletteSafe?.headerEnd ?? DEFAULT_BRAND_PALETTE.headerEnd,
+      DEFAULT_BRAND_PALETTE.headerEnd,
+      0.3
+    );
+    const vsGradientEnd = ensureSubduedGradientColor(
+      paletteSafe?.footerStart ?? DEFAULT_BRAND_PALETTE.footerStart,
+      DEFAULT_BRAND_PALETTE.footerStart,
+      0.4
+    );
     const ribbonStartColor = ensureSubduedGradientColor(
       paletteSafe?.footerStart ?? DEFAULT_BRAND_PALETTE.footerStart,
       DEFAULT_BRAND_PALETTE.footerStart,
@@ -113,13 +127,109 @@ export const drawMatches = (
       0.4
     );
     const nameColor = "#111827";
-    const vsTextColor = "#111827";
     const ribbonTextColor = "#1f2937";
+    const vsTextColorThreshold = 0.55;
 
-    const vsWidth = Math.max(70, 90 * scale);
+    const hexToRgb = (hex) => {
+      if (!hex || typeof hex !== "string") return null;
+      const raw = hex.replace("#", "").trim();
+      const normalized =
+        raw.length === 3
+          ? raw
+              .split("")
+              .map((ch) => ch + ch)
+              .join("")
+          : raw;
+      if (normalized.length !== 6) return null;
+      const value = Number.parseInt(normalized, 16);
+      if (!Number.isFinite(value)) return null;
+      return {
+        r: (value >> 16) & 255,
+        g: (value >> 8) & 255,
+        b: value & 255,
+      };
+    };
+
+    const getRelativeLuminance = (rgb) => {
+      if (!rgb) return 0;
+      const toLinear = (channel) => {
+        const srgb = channel / 255;
+        return srgb <= 0.03928
+          ? srgb / 12.92
+          : Math.pow((srgb + 0.055) / 1.055, 2.4);
+      };
+      const r = toLinear(rgb.r);
+      const g = toLinear(rgb.g);
+      const b = toLinear(rgb.b);
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+
+    const blendHexColors = (colors) => {
+      const values = colors
+        .map((color) => hexToRgb(color))
+        .filter(Boolean);
+      if (!values.length) return { r: 0, g: 0, b: 0 };
+      const total = values.reduce(
+        (acc, value) => ({
+          r: acc.r + value.r,
+          g: acc.g + value.g,
+          b: acc.b + value.b,
+        }),
+        { r: 0, g: 0, b: 0 }
+      );
+      const count = values.length;
+      return {
+        r: Math.round(total.r / count),
+        g: Math.round(total.g / count),
+        b: Math.round(total.b / count),
+      };
+    };
+
+    const pickVsTextStyle = (gradientColors) => {
+      const blended = blendHexColors(gradientColors);
+      const luminance = getRelativeLuminance(blended);
+      const isDark = luminance < vsTextColorThreshold;
+      return {
+        fill: isDark ? "#ffffff" : "#111827",
+        stroke: isDark ? "rgba(0,0,0,0.45)" : "rgba(255,255,255,0.55)",
+      };
+    };
+
+    const fillTextTracking = (text, centerX, centerY, trackingValue) => {
+      const chars = text.split("");
+      const widths = chars.map((ch) => ctx.measureText(ch).width);
+      const totalWidth =
+        widths.reduce((sum, width) => sum + width, 0) +
+        trackingValue * Math.max(chars.length - 1, 0);
+      let cursorX = centerX - totalWidth / 2;
+      chars.forEach((ch, idx) => {
+        const half = widths[idx] / 2;
+        const drawX = cursorX + half;
+        ctx.fillText(ch, drawX, centerY);
+        cursorX += widths[idx] + trackingValue;
+      });
+    };
+
+    const strokeTextTracking = (text, centerX, centerY, trackingValue) => {
+      const chars = text.split("");
+      const widths = chars.map((ch) => ctx.measureText(ch).width);
+      const totalWidth =
+        widths.reduce((sum, width) => sum + width, 0) +
+        trackingValue * Math.max(chars.length - 1, 0);
+      let cursorX = centerX - totalWidth / 2;
+      chars.forEach((ch, idx) => {
+        const half = widths[idx] / 2;
+        const drawX = cursorX + half;
+        ctx.strokeText(ch, drawX, centerY);
+        cursorX += widths[idx] + trackingValue;
+      });
+    };
+
+    const vsWidth = Math.max(76, 98 * scale);
     const logoSize = rowHeight;
     const paddingX = Math.max(16, 20 * scale);
     const gapBetweenLogoAndText = Math.max(12, 16 * scale);
+    const TEXT_INNER_PAD = Math.max(10, 14 * scale);
 
     const drawTrapezoid = (x, y, width, height, bottomInset) => {
       ctx.beginPath();
@@ -186,12 +296,13 @@ export const drawMatches = (
       if (width <= 0) return;
       const text = (label && label.trim()) || fallback || "Tim TBD";
       const upper = text.toUpperCase();
+      const longNameScale = upper.length >= 13 ? 0.92 : 1;
       const layout = layoutTeamName(ctx, upper, {
         maxWidth: width,
-        maxFontSize: Math.max(22, 30 * scale),
+        maxFontSize: Math.max(22, 30 * scale) * longNameScale,
         minFontSize: 16,
-        fontWeight: 900,
-        fontFamily: '"Poppins", sans-serif',
+        fontWeight: 800,
+        fontFamily: '"Oswald", sans-serif',
       });
       const lines = layout.lines && layout.lines.length ? layout.lines : [upper];
       const lineHeight = layout.fontSize * (lines.length > 1 ? 1.05 : 1);
@@ -200,10 +311,23 @@ export const drawMatches = (
       ctx.fillStyle = nameColor;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = `900 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
-      lines.forEach((line, index) => {
-        ctx.fillText(line, x + width / 2, firstLineY + index * lineHeight);
-      });
+      ctx.strokeStyle = "rgba(0,0,0,0.12)";
+      ctx.lineWidth = Math.max(0.9, 1.4 * scale);
+      ctx.shadowColor = "rgba(0,0,0,0.18)";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = Math.max(1, 1.2 * scale);
+      ctx.font = `800 ${Math.round(layout.fontSize)}px "Oswald", sans-serif`;
+      if (lines.length === 1) {
+        const tracking = Math.max(0.5, 1.2 * scale);
+        strokeTextTracking(lines[0], x + width / 2, firstLineY, tracking);
+        fillTextTracking(lines[0], x + width / 2, firstLineY, tracking);
+      } else {
+        lines.forEach((line, index) => {
+          const lineY = firstLineY + index * lineHeight;
+          ctx.strokeText(line, x + width / 2, lineY);
+          ctx.fillText(line, x + width / 2, lineY);
+        });
+      }
       ctx.restore();
     };
 
@@ -240,6 +364,22 @@ export const drawMatches = (
       ctx.fillStyle = frontColor;
       ctx.fill();
       ctx.restore();
+      ctx.save();
+      drawTrapezoid(frontX, frontY, frontWidth, rowHeight, frontBottomInset);
+      ctx.clip();
+      ctx.beginPath();
+      ctx.moveTo(frontX, frontY + 1);
+      ctx.lineTo(frontX + frontWidth, frontY + 1);
+      ctx.strokeStyle = "rgba(255,255,255,0.8)";
+      ctx.lineWidth = Math.max(1, 1.4 * scale);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(frontX, frontY + rowHeight - 1);
+      ctx.lineTo(frontX + frontWidth, frontY + rowHeight - 1);
+      ctx.strokeStyle = "rgba(0,0,0,0.10)";
+      ctx.lineWidth = Math.max(1, 1.4 * scale);
+      ctx.stroke();
+      ctx.restore();
 
       const leftColX = frontX;
       const leftColW = (frontWidth - vsWidth) / 2;
@@ -262,10 +402,16 @@ export const drawMatches = (
         offsetY: match.teamAwayLogoOffsetY,
       });
 
-      const leftTextSlotX = homeLogoX + logoSize + gapBetweenLogoAndText;
-      const leftTextSlotW = Math.max(40, leftColX + leftColW - leftTextSlotX);
-      const rightTextSlotX = rightColX;
-      const rightTextSlotW = Math.max(40, awayLogoX - gapBetweenLogoAndText - rightTextSlotX);
+      const leftTextSlotX = homeLogoX + logoSize + gapBetweenLogoAndText + TEXT_INNER_PAD;
+      const leftTextSlotW = Math.max(
+        40,
+        leftColX + leftColW - leftTextSlotX - TEXT_INNER_PAD
+      );
+      const rightTextSlotX = rightColX + TEXT_INNER_PAD;
+      const rightTextSlotW = Math.max(
+        40,
+        awayLogoX - gapBetweenLogoAndText - rightTextSlotX - TEXT_INNER_PAD
+      );
 
       renderTeamName(match.teamHome, "Tuan Rumah", leftTextSlotX, leftTextSlotW, centerY);
       renderTeamName(match.teamAway, "Tim Tamu", rightTextSlotX, rightTextSlotW, centerY);
@@ -274,29 +420,73 @@ export const drawMatches = (
       const vsY = frontY;
       const vsHeight = rowHeight;
       ctx.save();
-      ctx.fillStyle = vsColor;
+      const vsGradient = ctx.createLinearGradient(
+        vsX,
+        vsY,
+        vsX,
+        vsY + vsHeight
+      );
+      vsGradient.addColorStop(0, vsGradientStart);
+      vsGradient.addColorStop(0.55, vsGradientMid);
+      vsGradient.addColorStop(1, vsGradientEnd);
+      ctx.fillStyle = vsGradient;
       ctx.fillRect(vsX, vsY, vsWidth, vsHeight);
       ctx.restore();
 
+      const vsTextStyle = pickVsTextStyle([
+        vsGradientStart,
+        vsGradientMid,
+        vsGradientEnd,
+      ]);
       ctx.save();
-      ctx.fillStyle = vsTextColor;
-      ctx.font = `900 ${Math.round(Math.max(28, 40 * scale))}px "Poppins", sans-serif`;
+      let vsFontSize = Math.round(vsHeight * 0.68);
+      ctx.font = `900 ${vsFontSize}px "Poppins", sans-serif`;
+      const maxTextWidth = vsWidth * 0.9;
+      let measuredWidth = ctx.measureText("VS").width;
+      let guard = 0;
+      while (measuredWidth > maxTextWidth && vsFontSize > 12 && guard < 12) {
+        vsFontSize = Math.round(vsFontSize * 0.95);
+        ctx.font = `900 ${vsFontSize}px "Poppins", sans-serif`;
+        measuredWidth = ctx.measureText("VS").width;
+        guard += 1;
+      }
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      ctx.fillStyle = vsTextStyle.fill;
+      ctx.strokeStyle = vsTextStyle.stroke;
+      ctx.lineWidth = Math.max(1, 2 * scale);
+      ctx.shadowColor = "rgba(0,0,0,0.25)";
+      ctx.shadowBlur = Math.max(1, 3 * scale);
+      ctx.shadowOffsetY = Math.max(1, 2 * scale);
       ctx.fillText("VS", vsX + vsWidth / 2, vsY + vsHeight / 2 + 1);
+      ctx.shadowColor = "transparent";
+      ctx.strokeText("VS", vsX + vsWidth / 2, vsY + vsHeight / 2 + 1);
       ctx.restore();
 
       const dateLabel = (formatDate(match.date) || "Jadwal TBD").toUpperCase();
       const timeLabel = match.time ? formatTime(match.time) : "WAKTU TBD";
       const ribbonText = `${dateLabel} - ${timeLabel}`.toUpperCase();
       ctx.save();
-      ctx.font = `700 ${Math.round(Math.max(12, 16 * scale))}px "Poppins", sans-serif`;
-      const textWidth = ctx.measureText(ribbonText).width;
-      const ribbonPaddingX = Math.max(18, 24 * scale);
-      const ribbonWidth = Math.min(
-        frontWidth - paddingX * 2,
+      let ribbonFontSize = Math.round(Math.max(12, 16 * scale));
+      ctx.font = `700 ${ribbonFontSize}px "Poppins", sans-serif`;
+      let textWidth = ctx.measureText(ribbonText).width;
+      const ribbonPaddingX = Math.max(22, 30 * scale);
+      const ribbonMaxWidth = frontWidth * 0.95;
+      let ribbonWidth = Math.min(
+        ribbonMaxWidth,
         Math.max(200, textWidth + ribbonPaddingX * 2)
       );
+      let ribbonGuard = 0;
+      while (textWidth + ribbonPaddingX * 2 > ribbonWidth && ribbonGuard < 6) {
+        ribbonFontSize = Math.round(ribbonFontSize * 0.94);
+        ctx.font = `700 ${ribbonFontSize}px "Poppins", sans-serif`;
+        textWidth = ctx.measureText(ribbonText).width;
+        ribbonWidth = Math.min(
+          ribbonMaxWidth,
+          Math.max(200, textWidth + ribbonPaddingX * 2)
+        );
+        ribbonGuard += 1;
+      }
       const ribbonX = frontX + frontWidth / 2 - ribbonWidth / 2;
       const ribbonY = frontY + rowHeight - ribbonOverlap;
       const ribbonBottomInset = Math.max(10, ribbonHeight * 0.35);
@@ -311,10 +501,25 @@ export const drawMatches = (
       ribbonGradient.addColorStop(1, ribbonEndColor);
       ctx.fillStyle = ribbonGradient;
       ctx.fill();
-      ctx.fillStyle = ribbonTextColor;
+      const ribbonCenterX = ribbonX + ribbonWidth / 2;
+      const ribbonCenterY = ribbonY + ribbonHeight / 2 + 1;
+      const tracking = Math.max(0.6, 1.4 * scale);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(ribbonText, ribbonX + ribbonWidth / 2, ribbonY + ribbonHeight / 2 + 1);
+      ctx.font = `800 ${Math.round(Math.max(13, 17 * scale))}px "Poppins", sans-serif`;
+      ctx.fillStyle = "#f9fafb";
+      ctx.strokeStyle = "rgba(0,0,0,0.60)";
+      ctx.lineWidth = Math.max(0.8, 1.4 * scale);
+      ctx.shadowColor = "rgba(0,0,0,0.30)";
+      ctx.shadowBlur = Math.max(1, 2 * scale);
+      ctx.shadowOffsetY = Math.max(1, 1.2 * scale);
+      if (tracking > 0.5) {
+        fillTextTracking(ribbonText, ribbonCenterX, ribbonCenterY, tracking);
+        strokeTextTracking(ribbonText, ribbonCenterX, ribbonCenterY, tracking);
+      } else {
+        ctx.fillText(ribbonText, ribbonCenterX, ribbonCenterY);
+        ctx.strokeText(ribbonText, ribbonCenterX, ribbonCenterY);
+      }
       ctx.restore();
     });
   };
