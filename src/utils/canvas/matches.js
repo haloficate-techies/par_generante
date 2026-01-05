@@ -1,4 +1,4 @@
-import {
+﻿import {
   DEFAULT_BRAND_PALETTE,
   TEAM_LOGO_PLACEHOLDER_COLORS,
   applyFittedFont,
@@ -249,7 +249,7 @@ const drawMatches = (
     const drawLogoHolder = (image, x, y, size, fallbackName, adjustments = {}) => {
   const hasImage = !!image;
 
-  // ✅ Background biru hanya kalau tidak ada logo image
+  // âœ… Background biru hanya kalau tidak ada logo image
   if (!hasImage) {
     ctx.save();
     ctx.fillStyle = logoHolderColor;
@@ -770,7 +770,7 @@ const drawMatches = (
         const timeLabelRaw = match.time ? formatTime(match.time) : "";
         const pillLabel = [dateLabelRaw.toUpperCase(), timeLabelRaw.toUpperCase()]
           .filter(Boolean)
-          .join(" • ") || "JADWAL TBD";
+          .join(" â€¢ ") || "JADWAL TBD";
         const maxPillWidth = Math.min(ctx.canvas.width - marginX, centerWidth + 480);
         ctx.save();
         ctx.font = `700 ${Math.round(Math.max(20, 28 * scheduleScale))}px "Poppins", sans-serif`;
@@ -1175,7 +1175,28 @@ const drawMatches = (
     let adjustedHeight =
       matchCount * rowTotal + Math.max(matchCount - 1, 0) * rowGap;
 
-    if (adjustedHeight > availableHeight) {
+    if (isEsportsLayout) {
+      const fixedRowHeight = clampMin(110, 90);
+      const minGap = 12;
+      const maxGap = 36;
+
+      scale = 1;
+      dateHeight = 0;
+      betweenBarAndCard = 0;
+      cardHeight = fixedRowHeight;
+      rowTotal = cardHeight;
+
+      rowGap =
+        matchCount > 1
+          ? clamp(
+              (availableHeight - matchCount * rowTotal) / (matchCount - 1),
+              minGap,
+              maxGap
+            )
+          : 0;
+      adjustedHeight =
+        matchCount * rowTotal + Math.max(matchCount - 1, 0) * rowGap;
+    } else if (adjustedHeight > availableHeight) {
       const overflowScale = availableHeight / adjustedHeight;
       dateHeight = clampMin(dateHeight * overflowScale, 20);
       cardHeight = clampMin(cardHeight * overflowScale, 88);
@@ -1247,6 +1268,124 @@ const drawMatches = (
       ctx.restore();
     };
 
+    const drawTextFitRect = (
+      text,
+      x,
+      y,
+      width,
+      height,
+      {
+        color = "#111827",
+        weight = 800,
+        family = '"Poppins", sans-serif',
+        minSize = 10,
+        maxSize = Math.max(10, height * 0.7),
+      } = {}
+    ) => {
+      const content = (text ?? "").toString();
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      applyFittedFont(ctx, content, {
+        maxSize,
+        minSize,
+        weight,
+        maxWidth: Math.max(0, width * 0.92),
+        family,
+      });
+      ctx.fillStyle = color;
+      ctx.fillText(content, x + width / 2, y + height / 2);
+      ctx.restore();
+    };
+
+    const drawBroadcastLetter = (text, x, y, width, height, maxSize) => {
+      const content = (text ?? "").toString();
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      applyFittedFont(ctx, content, {
+        maxSize: maxSize ?? Math.max(10, height * 0.9),
+        minSize: 10,
+        weight: 900,
+        maxWidth: Math.max(0, width * 0.92),
+        family: '"Poppins", sans-serif',
+      });
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      ctx.shadowColor = "rgba(0,0,0,0.45)";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = Math.max(1, cardHeight * 0.02);
+      ctx.shadowOffsetX = 0;
+      ctx.strokeStyle = "rgba(0,0,0,0.55)";
+      ctx.lineWidth = Math.max(2, cardHeight * 0.035);
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeText(content, centerX, centerY);
+      ctx.fillText(content, centerX, centerY);
+      ctx.restore();
+    };
+
+    const drawLogoBoxRect = (image, x, y, size, fallbackName) => {
+      ctx.save();
+      ctx.fillStyle = "#6B7280";
+      ctx.fillRect(x, y, size, size);
+
+      if (image) {
+        const padding = size * 0.12;
+        const slot = size - padding * 2;
+        const naturalWidth = image.naturalWidth || image.width || slot;
+        const naturalHeight = image.naturalHeight || image.height || slot;
+        const scale = Math.min(slot / naturalWidth, slot / naturalHeight);
+        const renderWidth = naturalWidth * scale;
+        const renderHeight = naturalHeight * scale;
+        const renderX = x + (size - renderWidth) / 2;
+        const renderY = y + (size - renderHeight) / 2;
+        ctx.drawImage(image, renderX, renderY, renderWidth, renderHeight);
+        ctx.restore();
+        return;
+      }
+
+      const raw = (fallbackName || "FC").trim().toUpperCase();
+      const initials = raw
+        .split(/\s+/)
+        .map((word) => word[0])
+        .filter(Boolean)
+        .join("")
+        .slice(0, 2);
+      drawTextFitRect(initials || "FC", x, y, size, size, {
+        color: "#ffffff",
+        weight: 900,
+        maxSize: size * 0.42,
+        minSize: 10,
+      });
+      ctx.restore();
+    };
+
+    const drawTeamNameRect = (label, x, y, width, height) => {
+      const text = ((label && label.trim()) || "TBD").toUpperCase();
+      const layout = layoutTeamName(ctx, text, {
+        maxWidth: Math.max(0, width * 0.9),
+        maxFontSize: Math.max(14, height * 0.42),
+        minFontSize: 12,
+        fontWeight: 900,
+        fontFamily: '"Poppins", sans-serif',
+      });
+      const lines =
+        layout.lines && layout.lines.length ? layout.lines.slice(0, 2) : [text];
+      const lineCount = lines.length;
+      const lineHeight = layout.fontSize * (lineCount > 1 ? 1.05 : 1);
+      const firstLineY = y + height / 2 - ((lineCount - 1) * lineHeight) / 2;
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `900 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
+      lines.forEach((line, idx) => {
+        ctx.fillText(line, x + width / 2, firstLineY + idx * lineHeight);
+      });
+      ctx.restore();
+    };
+
     matches.forEach((match, index) => {
       let cardX = baseInset;
       let esportsSlot = null;
@@ -1267,6 +1406,154 @@ const drawMatches = (
         startY + verticalOffset + index * (rowTotal + rowGap);
       const barY = rowTop;
       const cardY = barY + dateHeight + betweenBarAndCard;
+
+      if (isEsportsLayout) {
+        const rowX = baseInset;
+        const rowY = cardY;
+        const rowHeight = cardHeight;
+        const frontWidth = cardWidth;
+
+        const logoBoxSize = rowHeight;
+        const centerWidth = rowHeight * 1.6;
+        const rawNameBarWidth =
+          (frontWidth - (logoBoxSize * 2 + centerWidth)) / 2;
+        const nameBarWidth = Math.max(0, rawNameBarWidth);
+
+        const dateHeightRect = rowHeight * 0.22;
+        const timeHeightRect = rowHeight * 0.22;
+        const centerStackGap = Math.max(6, rowHeight * 0.06);
+        const gameSize = Math.max(
+          40,
+          rowHeight - dateHeightRect - timeHeightRect - centerStackGap * 2
+        );
+
+        const blueName = "#2B2FFF";
+        const redDate = "#EF4444";
+        const yellowGame = "#FACC15";
+        const greenTime = "#22C55E";
+
+        const columnGap = Math.max(14, rowHeight * 0.12);
+        const totalBlocksWidth =
+          nameBarWidth * 2 + logoBoxSize * 2 + centerWidth + columnGap * 4;
+        const contentX = rowX + (frontWidth - totalBlocksWidth) / 2;
+
+        const leftNameX = contentX;
+        const leftLogoX = leftNameX + nameBarWidth + columnGap;
+        const centerX = leftLogoX + logoBoxSize + columnGap;
+        const rightLogoX = centerX + centerWidth + columnGap;
+        const rightNameX = rightLogoX + logoBoxSize + columnGap;
+
+        const blueInsetY = Math.max(10, rowHeight * 0.18);
+        const blueY = rowY + blueInsetY;
+        const blueH = rowHeight - blueInsetY * 2;
+        const nameRectInsetX = Math.max(12, rowHeight * 0.12);
+        const nameRectWidth = Math.max(0, nameBarWidth - nameRectInsetX);
+
+        ctx.save();
+        ctx.fillStyle = blueName;
+        ctx.fillRect(leftNameX, blueY, nameRectWidth, blueH);
+        ctx.fillRect(rightNameX + nameRectInsetX, blueY, nameRectWidth, blueH);
+        ctx.restore();
+
+        drawTeamNameRect(match.teamHome, leftNameX, blueY, nameRectWidth, blueH);
+        drawTeamNameRect(match.teamAway, rightNameX + nameRectInsetX, blueY, nameRectWidth, blueH);
+
+        drawLogoBoxRect(
+          match.homeLogoImage,
+          leftLogoX,
+          rowY,
+          logoBoxSize,
+          match.teamHome
+        );
+        drawLogoBoxRect(
+          match.awayLogoImage,
+          rightLogoX,
+          rowY,
+          logoBoxSize,
+          match.teamAway
+        );
+
+        const dateText = (formatDate(match.date) || "JADWAL TBD").toUpperCase();
+        const timeText = (match.time ? formatTime(match.time) : "WAKTU TBD").toUpperCase();
+
+        const dateRect = {
+          x: centerX,
+          y: rowY,
+          w: centerWidth,
+          h: dateHeightRect,
+        };
+        const gameRect = {
+          x: centerX + (centerWidth - gameSize) / 2,
+          y: rowY + dateHeightRect + centerStackGap,
+          w: gameSize,
+          h: gameSize,
+        };
+        const timeRect = {
+          x: centerX,
+          y: gameRect.y + gameRect.h + centerStackGap,
+          w: centerWidth,
+          h: timeHeightRect,
+        };
+
+        ctx.save();
+        ctx.fillStyle = redDate;
+        ctx.fillRect(dateRect.x, dateRect.y, dateRect.w, dateRect.h);
+        ctx.fillStyle = yellowGame;
+        ctx.fillRect(gameRect.x, gameRect.y, gameRect.w, gameRect.h);
+        ctx.fillStyle = greenTime;
+        ctx.fillRect(timeRect.x, timeRect.y, timeRect.w, timeRect.h);
+        ctx.restore();
+
+        drawTextFitRect(dateText, dateRect.x, dateRect.y, dateRect.w, dateRect.h, {
+          color: "#ffffff",
+          weight: 900,
+          maxSize: dateRect.h * 0.75,
+          minSize: 10,
+        });
+
+        drawTextFitRect(timeText, timeRect.x, timeRect.y, timeRect.w, timeRect.h, {
+          color: "#111827",
+          weight: 900,
+          maxSize: timeRect.h * 0.75,
+          minSize: 10,
+        });
+
+        if (match.gameLogoImage) {
+          const padding = gameSize * 0.12;
+          const slot = gameSize - padding * 2;
+          const naturalWidth =
+            match.gameLogoImage.naturalWidth || match.gameLogoImage.width || slot;
+          const naturalHeight =
+            match.gameLogoImage.naturalHeight || match.gameLogoImage.height || slot;
+          const containScale = Math.min(slot / naturalWidth, slot / naturalHeight);
+          const renderWidth = naturalWidth * containScale;
+          const renderHeight = naturalHeight * containScale;
+          const renderX = gameRect.x + (gameRect.w - renderWidth) / 2;
+          const renderY = gameRect.y + (gameRect.h - renderHeight) / 2;
+          ctx.drawImage(match.gameLogoImage, renderX, renderY, renderWidth, renderHeight);
+        } else {
+          drawTextFitRect("GAME", gameRect.x, gameRect.y, gameRect.w, gameRect.h, {
+            color: "#111827",
+            weight: 900,
+            maxSize: gameRect.h * 0.42,
+            minSize: 10,
+          });
+        }
+
+        const sideGap = Math.max(0, (centerWidth - gameSize) / 2);
+        const letterSize = Math.max(14, gameRect.h * 0.92);
+        drawBroadcastLetter("V", centerX, gameRect.y, sideGap, gameRect.h, letterSize);
+        drawBroadcastLetter(
+          "S",
+          gameRect.x + gameRect.w,
+          gameRect.y,
+          sideGap,
+          gameRect.h,
+          letterSize
+        );
+
+        return;
+      }
 
       const timeWidth = Math.max(105, baseTimeWidth * scale);
       const dateLabel = formatDate(match.date);
