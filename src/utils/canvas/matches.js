@@ -22,7 +22,7 @@ import {
   drawEsportsGameSlot,
 } from "./matches/helpers";
 
-export const drawMatches = (
+const drawMatches = (
   ctx,
   matches,
   startY = 220,
@@ -50,10 +50,10 @@ export const drawMatches = (
   const bottomLimit = ctx.canvas.height - footerGuard;
   const isFootballMode = options?.mode === "football";
   const isBasketballMode = options?.mode === "basketball";
-  const isFootballScheduleLayout =
-    isFootballMode && (options?.activeSubMenu || "schedule") === "schedule";
+  const isEsportsMode = options?.mode === "esports";
+  const footballSubMenu = isFootballMode ? options?.activeSubMenu || "schedule" : null;
   const isFootballScoresLayout =
-    isFootballMode && options?.activeSubMenu === "scores";
+    isFootballMode && footballSubMenu === "scores";
   const isBasketballScheduleLayout =
     isBasketballMode && (options?.activeSubMenu || "schedule") === "schedule";
   const matchCount = Math.max(matches.length, 1);
@@ -66,6 +66,14 @@ export const drawMatches = (
   const paddedBottom = bottomLimit - layoutPaddingY;
   const availableHeight = Math.max(paddedBottom - paddedTop, 240);
 
+  // =====================================================================
+  // ROW RENDERERS
+  // - Basketball: schedule rows
+  // - Football: schedule/scores/bigmatch rows
+  // - Default/Esports: standard schedule rows
+  // =====================================================================
+
+  // ===== Rows: Basketball (schedule) =====
   const drawBasketballScheduleRows = () => {
     const baseRowHeight = 90;
     const baseRowGap = 26;
@@ -127,7 +135,6 @@ export const drawMatches = (
       0.4
     );
     const nameColor = "#111827";
-    const ribbonTextColor = "#1f2937";
     const vsTextColorThreshold = 0.55;
 
     const hexToRgb = (hex) => {
@@ -227,7 +234,6 @@ export const drawMatches = (
 
     const vsWidth = Math.max(76, 98 * scale);
     const logoSize = rowHeight;
-    const paddingX = Math.max(16, 20 * scale);
     const gapBetweenLogoAndText = Math.max(12, 16 * scale);
     const TEXT_INNER_PAD = Math.max(10, 14 * scale);
 
@@ -524,7 +530,10 @@ export const drawMatches = (
     });
   };
 
-  if (isFootballScheduleLayout || isFootballScoresLayout) {
+  // ===== Rows: Football (schedule/scores/bigmatch) =====
+  const drawFootballRows = ({ isScoresLayout = false, centerLabel = null } = {}) => {
+    const isFootballScoresLayout = Boolean(isScoresLayout);
+    const customCenterLabel = centerLabel;
     const baseRowHeight = 118;
     const baseRowGap = 22;
     const baseTotal =
@@ -1133,6 +1142,399 @@ export const drawMatches = (
       );
     });
 
+  };
+
+  // ===== Rows: Default + Esports (standard schedule) =====
+  const drawStandardScheduleRows = (useEsportsLayout = false) => {
+    const isEsportsLayout = Boolean(useEsportsLayout);
+    const baseDateHeight = 36;
+    const baseCardHeight = 132;
+    const baseBetweenBarAndCard = 8;
+    const baseRowGap = 26;
+    const baseTimeWidth = 140;
+
+    const baseRowTotal =
+      baseDateHeight + baseBetweenBarAndCard + baseCardHeight;
+    const baseTotalHeight =
+      matchCount * baseRowTotal +
+      Math.max(matchCount - 1, 0) * baseRowGap;
+
+    let scale =
+      baseTotalHeight > availableHeight
+        ? availableHeight / baseTotalHeight
+        : 1;
+
+    let dateHeight = clampMin(baseDateHeight * scale, 20);
+    let cardHeight = clampMin(baseCardHeight * scale, 88);
+    let betweenBarAndCard = clampMin(
+      baseBetweenBarAndCard * scale,
+      4
+    );
+    let rowGap = clampMin(baseRowGap * scale, 10);
+    let rowTotal = dateHeight + betweenBarAndCard + cardHeight;
+    let adjustedHeight =
+      matchCount * rowTotal + Math.max(matchCount - 1, 0) * rowGap;
+
+    if (adjustedHeight > availableHeight) {
+      const overflowScale = availableHeight / adjustedHeight;
+      dateHeight = clampMin(dateHeight * overflowScale, 20);
+      cardHeight = clampMin(cardHeight * overflowScale, 88);
+      betweenBarAndCard = clampMin(
+        betweenBarAndCard * overflowScale,
+        4
+      );
+      rowGap = clampMin(rowGap * overflowScale, 10);
+
+      rowTotal = dateHeight + betweenBarAndCard + cardHeight;
+      adjustedHeight =
+        matchCount * rowTotal + Math.max(matchCount - 1, 0) * rowGap;
+    }
+
+    const detailScale = Math.min(scale, rowTotal / baseRowTotal);
+    const spacingScale = Math.min(scale, rowGap / baseRowGap || scale);
+
+    const verticalOffset =
+      adjustedHeight < availableHeight
+        ? (availableHeight - adjustedHeight) / 2
+        : 0;
+
+    const baseInset = isEsportsLayout ? 130 : 90;
+    const cardWidth = ctx.canvas.width - baseInset * 2;
+    const dateTimeGap = Math.max(16, 26 * spacingScale);
+    const innerPaddingX = Math.max(28, 38 * detailScale);
+    const innerPaddingY = Math.max(12, 20 * detailScale);
+    const gapBetweenBlocks = Math.max(18, 28 * detailScale);
+    const vsDiameter = Math.max(88, 112 * detailScale);
+    const cardRadius = Math.max(24, 34 * detailScale);
+    const nameAreaHeight = cardHeight - innerPaddingY * 2;
+
+    const nameFontFamily = '"Poppins", sans-serif';
+    const nameFontWeight = 700;
+
+    const buildTeamNameLayout = (label, width, fallback, forcedMaxFontSize) => {
+      if (width <= 0) return null;
+      const baseText = (label && label.trim()) || fallback || "Tim TBD";
+      const rawText = baseText.toUpperCase();
+      const paddingX = Math.max(14, 22 * detailScale);
+      const availableWidth = Math.max(0, width - paddingX * 2);
+      const targetMaxFontSize =
+        forcedMaxFontSize ?? Math.min(38 * detailScale, nameAreaHeight * 0.58);
+      const layout = layoutTeamName(ctx, rawText, {
+        maxWidth: availableWidth,
+        maxFontSize: targetMaxFontSize,
+        minFontSize: 18,
+        fontWeight: nameFontWeight,
+        fontFamily: nameFontFamily,
+      });
+      return { text: rawText, layout };
+    };
+
+    const renderTeamNameLayout = (info, x, width, centerY) => {
+      if (!info || !info.layout) return;
+      ctx.save();
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#e2e8f0";
+      ctx.textAlign = "center";
+      ctx.font = `${nameFontWeight} ${Math.round(info.layout.fontSize)}px ${nameFontFamily}`;
+      const lines =
+        info.layout.lines && info.layout.lines.length ? info.layout.lines : [info.text];
+      const lineCount = lines.length;
+      const lineHeight = info.layout.fontSize * (lineCount > 1 ? 1.08 : 1);
+      const firstLineY = centerY - ((lineCount - 1) * lineHeight) / 2;
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x + width / 2, firstLineY + index * lineHeight);
+      });
+      ctx.restore();
+    };
+
+    matches.forEach((match, index) => {
+      let cardX = baseInset;
+      let esportsSlot = null;
+      if (isEsportsLayout) {
+        const slotSize = cardHeight;
+        const slotGap = Math.max(18, 28 * detailScale);
+        const combinedWidth = slotSize + slotGap + cardWidth;
+        const startX = Math.max(12, (ctx.canvas.width - combinedWidth) / 2);
+        esportsSlot = {
+          x: startX,
+          y: 0, // placeholder, set later
+          size: slotSize,
+        };
+        cardX = startX + slotSize + slotGap;
+      }
+
+      const rowTop =
+        startY + verticalOffset + index * (rowTotal + rowGap);
+      const barY = rowTop;
+      const cardY = barY + dateHeight + betweenBarAndCard;
+
+      const timeWidth = Math.max(105, baseTimeWidth * scale);
+      const dateLabel = formatDate(match.date);
+      const timeLabel = match.time ? formatTime(match.time) : "Waktu TBD";
+
+      const dateLeftLimit = cardX;
+      const dateRightLimit = cardX + cardWidth - timeWidth - dateTimeGap;
+      const availableDateWidth = Math.max(0, dateRightLimit - dateLeftLimit);
+      const datePaddingX = Math.max(16, 22 * detailScale);
+      const pillRadius = Math.max(dateHeight / 2, 14);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      if (availableDateWidth > 0) {
+        const minDateWidth = Math.min(
+          availableDateWidth,
+          clampMin(180 * detailScale, 140)
+        );
+        const maxTextWidth =
+          availableDateWidth > datePaddingX * 2
+            ? availableDateWidth - datePaddingX * 2
+            : undefined;
+        applyFittedFont(ctx, dateLabel, {
+          maxSize: Math.max(20, 28 * detailScale),
+          minSize: 16,
+          weight: 700,
+          maxWidth: maxTextWidth,
+        });
+        const dateTextWidth = ctx.measureText(dateLabel).width;
+        let dateWidth = Math.min(
+          availableDateWidth,
+          Math.max(minDateWidth, dateTextWidth + datePaddingX * 2)
+        );
+        const desiredCenter = cardX + cardWidth / 2;
+        let dateX = desiredCenter - dateWidth / 2;
+        if (dateX < dateLeftLimit) dateX = dateLeftLimit;
+        if (dateX + dateWidth > dateRightLimit) {
+          dateX = Math.max(dateLeftLimit, dateRightLimit - dateWidth);
+        }
+        ctx.save();
+        drawRoundedRectPath(ctx, dateX, barY, dateWidth, dateHeight, pillRadius);
+        const dateGradient = ctx.createLinearGradient(
+          dateX,
+          barY,
+          dateX + dateWidth,
+          barY + dateHeight
+        );
+        dateGradient.addColorStop(0, headerStart);
+        dateGradient.addColorStop(1, headerEnd);
+        ctx.fillStyle = dateGradient;
+        ctx.fill();
+        ctx.restore();
+        ctx.fillStyle = dateTextColor;
+        if (isEsportsLayout || isBasketballMode || isFootballMode) {
+          ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
+          ctx.shadowBlur = Math.max(6, 12 * detailScale);
+          ctx.shadowOffsetY = Math.max(1, 2 * detailScale);
+        }
+        ctx.fillText(dateLabel, dateX + dateWidth / 2, barY + dateHeight / 2);
+      } else {
+        applyFittedFont(ctx, dateLabel, {
+          maxSize: Math.max(20, 28 * detailScale),
+          minSize: 16,
+          weight: 700,
+        });
+      }
+
+      const timeX = cardX + cardWidth - timeWidth;
+      ctx.save();
+      drawRoundedRectPath(ctx, timeX, barY, timeWidth, dateHeight, pillRadius);
+      const timeGradient = ctx.createLinearGradient(
+        timeX,
+        barY,
+        timeX + timeWidth,
+        barY + dateHeight
+      );
+      timeGradient.addColorStop(0, footerStart);
+      timeGradient.addColorStop(1, footerEnd);
+      ctx.fillStyle = timeGradient;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.fillStyle = timeTextColor;
+      ctx.font = `700 ${Math.max(18, 24 * detailScale)}px Poppins`;
+      if (isEsportsLayout || isBasketballMode || isFootballMode) {
+        ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
+        ctx.shadowBlur = Math.max(6, 12 * detailScale);
+        ctx.shadowOffsetY = Math.max(1, 2 * detailScale);
+      }
+      ctx.fillText(timeLabel, timeX + timeWidth / 2, barY + dateHeight / 2);
+
+      ctx.save();
+      ctx.shadowColor = "rgba(15, 23, 42, 0.45)";
+      ctx.shadowBlur = Math.max(20, 34 * detailScale);
+      ctx.shadowOffsetY = Math.max(8, 14 * detailScale);
+      drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
+      const cardGradient = ctx.createLinearGradient(
+        cardX,
+        cardY,
+        cardX + cardWidth,
+        cardY + cardHeight
+      );
+      cardGradient.addColorStop(0, "#1f2937");
+      cardGradient.addColorStop(0.5, "#111827");
+      cardGradient.addColorStop(1, "#0f172a");
+      ctx.fillStyle = cardGradient;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.28)";
+      ctx.lineWidth = Math.max(1.6, 2.2 * detailScale);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
+      const glassGradient = ctx.createLinearGradient(
+        cardX,
+        cardY,
+        cardX,
+        cardY + cardHeight
+      );
+      glassGradient.addColorStop(0, "rgba(255, 255, 255, 0.08)");
+      glassGradient.addColorStop(1, "rgba(148, 163, 184, 0.04)");
+      ctx.fillStyle = glassGradient;
+      ctx.fill();
+      ctx.restore();
+
+      const innerTop = cardY + innerPaddingY;
+      const textCenterY = innerTop + nameAreaHeight / 2;
+
+      const logoSize = Math.min(
+        nameAreaHeight,
+        Math.max(78, 104 * detailScale)
+      );
+      const logoY = innerTop + (nameAreaHeight - logoSize) / 2;
+
+      const leftLogoX = cardX + innerPaddingX;
+      const rightLogoX = cardX + cardWidth - innerPaddingX - logoSize;
+
+      if (isEsportsLayout && esportsSlot) {
+        const slotSize = esportsSlot.size;
+        const slotY = cardY;
+        drawEsportsGameSlot(ctx, esportsSlot.x, slotY, slotSize, {
+          logoImage: match.gameLogoImage,
+          label: match.gameName,
+        });
+      }
+
+      drawLogoTile(
+        ctx,
+        match.homeLogoImage,
+        leftLogoX,
+        logoY,
+        logoSize,
+        match.teamHome,
+        {
+          scale: match.teamHomeLogoScale,
+          offsetX: match.teamHomeLogoOffsetX,
+          offsetY: match.teamHomeLogoOffsetY,
+          placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
+        }
+      );
+      drawLogoTile(
+        ctx,
+        match.awayLogoImage,
+        rightLogoX,
+        logoY,
+        logoSize,
+        match.teamAway,
+        {
+          scale: match.teamAwayLogoScale,
+          offsetX: match.teamAwayLogoOffsetX,
+          offsetY: match.teamAwayLogoOffsetY,
+          placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
+        }
+      );
+
+      const leftNameX = leftLogoX + logoSize + gapBetweenBlocks;
+      const vsRadius = vsDiameter / 2;
+      const vsCenterX = cardX + cardWidth / 2;
+      const leftNameEnd = vsCenterX - vsRadius - gapBetweenBlocks;
+      const leftNameWidth = Math.max(0, leftNameEnd - leftNameX);
+
+      const rightNameX = vsCenterX + vsRadius + gapBetweenBlocks;
+      const rightNameEnd = rightLogoX - gapBetweenBlocks;
+      const rightNameWidth = Math.max(0, rightNameEnd - rightNameX);
+
+      const homeNameLayout = buildTeamNameLayout(match.teamHome, leftNameWidth, "Tuan Rumah");
+      const awayNameLayout = buildTeamNameLayout(match.teamAway, rightNameWidth, "Tim Tamu");
+      let normalizedHomeLayout = homeNameLayout;
+      let normalizedAwayLayout = awayNameLayout;
+      if (homeNameLayout && awayNameLayout) {
+        const sharedFontSize = Math.min(
+          homeNameLayout.layout.fontSize || 0,
+          awayNameLayout.layout.fontSize || 0
+        );
+        if (Number.isFinite(sharedFontSize) && sharedFontSize > 0) {
+          if (sharedFontSize < (homeNameLayout.layout.fontSize || 0) - 0.1) {
+            normalizedHomeLayout = buildTeamNameLayout(
+              match.teamHome,
+              leftNameWidth,
+              "Tuan Rumah",
+              sharedFontSize
+            );
+          }
+          if (sharedFontSize < (awayNameLayout.layout.fontSize || 0) - 0.1) {
+            normalizedAwayLayout = buildTeamNameLayout(
+              match.teamAway,
+              rightNameWidth,
+              "Tim Tamu",
+              sharedFontSize
+            );
+          }
+        }
+      }
+
+      renderTeamNameLayout(normalizedHomeLayout, leftNameX, leftNameWidth, textCenterY);
+      renderTeamNameLayout(normalizedAwayLayout, rightNameX, rightNameWidth, textCenterY);
+
+      drawVsBadge(ctx, vsCenterX, textCenterY, vsRadius, detailScale);
+    });
+  };
+
+  // ===== Rows: Esports (schedule wrapper) =====
+  const drawEsportsScheduleRows = () => {
+    drawStandardScheduleRows(true);
+  };
+
+  // =====================================================================
+  // LAYOUT ROUTERS
+  // =====================================================================
+
+  // ===== Layout: Football (submenu router) =====
+  const drawFootballLayout = () => {
+    const rawSubMenu = footballSubMenu || "schedule";
+    const effectiveSubMenu =
+      rawSubMenu === "schedule" && customCenterLabel ? "bigmatch" : rawSubMenu;
+
+    const drawFootballScheduleRows = () =>
+      drawFootballRows({ isScoresLayout: false, centerLabel: null });
+    const drawFootballScoresRows = () =>
+      drawFootballRows({ isScoresLayout: true, centerLabel: null });
+    const drawFootballBigMatch = () =>
+      drawFootballRows({
+        isScoresLayout: false,
+        centerLabel: customCenterLabel || { title: "VS" },
+      });
+
+    if (effectiveSubMenu === "scores") {
+      drawFootballScoresRows();
+      return;
+    }
+    if (effectiveSubMenu === "bigmatch") {
+      drawFootballBigMatch();
+      return;
+    }
+    drawFootballScheduleRows();
+  };
+
+  // =====================================================================
+  // ROUTING (pick mode/submenu layout)
+  // =====================================================================
+
+  if (isFootballMode) {
+    drawFootballLayout();
     ctx.restore();
     return;
   }
@@ -1143,357 +1545,18 @@ export const drawMatches = (
     return;
   }
 
-  const baseDateHeight = 36;
-  const baseCardHeight = 132;
-  const baseBetweenBarAndCard = 8;
-  const baseRowGap = 26;
-  const baseTimeWidth = 140;
-
-  const baseRowTotal =
-    baseDateHeight + baseBetweenBarAndCard + baseCardHeight;
-  const baseTotalHeight =
-    matchCount * baseRowTotal +
-    Math.max(matchCount - 1, 0) * baseRowGap;
-
-  let scale =
-    baseTotalHeight > availableHeight
-      ? availableHeight / baseTotalHeight
-      : 1;
-
-  let dateHeight = clampMin(baseDateHeight * scale, 20);
-  let cardHeight = clampMin(baseCardHeight * scale, 88);
-  let betweenBarAndCard = clampMin(
-    baseBetweenBarAndCard * scale,
-    4
-  );
-  let rowGap = clampMin(baseRowGap * scale, 10);
-  let rowTotal = dateHeight + betweenBarAndCard + cardHeight;
-  let adjustedHeight =
-    matchCount * rowTotal + Math.max(matchCount - 1, 0) * rowGap;
-
-  if (adjustedHeight > availableHeight) {
-    const overflowScale = availableHeight / adjustedHeight;
-    dateHeight = clampMin(dateHeight * overflowScale, 20);
-    cardHeight = clampMin(cardHeight * overflowScale, 88);
-    betweenBarAndCard = clampMin(
-      betweenBarAndCard * overflowScale,
-      4
-    );
-    rowGap = clampMin(rowGap * overflowScale, 10);
-
-    rowTotal = dateHeight + betweenBarAndCard + cardHeight;
-    adjustedHeight =
-      matchCount * rowTotal + Math.max(matchCount - 1, 0) * rowGap;
+  if (isEsportsMode) {
+    drawEsportsScheduleRows();
+    ctx.restore();
+    return;
   }
 
-  const detailScale = Math.min(scale, rowTotal / baseRowTotal);
-  const spacingScale = Math.min(scale, rowGap / baseRowGap || scale);
-
-    const verticalOffset =
-      adjustedHeight < availableHeight
-        ? (availableHeight - adjustedHeight) / 2
-        : 0;
-
-  const isEsportsMode = options?.mode === "esports";
-  const baseInset = isEsportsMode ? 130 : 90;
-  const cardWidth = ctx.canvas.width - baseInset * 2;
-  const dateTimeGap = Math.max(16, 26 * spacingScale);
-  const innerPaddingX = Math.max(28, 38 * detailScale);
-  const innerPaddingY = Math.max(12, 20 * detailScale);
-  const gapBetweenBlocks = Math.max(18, 28 * detailScale);
-  const vsDiameter = Math.max(88, 112 * detailScale);
-  const cardRadius = Math.max(24, 34 * detailScale);
-  const nameAreaHeight = cardHeight - innerPaddingY * 2;
-
-  const nameFontFamily = '"Poppins", sans-serif';
-  const nameFontWeight = 700;
-
-  const buildTeamNameLayout = (label, width, fallback, forcedMaxFontSize) => {
-    if (width <= 0) return null;
-    const baseText = (label && label.trim()) || fallback || "Tim TBD";
-    const rawText = baseText.toUpperCase();
-    const paddingX = Math.max(14, 22 * detailScale);
-    const availableWidth = Math.max(0, width - paddingX * 2);
-    const targetMaxFontSize =
-      forcedMaxFontSize ?? Math.min(38 * detailScale, nameAreaHeight * 0.58);
-    const layout = layoutTeamName(ctx, rawText, {
-      maxWidth: availableWidth,
-      maxFontSize: targetMaxFontSize,
-      minFontSize: 18,
-      fontWeight: nameFontWeight,
-      fontFamily: nameFontFamily,
-    });
-    return { text: rawText, layout };
-  };
-
-  const renderTeamNameLayout = (info, x, width, centerY) => {
-    if (!info || !info.layout) return;
-    ctx.save();
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#e2e8f0";
-    ctx.textAlign = "center";
-    ctx.font = `${nameFontWeight} ${Math.round(info.layout.fontSize)}px ${nameFontFamily}`;
-    const lines =
-      info.layout.lines && info.layout.lines.length ? info.layout.lines : [info.text];
-    const lineCount = lines.length;
-    const lineHeight = info.layout.fontSize * (lineCount > 1 ? 1.08 : 1);
-    const firstLineY = centerY - ((lineCount - 1) * lineHeight) / 2;
-    lines.forEach((line, index) => {
-      ctx.fillText(line, x + width / 2, firstLineY + index * lineHeight);
-    });
-    ctx.restore();
-  };
-
-  matches.forEach((match, index) => {
-    let cardX = baseInset;
-    let esportsSlot = null;
-    if (isEsportsMode) {
-      const slotSize = cardHeight;
-      const slotGap = Math.max(18, 28 * detailScale);
-      const combinedWidth = slotSize + slotGap + cardWidth;
-      const startX = Math.max(12, (ctx.canvas.width - combinedWidth) / 2);
-      esportsSlot = {
-        x: startX,
-        y: 0, // placeholder, set later
-        size: slotSize,
-      };
-      cardX = startX + slotSize + slotGap;
-    }
-
-    const rowTop =
-      startY + verticalOffset + index * (rowTotal + rowGap);
-    const barY = rowTop;
-    const cardY = barY + dateHeight + betweenBarAndCard;
-
-    const timeWidth = Math.max(105, baseTimeWidth * scale);
-    const dateLabel = formatDate(match.date);
-    const timeLabel = match.time ? formatTime(match.time) : "Waktu TBD";
-
-    const dateLeftLimit = cardX;
-    const dateRightLimit = cardX + cardWidth - timeWidth - dateTimeGap;
-    const availableDateWidth = Math.max(0, dateRightLimit - dateLeftLimit);
-    const datePaddingX = Math.max(16, 22 * detailScale);
-    const pillRadius = Math.max(dateHeight / 2, 14);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    if (availableDateWidth > 0) {
-      const minDateWidth = Math.min(
-        availableDateWidth,
-        clampMin(180 * detailScale, 140)
-      );
-      const maxTextWidth =
-        availableDateWidth > datePaddingX * 2
-          ? availableDateWidth - datePaddingX * 2
-          : undefined;
-      applyFittedFont(ctx, dateLabel, {
-        maxSize: Math.max(20, 28 * detailScale),
-        minSize: 16,
-        weight: 700,
-        maxWidth: maxTextWidth,
-      });
-      const dateTextWidth = ctx.measureText(dateLabel).width;
-      let dateWidth = Math.min(
-        availableDateWidth,
-        Math.max(minDateWidth, dateTextWidth + datePaddingX * 2)
-      );
-      const desiredCenter = cardX + cardWidth / 2;
-      let dateX = desiredCenter - dateWidth / 2;
-      if (dateX < dateLeftLimit) dateX = dateLeftLimit;
-      if (dateX + dateWidth > dateRightLimit) {
-        dateX = Math.max(dateLeftLimit, dateRightLimit - dateWidth);
-      }
-      ctx.save();
-      drawRoundedRectPath(ctx, dateX, barY, dateWidth, dateHeight, pillRadius);
-      const dateGradient = ctx.createLinearGradient(
-        dateX,
-        barY,
-        dateX + dateWidth,
-        barY + dateHeight
-      );
-      dateGradient.addColorStop(0, headerStart);
-      dateGradient.addColorStop(1, headerEnd);
-      ctx.fillStyle = dateGradient;
-      ctx.fill();
-      ctx.restore();
-      ctx.fillStyle = dateTextColor;
-      if (isEsportsMode || isBasketballMode || isFootballMode) {
-        ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
-        ctx.shadowBlur = Math.max(6, 12 * detailScale);
-        ctx.shadowOffsetY = Math.max(1, 2 * detailScale);
-      }
-      ctx.fillText(dateLabel, dateX + dateWidth / 2, barY + dateHeight / 2);
-    } else {
-      applyFittedFont(ctx, dateLabel, {
-        maxSize: Math.max(20, 28 * detailScale),
-        minSize: 16,
-        weight: 700,
-      });
-    }
-
-    const timeX = cardX + cardWidth - timeWidth;
-    ctx.save();
-    drawRoundedRectPath(ctx, timeX, barY, timeWidth, dateHeight, pillRadius);
-    const timeGradient = ctx.createLinearGradient(
-      timeX,
-      barY,
-      timeX + timeWidth,
-      barY + dateHeight
-    );
-    timeGradient.addColorStop(0, footerStart);
-    timeGradient.addColorStop(1, footerEnd);
-    ctx.fillStyle = timeGradient;
-    ctx.fill();
-    ctx.restore();
-
-    ctx.fillStyle = timeTextColor;
-    ctx.font = `700 ${Math.max(18, 24 * detailScale)}px Poppins`;
-    if (isEsportsMode || isBasketballMode || isFootballMode) {
-      ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
-      ctx.shadowBlur = Math.max(6, 12 * detailScale);
-      ctx.shadowOffsetY = Math.max(1, 2 * detailScale);
-    }
-    ctx.fillText(timeLabel, timeX + timeWidth / 2, barY + dateHeight / 2);
-
-    ctx.save();
-    ctx.shadowColor = "rgba(15, 23, 42, 0.45)";
-    ctx.shadowBlur = Math.max(20, 34 * detailScale);
-    ctx.shadowOffsetY = Math.max(8, 14 * detailScale);
-    drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
-    const cardGradient = ctx.createLinearGradient(
-      cardX,
-      cardY,
-      cardX + cardWidth,
-      cardY + cardHeight
-    );
-    cardGradient.addColorStop(0, "#1f2937");
-    cardGradient.addColorStop(0.5, "#111827");
-    cardGradient.addColorStop(1, "#0f172a");
-    ctx.fillStyle = cardGradient;
-    ctx.fill();
-    ctx.restore();
-
-    ctx.save();
-    drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
-    ctx.strokeStyle = "rgba(148, 163, 184, 0.28)";
-    ctx.lineWidth = Math.max(1.6, 2.2 * detailScale);
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.save();
-    drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
-    const glassGradient = ctx.createLinearGradient(
-      cardX,
-      cardY,
-      cardX,
-      cardY + cardHeight
-    );
-    glassGradient.addColorStop(0, "rgba(255, 255, 255, 0.08)");
-    glassGradient.addColorStop(1, "rgba(148, 163, 184, 0.04)");
-    ctx.fillStyle = glassGradient;
-    ctx.fill();
-    ctx.restore();
-
-    const innerTop = cardY + innerPaddingY;
-    const textCenterY = innerTop + nameAreaHeight / 2;
-
-    const logoSize = Math.min(
-      nameAreaHeight,
-      Math.max(78, 104 * detailScale)
-    );
-    const logoY = innerTop + (nameAreaHeight - logoSize) / 2;
-
-    const leftLogoX = cardX + innerPaddingX;
-    const rightLogoX = cardX + cardWidth - innerPaddingX - logoSize;
-
-    if (isEsportsMode && esportsSlot) {
-      const slotSize = esportsSlot.size;
-      const slotY = cardY;
-      drawEsportsGameSlot(ctx, esportsSlot.x, slotY, slotSize, {
-        logoImage: match.gameLogoImage,
-        label: match.gameName,
-      });
-    }
-
-    drawLogoTile(
-      ctx,
-      match.homeLogoImage,
-      leftLogoX,
-      logoY,
-      logoSize,
-      match.teamHome,
-      {
-        scale: match.teamHomeLogoScale,
-        offsetX: match.teamHomeLogoOffsetX,
-        offsetY: match.teamHomeLogoOffsetY,
-        placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
-      }
-    );
-    drawLogoTile(
-      ctx,
-      match.awayLogoImage,
-      rightLogoX,
-      logoY,
-      logoSize,
-      match.teamAway,
-      {
-        scale: match.teamAwayLogoScale,
-        offsetX: match.teamAwayLogoOffsetX,
-        offsetY: match.teamAwayLogoOffsetY,
-        placeholderColors: TEAM_LOGO_PLACEHOLDER_COLORS,
-      }
-    );
-
-    const leftNameX = leftLogoX + logoSize + gapBetweenBlocks;
-    const vsRadius = vsDiameter / 2;
-    const vsCenterX = cardX + cardWidth / 2;
-    const leftNameEnd = vsCenterX - vsRadius - gapBetweenBlocks;
-    const leftNameWidth = Math.max(0, leftNameEnd - leftNameX);
-
-    const rightNameX = vsCenterX + vsRadius + gapBetweenBlocks;
-    const rightNameEnd = rightLogoX - gapBetweenBlocks;
-    const rightNameWidth = Math.max(0, rightNameEnd - rightNameX);
-
-    const homeNameLayout = buildTeamNameLayout(match.teamHome, leftNameWidth, "Tuan Rumah");
-    const awayNameLayout = buildTeamNameLayout(match.teamAway, rightNameWidth, "Tim Tamu");
-    let normalizedHomeLayout = homeNameLayout;
-    let normalizedAwayLayout = awayNameLayout;
-    if (homeNameLayout && awayNameLayout) {
-      const sharedFontSize = Math.min(
-        homeNameLayout.layout.fontSize || 0,
-        awayNameLayout.layout.fontSize || 0
-      );
-      if (Number.isFinite(sharedFontSize) && sharedFontSize > 0) {
-        if (sharedFontSize < (homeNameLayout.layout.fontSize || 0) - 0.1) {
-          normalizedHomeLayout = buildTeamNameLayout(
-            match.teamHome,
-            leftNameWidth,
-            "Tuan Rumah",
-            sharedFontSize
-          );
-        }
-        if (sharedFontSize < (awayNameLayout.layout.fontSize || 0) - 0.1) {
-          normalizedAwayLayout = buildTeamNameLayout(
-            match.teamAway,
-            rightNameWidth,
-            "Tim Tamu",
-            sharedFontSize
-          );
-        }
-      }
-    }
-
-    renderTeamNameLayout(normalizedHomeLayout, leftNameX, leftNameWidth, textCenterY);
-    renderTeamNameLayout(normalizedAwayLayout, rightNameX, rightNameWidth, textCenterY);
-
-    drawVsBadge(ctx, vsCenterX, textCenterY, vsRadius, detailScale);
-  });
-
+  drawStandardScheduleRows();
   ctx.restore();
 };
 
 
-export const drawBigMatchLayout = (
+const drawBigMatchLayout = (
   ctx,
   {
     matchesWithImages = [],
@@ -1521,7 +1584,7 @@ export const drawBigMatchLayout = (
   );
   drawMatches(ctx, singleMatch, adjustedStartY, brandPalette, {
     mode: "football",
-    activeSubMenu: "schedule",
+    activeSubMenu: "bigmatch",
     brandDisplayName,
     customCenterLabel: {
       title: "VS",
@@ -1529,3 +1592,9 @@ export const drawBigMatchLayout = (
     },
   });
 };
+
+// =====================================================================
+// EXPORTS
+// =====================================================================
+
+export { drawMatches, drawBigMatchLayout };
