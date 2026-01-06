@@ -183,6 +183,8 @@ export const renderBanner = async ({
   } = overrides || {};
 
   const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.clearRect(0, 0, baseSize, baseSize);

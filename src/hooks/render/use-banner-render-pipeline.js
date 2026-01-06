@@ -30,6 +30,9 @@ const useBannerRenderPipeline = ({
       isRenderingRef.current = true;
       setIsRenderingUi(true);
       try {
+        if (typeof document !== "undefined" && document.fonts?.load) {
+          await document.fonts.load('900 40px "Montserrat"');
+        }
         return await renderBannerService({
           overrides,
           canvasRef,

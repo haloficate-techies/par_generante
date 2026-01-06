@@ -1298,51 +1298,37 @@ const drawMatches = (
       ctx.restore();
     };
 
-    const drawBroadcastLetter = (text, x, y, width, height, maxSize) => {
-      const content = (text ?? "").toString();
+    const drawLogoBoxRect = (image, x, y, size, fallbackName, adjustments = {}) => {
       ctx.save();
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      applyFittedFont(ctx, content, {
-        maxSize: maxSize ?? Math.max(10, height * 0.9),
-        minSize: 10,
-        weight: 900,
-        maxWidth: Math.max(0, width * 0.92),
-        family: '"Poppins", sans-serif',
-      });
-      const centerX = x + width / 2;
-      const centerY = y + height / 2;
-      ctx.shadowColor = "rgba(0,0,0,0.45)";
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = Math.max(1, cardHeight * 0.02);
-      ctx.shadowOffsetX = 0;
-      ctx.strokeStyle = "rgba(0,0,0,0.55)";
-      ctx.lineWidth = Math.max(2, cardHeight * 0.035);
-      ctx.fillStyle = "#ffffff";
-      ctx.strokeText(content, centerX, centerY);
-      ctx.fillText(content, centerX, centerY);
-      ctx.restore();
-    };
-
-    const drawLogoBoxRect = (image, x, y, size, fallbackName) => {
-      ctx.save();
-      ctx.fillStyle = "#6B7280";
-      ctx.fillRect(x, y, size, size);
+      const overlapX = clamp(adjustments.overlapX ?? 0, 0, size);
+      const overlapSide = adjustments.overlapSide === "right" ? "right" : "left";
+      const rectX = overlapSide === "right" ? x : x - overlapX;
+      const rectW = size + overlapX;
 
       if (image) {
         const padding = size * 0.12;
         const slot = size - padding * 2;
         const naturalWidth = image.naturalWidth || image.width || slot;
         const naturalHeight = image.naturalHeight || image.height || slot;
-        const scale = Math.min(slot / naturalWidth, slot / naturalHeight);
-        const renderWidth = naturalWidth * scale;
-        const renderHeight = naturalHeight * scale;
-        const renderX = x + (size - renderWidth) / 2;
-        const renderY = y + (size - renderHeight) / 2;
+        const baseScale = Math.min(slot / naturalWidth, slot / naturalHeight);
+        const userScale = clamp(adjustments.scale ?? 1, 0.7, 1.5);
+        const renderWidth = naturalWidth * baseScale * userScale;
+        const renderHeight = naturalHeight * baseScale * userScale;
+        const offsetRangeX = slot * 0.35;
+        const offsetRangeY = slot * 0.35;
+        const offsetX = clamp(adjustments.offsetX ?? 0, -0.75, 0.75);
+        const offsetY = clamp(adjustments.offsetY ?? 0, -0.75, 0.75);
+        const renderX =
+          x + padding + (slot - renderWidth) / 2 + offsetX * offsetRangeX;
+        const renderY =
+          y + padding + (slot - renderHeight) / 2 + offsetY * offsetRangeY;
         ctx.drawImage(image, renderX, renderY, renderWidth, renderHeight);
         ctx.restore();
         return;
       }
+
+      ctx.fillStyle = "#6B7280";
+      ctx.fillRect(rectX, y, rectW, size);
 
       const raw = (fallbackName || "FC").trim().toUpperCase();
       const initials = raw
@@ -1367,7 +1353,7 @@ const drawMatches = (
         maxFontSize: Math.max(14, height * 0.42),
         minFontSize: 12,
         fontWeight: 900,
-        fontFamily: '"Poppins", sans-serif',
+        fontFamily: '"Montserrat", sans-serif',
       });
       const lines =
         layout.lines && layout.lines.length ? layout.lines.slice(0, 2) : [text];
@@ -1379,7 +1365,7 @@ const drawMatches = (
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "#ffffff";
-      ctx.font = `900 ${Math.round(layout.fontSize)}px "Poppins", sans-serif`;
+      ctx.font = `900 ${Math.round(layout.fontSize)}px "Montserrat", sans-serif`;
       lines.forEach((line, idx) => {
         ctx.fillText(line, x + width / 2, firstLineY + idx * lineHeight);
       });
@@ -1419,58 +1405,117 @@ const drawMatches = (
           (frontWidth - (logoBoxSize * 2 + centerWidth)) / 2;
         const nameBarWidth = Math.max(0, rawNameBarWidth);
 
-        const dateHeightRect = rowHeight * 0.22;
-        const timeHeightRect = rowHeight * 0.22;
-        const centerStackGap = Math.max(6, rowHeight * 0.06);
+        const dateHeightRect = rowHeight * 0.19;
+        const timeHeightRect = rowHeight * 0.19;
+        const centerStackGap = Math.max(4, rowHeight * 0.04);
         const gameSize = Math.max(
           40,
           rowHeight - dateHeightRect - timeHeightRect - centerStackGap * 2
         );
 
-        const blueName = "#2B2FFF";
-        const redDate = "#EF4444";
+        const nameGradientStart = ensureSubduedGradientColor(
+          paletteSafe?.headerStart ?? DEFAULT_BRAND_PALETTE.headerStart,
+          DEFAULT_BRAND_PALETTE.headerStart,
+          0.18
+        );
+        const nameGradientEnd = ensureSubduedGradientColor(
+          paletteSafe?.headerEnd ?? DEFAULT_BRAND_PALETTE.headerEnd,
+          DEFAULT_BRAND_PALETTE.headerEnd,
+          0.18
+        );
+        const headerCandidateA =
+          paletteSafe?.headerStart ?? DEFAULT_BRAND_PALETTE.headerStart;
+        const headerCandidateB =
+          paletteSafe?.headerEnd ?? DEFAULT_BRAND_PALETTE.headerEnd;
+        const redDate =
+          getRelativeLuminanceSafe(headerCandidateA) >=
+          getRelativeLuminanceSafe(headerCandidateB)
+            ? headerCandidateA
+            : headerCandidateB;
         const yellowGame = "#FACC15";
-        const greenTime = "#22C55E";
+        const footerCandidateA =
+          paletteSafe?.footerStart ?? DEFAULT_BRAND_PALETTE.footerStart;
+        const footerCandidateB =
+          paletteSafe?.footerEnd ?? DEFAULT_BRAND_PALETTE.footerEnd;
+        const greenTime =
+          getRelativeLuminanceSafe(footerCandidateA) >=
+          getRelativeLuminanceSafe(footerCandidateB)
+            ? footerCandidateA
+            : footerCandidateB;
 
         const columnGap = Math.max(14, rowHeight * 0.12);
         const totalBlocksWidth =
-          nameBarWidth * 2 + logoBoxSize * 2 + centerWidth + columnGap * 4;
+          nameBarWidth * 2 + logoBoxSize * 2 + centerWidth + columnGap * 2;
         const contentX = rowX + (frontWidth - totalBlocksWidth) / 2;
 
         const leftNameX = contentX;
-        const leftLogoX = leftNameX + nameBarWidth + columnGap;
+        const leftLogoX = leftNameX + nameBarWidth;
         const centerX = leftLogoX + logoBoxSize + columnGap;
         const rightLogoX = centerX + centerWidth + columnGap;
-        const rightNameX = rightLogoX + logoBoxSize + columnGap;
+        const rightNameX = rightLogoX + logoBoxSize;
 
         const blueInsetY = Math.max(10, rowHeight * 0.18);
         const blueY = rowY + blueInsetY;
         const blueH = rowHeight - blueInsetY * 2;
-        const nameRectInsetX = Math.max(12, rowHeight * 0.12);
-        const nameRectWidth = Math.max(0, nameBarWidth - nameRectInsetX);
+        const nameRectWidth = Math.max(0, nameBarWidth);
 
         ctx.save();
-        ctx.fillStyle = blueName;
-        ctx.fillRect(leftNameX, blueY, nameRectWidth, blueH);
-        ctx.fillRect(rightNameX + nameRectInsetX, blueY, nameRectWidth, blueH);
+        if (nameRectWidth > 0 && blueH > 0) {
+          const leftGradient = ctx.createLinearGradient(
+            leftNameX,
+            blueY,
+            leftNameX + nameRectWidth,
+            blueY
+          );
+          leftGradient.addColorStop(0, nameGradientStart);
+          leftGradient.addColorStop(1, nameGradientEnd);
+          ctx.fillStyle = leftGradient;
+          ctx.fillRect(leftNameX, blueY, nameRectWidth, blueH);
+
+          const rightGradient = ctx.createLinearGradient(
+            rightNameX,
+            blueY,
+            rightNameX + nameRectWidth,
+            blueY
+          );
+          rightGradient.addColorStop(0, nameGradientStart);
+          rightGradient.addColorStop(1, nameGradientEnd);
+          ctx.fillStyle = rightGradient;
+          ctx.fillRect(rightNameX, blueY, nameRectWidth, blueH);
+        }
         ctx.restore();
 
         drawTeamNameRect(match.teamHome, leftNameX, blueY, nameRectWidth, blueH);
-        drawTeamNameRect(match.teamAway, rightNameX + nameRectInsetX, blueY, nameRectWidth, blueH);
+        drawTeamNameRect(match.teamAway, rightNameX, blueY, nameRectWidth, blueH);
 
+        const overlap = Math.round(rowHeight * 0.22);
         drawLogoBoxRect(
           match.homeLogoImage,
           leftLogoX,
           rowY,
           logoBoxSize,
-          match.teamHome
+          match.teamHome,
+          {
+            scale: match.teamHomeLogoScale,
+            offsetX: match.teamHomeLogoOffsetX,
+            offsetY: match.teamHomeLogoOffsetY,
+            overlapX: overlap,
+            overlapSide: "left",
+          }
         );
         drawLogoBoxRect(
           match.awayLogoImage,
           rightLogoX,
           rowY,
           logoBoxSize,
-          match.teamAway
+          match.teamAway,
+          {
+            scale: match.teamAwayLogoScale,
+            offsetX: match.teamAwayLogoOffsetX,
+            offsetY: match.teamAwayLogoOffsetY,
+            overlapX: overlap,
+            overlapSide: "right",
+          }
         );
 
         const dateText = (formatDate(match.date) || "JADWAL TBD").toUpperCase();
@@ -1498,8 +1543,10 @@ const drawMatches = (
         ctx.save();
         ctx.fillStyle = redDate;
         ctx.fillRect(dateRect.x, dateRect.y, dateRect.w, dateRect.h);
-        ctx.fillStyle = yellowGame;
-        ctx.fillRect(gameRect.x, gameRect.y, gameRect.w, gameRect.h);
+        if (!match.gameLogoImage) {
+          ctx.fillStyle = yellowGame;
+          ctx.fillRect(gameRect.x, gameRect.y, gameRect.w, gameRect.h);
+        }
         ctx.fillStyle = greenTime;
         ctx.fillRect(timeRect.x, timeRect.y, timeRect.w, timeRect.h);
         ctx.restore();
@@ -1509,17 +1556,19 @@ const drawMatches = (
           weight: 900,
           maxSize: dateRect.h * 0.75,
           minSize: 10,
+          family: '"Montserrat", sans-serif',
         });
 
         drawTextFitRect(timeText, timeRect.x, timeRect.y, timeRect.w, timeRect.h, {
-          color: "#111827",
+          color: "#ffffff",
           weight: 900,
           maxSize: timeRect.h * 0.75,
           minSize: 10,
+          family: '"Montserrat", sans-serif',
         });
 
         if (match.gameLogoImage) {
-          const padding = gameSize * 0.12;
+          const padding = Math.max(2, gameSize * 0.03);
           const slot = gameSize - padding * 2;
           const naturalWidth =
             match.gameLogoImage.naturalWidth || match.gameLogoImage.width || slot;
@@ -1539,18 +1588,6 @@ const drawMatches = (
             minSize: 10,
           });
         }
-
-        const sideGap = Math.max(0, (centerWidth - gameSize) / 2);
-        const letterSize = Math.max(14, gameRect.h * 0.92);
-        drawBroadcastLetter("V", centerX, gameRect.y, sideGap, gameRect.h, letterSize);
-        drawBroadcastLetter(
-          "S",
-          gameRect.x + gameRect.w,
-          gameRect.y,
-          sideGap,
-          gameRect.h,
-          letterSize
-        );
 
         return;
       }
