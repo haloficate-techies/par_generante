@@ -1268,6 +1268,69 @@ const drawMatches = (
       ctx.restore();
     };
 
+    const roundedRectPath = (context, x, y, width, height, radius) => {
+      const safeWidth = Math.max(0, width);
+      const safeHeight = Math.max(0, height);
+      const maxRadius = Math.min(safeWidth, safeHeight) / 2;
+      const safeRadius = clamp(radius, 0, maxRadius);
+      const right = x + safeWidth;
+      const bottom = y + safeHeight;
+
+      context.beginPath();
+      context.moveTo(x + safeRadius, y);
+      context.lineTo(right - safeRadius, y);
+      context.arcTo(right, y, right, y + safeRadius, safeRadius);
+      context.lineTo(right, bottom - safeRadius);
+      context.arcTo(right, bottom, right - safeRadius, bottom, safeRadius);
+      context.lineTo(x + safeRadius, bottom);
+      context.arcTo(x, bottom, x, bottom - safeRadius, safeRadius);
+      context.lineTo(x, y + safeRadius);
+      context.arcTo(x, y, x + safeRadius, y, safeRadius);
+      context.closePath();
+    };
+
+    const drawRowBackground = (
+      context,
+      x,
+      y,
+      width,
+      height,
+      index,
+      opts = {}
+    ) => {
+      const insetX = opts.insetX ?? height * 0.06;
+      const insetY = opts.insetY ?? height * 0.06;
+      const rectX = x + insetX;
+      const rectY = y + insetY;
+      const rectW = width - insetX * 2;
+      const rectH = height - insetY * 2;
+      if (rectW <= 0 || rectH <= 0) return;
+
+      const radius = rectH * 0.12;
+      const evenAlpha = clamp(opts.evenAlpha ?? 0.09, 0.07, 0.14);
+      const oddAlpha = clamp(opts.oddAlpha ?? 0.13, 0.07, 0.14);
+      const fillAlpha = index % 2 === 1 ? oddAlpha : evenAlpha;
+      const fillColor = opts.fillColor ?? `rgba(0, 0, 0, ${fillAlpha})`;
+
+      context.save();
+      if (opts.shadow !== false) {
+        context.shadowColor = `rgba(0, 0, 0, ${opts.shadowAlpha ?? 0.18})`;
+        context.shadowBlur = opts.shadowBlur ?? 12;
+        context.shadowOffsetY = opts.shadowOffsetY ?? 0;
+      }
+      roundedRectPath(context, rectX, rectY, rectW, rectH, radius);
+      context.fillStyle = fillColor;
+      context.fill();
+
+      if (opts.stroke !== false) {
+        context.shadowColor = "transparent";
+        context.strokeStyle = `rgba(255, 255, 255, ${opts.strokeAlpha ?? 0.1})`;
+        context.lineWidth = opts.strokeWidth ?? 1;
+        context.stroke();
+      }
+      context.restore();
+    };
+
     const drawTextFitRect = (
       text,
       x,
@@ -1275,11 +1338,23 @@ const drawMatches = (
       width,
       height,
       {
-        color = "#111827",
+        color = "#FFFFFF",
         weight = 800,
         family = '"Poppins", sans-serif',
         minSize = 10,
         maxSize = Math.max(10, height * 0.7),
+        strokeText = true,
+        strokeColor = "rgba(0, 0, 0, 0.55)",
+        strokeWidth,
+        outlineMode = "single",
+        outerStrokeColor = "rgba(0, 0, 0, 0.65)",
+        outerStrokeWidth,
+        innerStrokeColor = strokeColor,
+        innerStrokeWidth,
+        glow = true,
+        glowColor = "rgba(0, 0, 0, 0.45)",
+        glowBlur,
+        glowOffsetY = 1,
       } = {}
     ) => {
       const content = (text ?? "").toString();
@@ -1293,9 +1368,115 @@ const drawMatches = (
         maxWidth: Math.max(0, width * 0.92),
         family,
       });
+      const fontSizeMatch = ctx.font.match(/(\d+(?:\.\d+)?)px/);
+      const fontSize = fontSizeMatch ? Number.parseFloat(fontSizeMatch[1]) : maxSize;
+      const autoOuterStrokeWidth = clamp(fontSize * 0.16, 3, 6);
+      const autoInnerStrokeWidth = clamp(fontSize * 0.1, 2, 4);
+      const resolvedStrokeWidth = strokeWidth ?? autoInnerStrokeWidth;
+      const resolvedOuterStrokeWidth = outerStrokeWidth ?? autoOuterStrokeWidth;
+      const resolvedInnerStrokeWidth = innerStrokeWidth ?? autoInnerStrokeWidth;
+      const resolvedGlowBlur = glowBlur ?? clamp(fontSize * 0.45, 8, 14);
+      if (strokeText) {
+        ctx.lineJoin = "round";
+        ctx.miterLimit = 2;
+        ctx.shadowColor = "transparent";
+        if (outlineMode === "double") {
+          ctx.strokeStyle = outerStrokeColor;
+          ctx.lineWidth = resolvedOuterStrokeWidth;
+          ctx.strokeText(content, x + width / 2, y + height / 2);
+          ctx.strokeStyle = innerStrokeColor;
+          ctx.lineWidth = resolvedInnerStrokeWidth;
+          ctx.strokeText(content, x + width / 2, y + height / 2);
+        } else {
+          ctx.strokeStyle = strokeColor;
+          ctx.lineWidth = resolvedStrokeWidth;
+          ctx.strokeText(content, x + width / 2, y + height / 2);
+        }
+      }
+      if (glow) {
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = resolvedGlowBlur;
+        ctx.shadowOffsetY = glowOffsetY;
+      }
       ctx.fillStyle = color;
       ctx.fillText(content, x + width / 2, y + height / 2);
       ctx.restore();
+    };
+
+    const parseColor = (value) => {
+      if (!value || typeof value !== "string") return null;
+      const input = value.trim().toLowerCase();
+      if (input[0] === "#") {
+        const raw = input.slice(1);
+        const hex =
+          raw.length === 3
+            ? raw
+                .split("")
+                .map((ch) => ch + ch)
+                .join("")
+            : raw;
+        if (hex.length !== 6) return null;
+        const num = Number.parseInt(hex, 16);
+        if (!Number.isFinite(num)) return null;
+        return {
+          r: (num >> 16) & 255,
+          g: (num >> 8) & 255,
+          b: num & 255,
+          a: 1,
+        };
+      }
+
+      const match = input.match(/^rgba?\((.+)\)$/);
+      if (!match) return null;
+      const parts = match[1]
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+      if (parts.length < 3) return null;
+      const r = Number.parseFloat(parts[0]);
+      const g = Number.parseFloat(parts[1]);
+      const b = Number.parseFloat(parts[2]);
+      if (![r, g, b].every(Number.isFinite)) return null;
+      const a = parts.length >= 4 ? Number.parseFloat(parts[3]) : 1;
+      return { r, g, b, a: Number.isFinite(a) ? a : 1 };
+    };
+
+    const getRelativeLuminance = ({ r, g, b }) => {
+      const toLinear = (channel) => {
+        const srgb = channel / 255;
+        return srgb <= 0.03928
+          ? srgb / 12.92
+          : Math.pow((srgb + 0.055) / 1.055, 2.4);
+      };
+      return (
+        0.2126 * toLinear(r) +
+        0.7152 * toLinear(g) +
+        0.0722 * toLinear(b)
+      );
+    };
+
+    const pickTextStyleForBg = (bgColor) => {
+      const parsed = parseColor(bgColor);
+      if (!parsed) {
+        return {
+          fill: "#FFFFFF",
+          stroke: "rgba(0, 0, 0, 0.55)",
+          strokeWidth: 3,
+        };
+      }
+      const luminance = getRelativeLuminance(parsed);
+      if (luminance > 0.62) {
+        return {
+          fill: "#111827",
+          stroke: "rgba(255, 255, 255, 0.28)",
+          strokeWidth: 2,
+        };
+      }
+      return {
+        fill: "#FFFFFF",
+        stroke: "rgba(0, 0, 0, 0.55)",
+        strokeWidth: 3,
+      };
     };
 
     const drawLogoBoxRect = (image, x, y, size, fallbackName, adjustments = {}) => {
@@ -1398,6 +1579,21 @@ const drawMatches = (
         const rowY = cardY;
         const rowHeight = cardHeight;
         const frontWidth = cardWidth;
+
+        // Row background strip behind the esports row.
+        const extra = rowHeight * 0.45;
+        const safeWidth = ctx.canvas.width;
+        const bgX = Math.max(0, rowX - extra);
+        const bgW = Math.min(safeWidth - bgX, frontWidth + extra * 2);
+        drawRowBackground(ctx, bgX, rowY, bgW, rowHeight, index, {
+          insetX: 0,
+          insetY: 0,
+          evenAlpha: 0.08,
+          oddAlpha: 0.11,
+          stroke: true,
+          shadow: true,
+          strokeAlpha: 0.10,
+        });
 
         const logoBoxSize = rowHeight;
         const centerWidth = rowHeight * 1.6;
@@ -1552,19 +1748,21 @@ const drawMatches = (
         ctx.restore();
 
         drawTextFitRect(dateText, dateRect.x, dateRect.y, dateRect.w, dateRect.h, {
-          color: "#ffffff",
           weight: 900,
           maxSize: dateRect.h * 0.75,
           minSize: 10,
           family: '"Montserrat", sans-serif',
+          outlineMode: "double",
+          glow: true,
         });
 
         drawTextFitRect(timeText, timeRect.x, timeRect.y, timeRect.w, timeRect.h, {
-          color: "#ffffff",
           weight: 900,
           maxSize: timeRect.h * 0.75,
           minSize: 10,
           family: '"Montserrat", sans-serif',
+          outlineMode: "double",
+          glow: true,
         });
 
         if (match.gameLogoImage) {
