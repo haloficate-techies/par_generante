@@ -64,7 +64,7 @@ const rgbToHsl = (r, g, b) => {
   return { h, s, l };
 };
 
-const mixColors = (baseHex, targetHex, amount) => {
+export const mixColors = (baseHex, targetHex, amount) => {
   const base = hexToRgb(baseHex);
   const target = hexToRgb(targetHex);
   const normalizedAmount = clamp(amount, 0, 1);
@@ -77,9 +77,9 @@ const mixColors = (baseHex, targetHex, amount) => {
   return rgbToHex(mixChannel("r"), mixChannel("g"), mixChannel("b"));
 };
 
-const lightenColor = (hex, amount) =>
+export const lightenColor = (hex, amount) =>
   mixColors(hex, "#ffffff", clamp(amount, 0, 1));
-const darkenColor = (hex, amount) =>
+export const darkenColor = (hex, amount) =>
   mixColors(hex, "#000000", clamp(amount, 0, 1));
 const colorDistance = (colorA, colorB) => {
   const a = hexToRgb(colorA);
