@@ -313,6 +313,9 @@ export const renderBanner = async ({
     shouldUseRaffleHeaderLogo ? "raffle-header" : "standard-header",
     isBigMatchLayoutActive ? effectiveLeagueLogoSrc || "league-none" : "league-none",
     isTogelMode ? togelPoolLogoSrc || "togel-logo-none" : "togel-logo-none",
+    isTogelMode
+      ? `variant-ball-${VARIANT_BALL_RADIUS}-${VARIANT_BALL_GAP}-${VARIANT_BALL_PADDING_RIGHT}-${VARIANT_BALL_TOP_INSET}`
+      : "variant-ball-none",
   ].join("|");
 
   let matchesStartY = 0;
