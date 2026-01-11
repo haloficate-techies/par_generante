@@ -1,4 +1,5 @@
 import { TOGEL_STREAMING_LINK_LOOKUP } from "./togel.streaming";
+import { TOGEL_POOL_LOGO_LOOKUP } from "./togel.constants";
 import { TOGEL_POOL_OPTIONS } from "../../../../domains/togel";
 
 const AVAILABLE_TOGEL_POOL_OPTIONS = Array.isArray(TOGEL_POOL_OPTIONS) ? TOGEL_POOL_OPTIONS : [];
@@ -16,6 +17,13 @@ export const resolveTogelPoolLabel = (poolValue) => {
   }
   const option = AVAILABLE_TOGEL_POOL_OPTIONS.find((item) => item.value === poolValue);
   return option?.label ?? "";
+};
+
+export const resolveTogelPoolLogoSrc = (poolValue) => {
+  if (!poolValue) {
+    return "";
+  }
+  return TOGEL_POOL_LOGO_LOOKUP?.[poolValue] || "";
 };
 
 export const buildTogelTitle = (inputTitle, poolLabel, variant) => {

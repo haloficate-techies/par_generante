@@ -6,6 +6,7 @@ export { LEAGUE_LOGO_OPTIONS } from "./config/modules/match/match.config";
 export * from "./config/modules/match/match.constants";
 export {
   resolveTogelPoolLabel,
+  resolveTogelPoolLogoSrc,
   resolveTogelStreamingInfo,
   buildTogelTitle,
 } from "./config/modules/togel/togel.utils";

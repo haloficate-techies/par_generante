@@ -94,6 +94,7 @@ export const drawHeader = (
   const headerLogoImage = options?.headerLogoImage || null;
   const leftLogoImage = options?.leftLogoImage || null;
   const showLeagueLogoSlot = Boolean(options?.showLeagueLogoSlot);
+  const leftLogoLabel = options?.leftLogoLabel || "LOGO LIGA";
   if (headerLogoImage && !leftLogoImage) {
     const paddingX = 80;
     const paddingY = 12;
@@ -185,7 +186,7 @@ export const drawHeader = (
       ctx.font = `700 ${Math.round(slotHeight * 0.16)}px "Poppins", sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      const placeholderText = "LOGO LIGA";
+      const placeholderText = leftLogoLabel;
       ctx.fillText(placeholderText, slotX + slotWidth / 2, slotY + slotHeight / 2);
       ctx.restore();
     }

@@ -38,6 +38,7 @@ import { useMemo } from "react";
  * @param {Function} params.deriveBrandPalette
  * @param {Function} params.buildTogelTitle
  * @param {Function} params.resolveTogelPoolLabel
+ * @param {Function} params.resolveTogelPoolLogoSrc
  * @param {Function} params.formatMatchDateLabel
  * @param {Function} params.formatMatchTimeLabel
  * @param {Array} params.availableBrandLogos
@@ -87,6 +88,7 @@ export const useRenderConfiguration = ({
   deriveBrandPalette,
   buildTogelTitle,
   resolveTogelPoolLabel,
+  resolveTogelPoolLogoSrc,
   formatMatchDateLabel,
   formatMatchTimeLabel,
   availableBrandLogos,
@@ -188,6 +190,7 @@ export const useRenderConfiguration = ({
       defaultBrandPalette: constants.DEFAULT_BRAND_PALETTE,
       buildTogelTitle,
       resolveTogelPoolLabel,
+      resolveTogelPoolLogoSrc,
       scoreModeTitle: constants.SCORE_MODE_TITLE,
       bigMatchTitle: constants.BIG_MATCH_TITLE,
       formatMatchDateLabel,
@@ -198,6 +201,7 @@ export const useRenderConfiguration = ({
       constants,
       buildTogelTitle,
       resolveTogelPoolLabel,
+      resolveTogelPoolLogoSrc,
       formatMatchDateLabel,
       formatMatchTimeLabel,
     ]

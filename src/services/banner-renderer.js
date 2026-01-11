@@ -126,6 +126,7 @@ export const renderBanner = async ({
     defaultBrandPalette,
     buildTogelTitle = (title) => title,
     resolveTogelPoolLabel = () => "",
+    resolveTogelPoolLogoSrc = () => "",
     scoreModeTitle = "",
     bigMatchTitle = "",
     formatMatchDateLabel = (value) => value || "",
@@ -205,6 +206,7 @@ export const renderBanner = async ({
   const isScoreLayoutActive = activeMode === "football" && layoutSubMenu === "scores";
 
   const poolLabel = resolveTogelPoolLabel(effectiveTogelPool);
+  const togelPoolLogoSrc = isTogelMode ? resolveTogelPoolLogoSrc(effectiveTogelPool) : "";
   const effectiveBrandDisplayName = resolveBrandDisplayName(
     availableBrandLogos,
     effectiveBrandLogoSrc,
@@ -238,12 +240,16 @@ export const renderBanner = async ({
     brandLogoImage,
     miniBannerImage,
     raffleHeaderLogoImage,
+    togelPoolLogoImage,
   ] = await Promise.all([
     loadCachedOptionalImage(effectiveBackgroundSrc),
     loadCachedOptionalImage(effectiveFooterSrc),
     loadCachedOptionalImage(effectiveBrandLogoSrc),
     miniBannerSrc ? loadCachedOptionalImage(miniBannerSrc) : Promise.resolve(null),
     shouldUseRaffleHeaderLogo ? loadCachedOptionalImage(raffleHeaderLogoSrc) : Promise.resolve(null),
+    isTogelMode && togelPoolLogoSrc
+      ? loadCachedOptionalImage(togelPoolLogoSrc)
+      : Promise.resolve(null),
   ]);
 
   const brandPaletteCache = brandPaletteCacheRef?.current;
@@ -282,6 +288,7 @@ export const renderBanner = async ({
     shouldSkipHeader ? "skip" : "show",
     shouldUseRaffleHeaderLogo ? "raffle-header" : "standard-header",
     isBigMatchLayoutActive ? effectiveLeagueLogoSrc || "league-none" : "league-none",
+    isTogelMode ? togelPoolLogoSrc || "togel-logo-none" : "togel-logo-none",
   ].join("|");
 
   let matchesStartY = 0;
@@ -366,12 +373,16 @@ export const renderBanner = async ({
     }
 
     const brandBottom = drawBrandLogo(ctx, brandLogoImage, brandPalette);
+    const showLeftLogoSlot = isBigMatchLayoutActive || isTogelMode;
+    const leftLogoImage = isBigMatchLayoutActive ? leagueLogoImage : togelPoolLogoImage;
+    const leftLogoLabel = isTogelMode ? "LOGO POOL" : undefined;
     headerBottom = shouldSkipHeader
       ? brandBottom
       : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette, {
           headerLogoImage: shouldUseRaffleHeaderLogo ? raffleHeaderLogoImage : null,
-          leftLogoImage: isBigMatchLayoutActive ? leagueLogoImage : null,
-          showLeagueLogoSlot: isBigMatchLayoutActive,
+          leftLogoImage,
+          showLeagueLogoSlot: showLeftLogoSlot,
+          leftLogoLabel,
         });
     matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
     try {

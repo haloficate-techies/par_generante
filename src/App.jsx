@@ -18,6 +18,7 @@ import {
   loadMatchLogoImage,
   resolveFooterSrcForBrand,
   resolveTogelPoolLabel,
+  resolveTogelPoolLogoSrc,
 } from "./app/index.js";
 import { createInitialMatches } from "./data/helpers/match-factory";
 import { resolveAutoTeamLogoSrc } from "./domains/teams";
@@ -229,6 +230,7 @@ const App = () => {
     deriveBrandPalette,
     buildTogelTitle,
     resolveTogelPoolLabel,
+    resolveTogelPoolLogoSrc,
     formatMatchDateLabel,
     formatMatchTimeLabel,
     availableBrandLogos: AVAILABLE_BRAND_LOGOS,
