@@ -4,6 +4,7 @@ import {
   drawBrandLogo as defaultDrawBrandLogo,
   drawHeader as defaultDrawHeader,
   drawFooter as defaultDrawFooter,
+  drawVariantBall as defaultDrawVariantBall,
 } from "../utils/canvas";
 
 /**
@@ -33,6 +34,28 @@ const ensureCacheLimit = (cacheRef, limit) => {
     const oldestKey = cache.keys().next().value;
     cache.delete(oldestKey);
   }
+};
+
+const VARIANT_BALL_RADIUS = 28;
+const VARIANT_BALL_GAP = 48;
+const VARIANT_BALL_PADDING_RIGHT = 40;
+const HEADER_HEIGHT = 88;
+const VARIANT_BALL_TOP_INSET = 8;
+
+const getBrandLogoSlotRect = (canvas) => {
+  const desiredWidth = 450;
+  const desiredHeight = 160;
+  const horizontalPadding = 80;
+  const slotWidth = Math.min(desiredWidth, canvas.width - horizontalPadding * 2);
+  const slotHeight = Math.min(desiredHeight, canvas.height * 0.25);
+  const x = canvas.width / 2 - slotWidth / 2;
+  const y = 36;
+  return {
+    x,
+    y,
+    width: slotWidth,
+    height: slotHeight,
+  };
 };
 
 /**
@@ -96,6 +119,7 @@ export const renderBanner = async ({
     drawBrandLogo = defaultDrawBrandLogo,
     drawHeader = defaultDrawHeader,
     drawFooter = defaultDrawFooter,
+    drawVariantBall = defaultDrawVariantBall,
   } = drawConfig;
 
   const {
@@ -376,14 +400,25 @@ export const renderBanner = async ({
     const showLeftLogoSlot = isBigMatchLayoutActive || isTogelMode;
     const leftLogoImage = isBigMatchLayoutActive ? leagueLogoImage : togelPoolLogoImage;
     const leftLogoLabel = isTogelMode ? "LOGO POOL" : undefined;
+    const headerY = brandBottom + 24;
     headerBottom = shouldSkipHeader
       ? brandBottom
-      : drawHeader(ctx, effectiveTitle, brandBottom + 24, brandPalette, {
+      : drawHeader(ctx, effectiveTitle, headerY, brandPalette, {
           headerLogoImage: shouldUseRaffleHeaderLogo ? raffleHeaderLogoImage : null,
           leftLogoImage,
           showLeagueLogoSlot: showLeftLogoSlot,
           leftLogoLabel,
         });
+    if (!shouldSkipHeader && isTogelMode && effectiveTogelVariant) {
+      const brandRect = getBrandLogoSlotRect(canvas);
+      const r = VARIANT_BALL_RADIUS;
+      const gap = VARIANT_BALL_GAP;
+      const desiredCenterX = brandRect.x + brandRect.width + r + gap;
+      const maxCenterX = canvas.width - VARIANT_BALL_PADDING_RIGHT - r;
+      const x = Math.min(desiredCenterX, maxCenterX);
+      const y = brandRect.y + r + VARIANT_BALL_TOP_INSET;
+      drawVariantBall(ctx, { x, y, text: effectiveTogelVariant, radius: r });
+    }
     matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
     try {
       const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);

@@ -8,4 +8,5 @@ export * from "./header";
 export * from "./matches";
 export * from "./raffle";
 export * from "./togel";
+export * from "./variant-ball";
 export * from "./footer";
