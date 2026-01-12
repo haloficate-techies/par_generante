@@ -31,14 +31,8 @@ export const buildTogelTitle = (inputTitle, poolLabel, variant) => {
   if (trimmedTitle) {
     return trimmedTitle;
   }
-  if (poolLabel && variant) {
-    return `${poolLabel.toUpperCase()} ${variant}`;
-  }
   if (poolLabel) {
     return poolLabel.toUpperCase();
-  }
-  if (variant) {
-    return `MODE ${variant}`;
   }
   return "TOGEL KELUARAN";
 };

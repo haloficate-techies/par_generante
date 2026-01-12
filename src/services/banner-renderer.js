@@ -36,11 +36,11 @@ const ensureCacheLimit = (cacheRef, limit) => {
   }
 };
 
-const VARIANT_BALL_RADIUS = 28;
-const VARIANT_BALL_GAP = 48;
+const VARIANT_BALL_RADIUS = 80;
+const VARIANT_BALL_GAP = 70;
 const VARIANT_BALL_PADDING_RIGHT = 40;
 const HEADER_HEIGHT = 88;
-const VARIANT_BALL_TOP_INSET = 8;
+const VARIANT_BALL_TOP_INSET = 0;
 
 const getBrandLogoSlotRect = (canvas) => {
   const desiredWidth = 450;
@@ -314,7 +314,7 @@ export const renderBanner = async ({
     isBigMatchLayoutActive ? effectiveLeagueLogoSrc || "league-none" : "league-none",
     isTogelMode ? togelPoolLogoSrc || "togel-logo-none" : "togel-logo-none",
     isTogelMode
-      ? `variant-ball-${VARIANT_BALL_RADIUS}-${VARIANT_BALL_GAP}-${VARIANT_BALL_PADDING_RIGHT}-${VARIANT_BALL_TOP_INSET}`
+      ? `variant-ball-${effectiveTogelVariant || "none"}-${VARIANT_BALL_RADIUS}-${VARIANT_BALL_GAP}-${VARIANT_BALL_PADDING_RIGHT}-${VARIANT_BALL_TOP_INSET}`
       : "variant-ball-none",
   ].join("|");
 
@@ -420,7 +420,13 @@ export const renderBanner = async ({
       const maxCenterX = canvas.width - VARIANT_BALL_PADDING_RIGHT - r;
       const x = Math.min(desiredCenterX, maxCenterX);
       const y = brandRect.y + r + VARIANT_BALL_TOP_INSET;
-      drawVariantBall(ctx, { x, y, text: effectiveTogelVariant, radius: r });
+      drawVariantBall(ctx, {
+        x,
+        y,
+        text: effectiveTogelVariant,
+        radius: r,
+        palette: brandPalette,
+      });
     }
     matchesStartY = headerBottom + (shouldSkipHeader ? 12 : 28);
     try {
