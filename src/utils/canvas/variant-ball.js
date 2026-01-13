@@ -12,7 +12,10 @@ const resolveBallColors = (palette = {}) => {
   };
 };
 
-export const drawVariantBall = (ctx, { x, y, text, radius = 28, palette } = {}) => {
+export const drawVariantBall = (
+  ctx,
+  { x, y, text, radius = 28, palette, fontScale = 0.9 } = {}
+) => {
   if (!ctx || !text || !Number.isFinite(x) || !Number.isFinite(y)) {
     return;
   }
@@ -75,7 +78,8 @@ export const drawVariantBall = (ctx, { x, y, text, radius = 28, palette } = {}) 
   ctx.fillStyle = "#111111";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = `900 ${Math.round(coreRadius * 0.9)}px "Inter", "Arial", sans-serif`;
+  const safeFontScale = Number.isFinite(fontScale) ? fontScale : 0.9;
+  ctx.font = `900 ${Math.round(coreRadius * safeFontScale)}px "Inter", "Arial", sans-serif`;
   ctx.fillText(String(text).toUpperCase(), x, y);
   ctx.restore();
 };

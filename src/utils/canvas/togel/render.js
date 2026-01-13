@@ -3,6 +3,7 @@ import {
   clampMin,
 } from "../constants";
 import { drawRoundedRectPath } from "../geometry";
+import { drawVariantBall } from "../variant-ball";
 import { resolveTogelDateLabel, getTodayDateLabel } from "../date";
 import { normalizeTogelDigits } from "./digits";
 import { resolveStreamingUrlCanvasStyle } from "./streaming-style";
@@ -87,54 +88,14 @@ const drawDigitOrb = (
   digitText,
   palette = DEFAULT_BRAND_PALETTE
 ) => {
-  ctx.save();
-  ctx.shadowColor = "rgba(15, 23, 42, 0.65)";
-  ctx.shadowBlur = Math.max(16, radius * 0.8);
-  ctx.shadowOffsetY = Math.max(6, radius * 0.25);
-
-  const gradient = ctx.createLinearGradient(
-    x - radius,
-    y - radius,
-    x + radius,
-    y + radius
-  );
-  gradient.addColorStop(0, palette?.headerStart ?? "#2563eb");
-  gradient.addColorStop(1, palette?.headerEnd ?? "#ec4899");
-
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.fillStyle = gradient;
-  ctx.fill();
-
-  const innerHighlight = ctx.createLinearGradient(
+  drawVariantBall(ctx, {
     x,
-    y - radius,
-    x,
-    y + radius
-  );
-  innerHighlight.addColorStop(0, "rgba(255, 255, 255, 0.35)");
-  innerHighlight.addColorStop(0.65, "rgba(255, 255, 255, 0.08)");
-  innerHighlight.addColorStop(1, "rgba(15, 23, 42, 0.45)");
-  ctx.fillStyle = innerHighlight;
-  ctx.globalAlpha = 0.85;
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
-  ctx.lineWidth = Math.max(2, radius * 0.12);
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.45)";
-  ctx.stroke();
-
-  ctx.fillStyle = "#f8fafc";
-  ctx.font = `800 ${Math.round(radius * 1)}px Poppins`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.shadowColor = "rgba(2, 6, 23, 0.45)";
-  ctx.shadowBlur = radius * 0.3;
-  ctx.shadowOffsetY = radius * 0.1;
-  ctx.fillText(digitText || "0", x, y + radius * 0.02);
-  ctx.restore();
+    y,
+    text: digitText || "0",
+    radius,
+    fontScale: 1.1,
+    palette,
+  });
 };
 
 export const drawTogelResult = (
@@ -247,13 +208,17 @@ export const drawTogelResult = (
   let digitGap = 0;
   if (digitCount > 1) {
     const baseGap = Math.min(36, digitsAreaWidth / digitCount / 2);
-    digitGap = digitCount >= 5 ? Math.min(18, baseGap) : baseGap;
+    digitGap = digitCount >= 5 ? Math.min(10, baseGap) : baseGap;
   }
   const rawDiameter =
     digitCount > 0
       ? (digitsAreaWidth - digitGap * (digitCount - 1)) / digitCount
       : digitsAreaWidth;
-  const digitDiameter = clampMin(Math.min(rawDiameter, 210), 110);
+  const diameterScale = digitCount >= 5 ? 1.3 : digitCount === 4 ? 1.22 : 1;
+  const digitDiameter = clampMin(
+    Math.min(rawDiameter * diameterScale, digitCount === 4 ? 260 : 260),
+    digitCount === 4 ? 130 : 130
+  );
   const digitRadius = digitDiameter / 2;
   const totalRowWidth =
     digitCount * digitDiameter + (digitCount - 1) * digitGap;
