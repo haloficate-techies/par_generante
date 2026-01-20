@@ -79,7 +79,10 @@ export const drawVariantBall = (
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   const safeFontScale = Number.isFinite(fontScale) ? fontScale : 0.9;
-  ctx.font = `900 ${Math.round(coreRadius * safeFontScale)}px "Inter", "Arial", sans-serif`;
+  ctx.shadowColor = "rgba(15, 23, 42, 0.25)";
+  ctx.shadowBlur = Math.max(1, Math.round(coreRadius * 0.1));
+  ctx.shadowOffsetY = Math.max(1, Math.round(coreRadius * 0.04));
+  ctx.font = `800 ${Math.round(coreRadius * safeFontScale)}px Poppins`;
   ctx.fillText(String(text).toUpperCase(), x, y);
   ctx.restore();
 };

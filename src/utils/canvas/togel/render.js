@@ -2,11 +2,17 @@ import {
   DEFAULT_BRAND_PALETTE,
   clampMin,
 } from "../constants";
+import {
+  darkenHexColor,
+  desaturateHexColor,
+  normalizeHeaderGradientColor,
+  shouldUseTextOutline,
+} from "../color";
 import { drawRoundedRectPath } from "../geometry";
 import { drawVariantBall } from "../variant-ball";
 import { resolveTogelDateLabel, getTodayDateLabel } from "../date";
 import { normalizeTogelDigits } from "./digits";
-import { resolveStreamingUrlCanvasStyle } from "./streaming-style";
+import { applyFooterLinkStyle } from "./streaming-style";
 
 const drawDigitOrb = (
   ctx,
@@ -75,15 +81,7 @@ export const drawTogelResult = (
   ctx.shadowBlur = 60;
   ctx.shadowOffsetY = 18;
   drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
-  const cardGradient = ctx.createLinearGradient(
-    cardX,
-    cardY,
-    cardX + cardWidth,
-    cardY + cardHeight
-  );
-  cardGradient.addColorStop(0, "rgba(30, 41, 59, 0.95)");
-  cardGradient.addColorStop(1, "rgba(15, 23, 42, 0.98)");
-  ctx.fillStyle = cardGradient;
+  ctx.fillStyle = "rgba(15, 23, 42, 0.98)";
   ctx.fill();
   ctx.restore();
 
@@ -95,14 +93,32 @@ export const drawTogelResult = (
 
   const leftAreaWidth = cardWidth * 0.7;
   const rightAreaWidth = cardWidth - leftAreaWidth;
+  const headerStartColor = normalizeHeaderGradientColor(
+    palette?.headerStart,
+    "#dc2626"
+  );
+  const headerEndColor = normalizeHeaderGradientColor(
+    palette?.headerEnd,
+    "#991b1b"
+  );
+  const headerRightStartColor = normalizeHeaderGradientColor(
+    palette?.headerRightStart,
+    "#1f2937",
+    { minLuminance: 0.24 }
+  );
+  const headerRightEndColor = normalizeHeaderGradientColor(
+    palette?.headerRightEnd,
+    "#111827",
+    { minLuminance: 0.22 }
+  );
   const headerLeftGradient = ctx.createLinearGradient(
     cardX,
     cardY,
     cardX + leftAreaWidth,
     cardY + headerHeight
   );
-  headerLeftGradient.addColorStop(0, palette?.headerStart ?? "#dc2626");
-  headerLeftGradient.addColorStop(1, palette?.headerEnd ?? "#991b1b");
+  headerLeftGradient.addColorStop(0, headerStartColor);
+  headerLeftGradient.addColorStop(1, headerEndColor);
   ctx.fillStyle = headerLeftGradient;
   ctx.fillRect(cardX, cardY, leftAreaWidth, headerHeight);
 
@@ -124,8 +140,8 @@ export const drawTogelResult = (
     cardX + cardWidth,
     cardY + headerHeight
   );
-  headerRightGradient.addColorStop(0, palette?.headerRightStart ?? "#1f2937");
-  headerRightGradient.addColorStop(1, palette?.headerRightEnd ?? "#111827");
+  headerRightGradient.addColorStop(0, headerRightStartColor);
+  headerRightGradient.addColorStop(1, headerRightEndColor);
   ctx.fillStyle = headerRightGradient;
   ctx.fillRect(cardX + leftAreaWidth, cardY, rightAreaWidth, headerHeight);
   ctx.restore();
@@ -142,11 +158,7 @@ export const drawTogelResult = (
   ctx.save();
   drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
   ctx.clip();
-  ctx.fillStyle = "#f8fafc";
   ctx.textBaseline = "middle";
-  ctx.shadowColor = "rgba(15, 23, 42, 0.35)";
-  ctx.shadowBlur = Math.max(6, headerHeight * 0.18);
-  ctx.shadowOffsetY = Math.max(2, headerHeight * 0.08);
 
   ctx.save();
   ctx.beginPath();
@@ -156,10 +168,15 @@ export const drawTogelResult = (
   ctx.textAlign = "center";
   ctx.letterSpacing = "0.5px";
   ctx.fillStyle = "#f8fafc";
-  ctx.shadowColor = "rgba(0, 0, 0, 0.28)";
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetY = 1.5;
+  ctx.shadowColor = "rgba(15, 23, 42, 0.38)";
+  ctx.shadowBlur = Math.max(4, headerHeight * 0.16);
+  ctx.shadowOffsetY = Math.max(1, headerHeight * 0.06);
   const dateTextX = cardX + leftAreaWidth / 2;
+  if (shouldUseTextOutline(headerStartColor)) {
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(15, 23, 42, 0.6)";
+    ctx.strokeText(dateText, dateTextX, cardY + headerHeight / 2);
+  }
   ctx.fillText(dateText, dateTextX, cardY + headerHeight / 2);
   ctx.letterSpacing = "0px";
   ctx.restore();
@@ -173,10 +190,15 @@ export const drawTogelResult = (
     ctx.textAlign = "center";
     ctx.letterSpacing = "0.5px";
     ctx.fillStyle = "rgba(248, 250, 252, 0.9)";
-    ctx.shadowColor = "rgba(226, 232, 240, 0.35)";
-    ctx.shadowBlur = 6;
-    ctx.shadowOffsetY = 0.5;
+    ctx.shadowColor = "rgba(15, 23, 42, 0.28)";
+    ctx.shadowBlur = Math.max(3, headerHeight * 0.12);
+    ctx.shadowOffsetY = Math.max(1, headerHeight * 0.05);
     const timeTextX = cardX + leftAreaWidth + rightAreaWidth / 2;
+    if (shouldUseTextOutline(headerRightStartColor)) {
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(15, 23, 42, 0.55)";
+      ctx.strokeText(drawTimeText, timeTextX, cardY + headerHeight / 2);
+    }
     ctx.fillText(drawTimeText, timeTextX, cardY + headerHeight / 2);
     ctx.letterSpacing = "0px";
     ctx.restore();
@@ -219,32 +241,20 @@ export const drawTogelResult = (
   });
 
   if (hasStreamingInfo) {
-    const themeStyle = resolveStreamingUrlCanvasStyle(streamingInfo.theme);
     ctx.save();
     drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
     ctx.clip();
     const footerTopHeight = Math.max(34, footerHeight * 0.45);
     const footerBottomHeight = Math.max(34, footerHeight - footerTopHeight);
-    const footerTopGradient = ctx.createLinearGradient(
-      cardX,
-      footerY,
-      cardX + cardWidth,
-      footerY + footerTopHeight
+    const footerTopBg = darkenHexColor(
+      desaturateHexColor(headerStartColor, 0.12),
+      0.25
     );
-    footerTopGradient.addColorStop(0, palette?.footerStart ?? "#22c55e");
-    footerTopGradient.addColorStop(1, palette?.footerEnd ?? "#0d9488");
-    ctx.fillStyle = footerTopGradient;
+    const footerBottomBg = darkenHexColor(headerEndColor, 0.15);
+    ctx.fillStyle = footerTopBg;
     ctx.fillRect(cardX, footerY, cardWidth, footerTopHeight);
 
-    const footerBottomGradient = ctx.createLinearGradient(
-      cardX,
-      footerY + footerTopHeight,
-      cardX + cardWidth,
-      footerY + footerHeight
-    );
-    footerBottomGradient.addColorStop(0, themeStyle.barColor);
-    footerBottomGradient.addColorStop(1, themeStyle.barColor);
-    ctx.fillStyle = footerBottomGradient;
+    ctx.fillStyle = footerBottomBg;
     ctx.fillRect(cardX, footerY + footerTopHeight, cardWidth, footerBottomHeight);
     ctx.restore();
 
@@ -269,23 +279,27 @@ export const drawTogelResult = (
       ""
     )
       .trim()
-      .toLowerCase();
+      .toUpperCase();
     const firstFontSize = Math.max(18, footerHeight * 0.26);
     const secondFontSize = Math.max(20, footerHeight * 0.3);
     ctx.font = `700 ${Math.round(firstFontSize)}px Poppins`;
+    ctx.shadowColor = "rgba(15, 23, 42, 0.45)";
+    ctx.shadowBlur = Math.max(6, footerHeight * 0.2);
+    ctx.shadowOffsetY = Math.max(1, footerHeight * 0.06);
     ctx.fillText(firstLine, cardX + cardWidth / 2, footerY + footerTopHeight / 2);
     if (secondLine) {
-      ctx.font = `800 ${Math.round(secondFontSize)}px Poppins`;
-      ctx.fillStyle = themeStyle.textColor;
-      ctx.shadowColor = themeStyle.shadowColor;
-      ctx.shadowBlur = 12;
-      ctx.shadowOffsetY = 2;
+      const resetFooterLinkShadow = applyFooterLinkStyle(
+        ctx,
+        secondFontSize,
+        0.5
+      );
       ctx.fillText(
         secondLine,
         cardX + cardWidth / 2,
         footerY + footerTopHeight + footerBottomHeight / 2
       );
-      ctx.shadowBlur = 0;
+      resetFooterLinkShadow();
+      ctx.letterSpacing = "0px";
     }
     ctx.restore();
   }
