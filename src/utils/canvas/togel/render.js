@@ -219,6 +219,7 @@ export const drawTogelResult = (
   });
 
   if (hasStreamingInfo) {
+    const themeStyle = resolveStreamingUrlCanvasStyle(streamingInfo.theme);
     ctx.save();
     drawRoundedRectPath(ctx, cardX, cardY, cardWidth, cardHeight, cardRadius);
     ctx.clip();
@@ -241,8 +242,8 @@ export const drawTogelResult = (
       cardX + cardWidth,
       footerY + footerHeight
     );
-    footerBottomGradient.addColorStop(0, palette?.footerBottomStart ?? "#166534");
-    footerBottomGradient.addColorStop(1, palette?.footerBottomEnd ?? "#0f172a");
+    footerBottomGradient.addColorStop(0, themeStyle.barColor);
+    footerBottomGradient.addColorStop(1, themeStyle.barColor);
     ctx.fillStyle = footerBottomGradient;
     ctx.fillRect(cardX, footerY + footerTopHeight, cardWidth, footerBottomHeight);
     ctx.restore();
@@ -274,10 +275,9 @@ export const drawTogelResult = (
     ctx.font = `700 ${Math.round(firstFontSize)}px Poppins`;
     ctx.fillText(firstLine, cardX + cardWidth / 2, footerY + footerTopHeight / 2);
     if (secondLine) {
-      const themeStyle = resolveStreamingUrlCanvasStyle(streamingInfo.theme);
       ctx.font = `800 ${Math.round(secondFontSize)}px Poppins`;
-      ctx.fillStyle = themeStyle.color || "#f8fafc";
-      ctx.shadowColor = themeStyle.shadow;
+      ctx.fillStyle = themeStyle.textColor;
+      ctx.shadowColor = themeStyle.shadowColor;
       ctx.shadowBlur = 12;
       ctx.shadowOffsetY = 2;
       ctx.fillText(

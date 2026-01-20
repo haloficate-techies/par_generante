@@ -1,4 +1,4 @@
-const STREAMING_THEME_CANVAS_COLOR = {
+const STREAMING_THEME_CANVAS_BAR_COLOR = {
   gold: "#FEF3C7",
   blue: "#BFDBFE",
   purple: "#E9D5FF",
@@ -19,11 +19,12 @@ const STREAMING_THEME_CANVAS_SHADOW = {
 export const resolveStreamingUrlCanvasStyle = (theme) => {
   const normalized = (theme || "dark").toLowerCase();
   return {
-    color:
-      STREAMING_THEME_CANVAS_COLOR[normalized] ||
-      STREAMING_THEME_CANVAS_COLOR.dark,
-    shadow:
+    barColor:
+      STREAMING_THEME_CANVAS_BAR_COLOR[normalized] ||
+      STREAMING_THEME_CANVAS_BAR_COLOR.dark,
+    shadowColor:
       STREAMING_THEME_CANVAS_SHADOW[normalized] ||
       STREAMING_THEME_CANVAS_SHADOW.dark,
+    textColor: "#F8FAFC",
   };
 };
