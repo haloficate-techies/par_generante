@@ -52,7 +52,11 @@ const renderMatchModeLayout = ({
     });
   }
   if (miniBannerLayout && miniBannerImage) {
-    drawMiniFooterBanner(ctx, miniBannerImage, miniBannerLayout);
+    const miniBannerYOffset = 24;
+    drawMiniFooterBanner(ctx, miniBannerImage, {
+      ...miniBannerLayout,
+      y: miniBannerLayout.y + miniBannerYOffset,
+    });
   }
 };
 

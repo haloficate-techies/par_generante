@@ -1177,7 +1177,7 @@ const drawMatches = (
 
     if (isEsportsLayout) {
       const fixedRowHeight = clampMin(110, 90);
-      const minGap = 12;
+      const minGap = 24;
       const maxGap = 36;
 
       scale = 1;
@@ -1592,7 +1592,8 @@ const drawMatches = (
           oddAlpha: 0.11,
           stroke: true,
           shadow: true,
-          strokeAlpha: 0.10,
+          strokeAlpha: 0.3,
+          strokeWidth: 3,
         });
 
         const logoBoxSize = rowHeight;
