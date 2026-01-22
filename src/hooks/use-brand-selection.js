@@ -41,7 +41,7 @@ const useBrandSelection = ({
 }) => {
   useEffect(() => {
     if (!brandLogoSrc) {
-      setFooter("", isRaffleMode ? defaultRaffleFooter : "");
+      setFooter(isRaffleMode ? defaultRaffleFooter : "", "");
       return;
     }
     const matchedBrandOption = availableBrandLogos.find(
@@ -52,7 +52,7 @@ const useBrandSelection = ({
     if (nextFooterSrc) {
       setFooter(nextFooterSrc);
     } else {
-      setFooter("", activeMode === "raffle" ? defaultRaffleFooter : "");
+      setFooter(activeMode === "raffle" ? defaultRaffleFooter : "", "");
     }
   }, [
     activeMode,
@@ -69,7 +69,7 @@ const useBrandSelection = ({
       setBrandLogo(newValue);
 
       if (!newValue) {
-        setFooter("", isRaffleMode ? defaultRaffleFooter : "");
+        setFooter(isRaffleMode ? defaultRaffleFooter : "", "");
         setSelectedFootballBackground(footballDefaultBackground);
         setSelectedBasketballBackground(modeBackgroundDefaults.basketball);
         setSelectedEsportsBackground(modeBackgroundDefaults.esports);

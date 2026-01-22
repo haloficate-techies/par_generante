@@ -7,6 +7,7 @@
   formatDate,
   formatTime,
   drawLogoTile,
+  hexToRgb,
 } from "./constants";
 import {
   ensureSubduedGradientColor,
@@ -1289,6 +1290,35 @@ const drawMatches = (
       context.closePath();
     };
 
+    const pickBrightestHexColor = (candidates = [], fallback = "#ffffff") => {
+      let best = null;
+      let bestLum = -1;
+      candidates.forEach((candidate) => {
+        if (typeof candidate !== "string") return;
+        const value = candidate.trim();
+        if (!value) return;
+        const lum = getRelativeLuminanceSafe(value);
+        if (!Number.isFinite(lum)) return;
+        if (lum > bestLum) {
+          bestLum = lum;
+          best = value;
+        }
+      });
+      return best || fallback;
+    };
+
+    const toRgba = (color, alpha) => {
+      const a = clamp(alpha, 0, 1);
+      if (typeof color !== "string") return `rgba(255, 255, 255, ${a})`;
+      const trimmed = color.trim();
+      if (trimmed.startsWith("#")) {
+        const rgb = hexToRgb(trimmed);
+        if (rgb) return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${a})`;
+      }
+      // Fallback: use the provided CSS color string as-is (alpha assumed included).
+      return trimmed;
+    };
+
     const drawRowBackground = (
       context,
       x,
@@ -1324,7 +1354,9 @@ const drawMatches = (
 
       if (opts.stroke !== false) {
         context.shadowColor = "transparent";
-        context.strokeStyle = `rgba(255, 255, 255, ${opts.strokeAlpha ?? 0.1})`;
+        const strokeAlpha = clamp(opts.strokeAlpha ?? 0.1, 0, 1);
+        const baseStrokeColor = opts.strokeColor ?? "#ffffff";
+        context.strokeStyle = toRgba(baseStrokeColor, strokeAlpha);
         context.lineWidth = opts.strokeWidth ?? 1;
         context.stroke();
       }
@@ -1592,6 +1624,13 @@ const drawMatches = (
           oddAlpha: 0.11,
           stroke: true,
           shadow: true,
+          strokeColor: pickBrightestHexColor([
+            paletteSafe?.accent,
+            paletteSafe?.headerStart,
+            paletteSafe?.headerEnd,
+            paletteSafe?.footerStart,
+            paletteSafe?.footerEnd,
+          ]),
           strokeAlpha: 0.3,
           strokeWidth: 3,
         });
