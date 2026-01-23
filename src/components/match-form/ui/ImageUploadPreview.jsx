@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import useImageUpload from "./hooks/useImageUpload";
 import ImagePreviewDisplay from "./ImagePreviewDisplay";
@@ -30,6 +30,7 @@ const ImageUploadPreview = ({
   removeBackgroundError = "",
   readFileAsDataURL = async () => null,
 }) => {
+  const [showAutoGlow, setShowAutoGlow] = useState(false);
   const {
     isLoading,
     manualInput,
@@ -44,6 +45,15 @@ const ImageUploadPreview = ({
     onAdjust,
     readFileAsDataURL,
   });
+
+  useEffect(() => {
+    if (!autoIndicator) return;
+    setShowAutoGlow(true);
+    const timeoutId = window.setTimeout(() => {
+      setShowAutoGlow(false);
+    }, 900);
+    return () => window.clearTimeout(timeoutId);
+  }, [autoIndicator]);
 
   const fileInputRef = useRef(null);
 
@@ -134,7 +144,9 @@ const ImageUploadPreview = ({
                 align="left"
               >
                 <span
-                  className="grid h-5 w-5 place-items-center rounded-full border border-amber-400/60 text-amber-200"
+                  className={`grid h-5 w-5 place-items-center rounded-full border border-amber-400/60 text-amber-200 ${
+                    showAutoGlow ? "auto-glow" : ""
+                  }`}
                   role="img"
                   aria-label="Logo otomatis"
                 >

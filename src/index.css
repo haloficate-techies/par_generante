@@ -9,3 +9,22 @@ body {
 input.hide-native-picker::-webkit-calendar-picker-indicator {
   opacity: 0;
 }
+
+@keyframes auto-glow-pop {
+  0% {
+    box-shadow: 0 0 0 rgba(251, 191, 36, 0);
+    transform: scale(1);
+  }
+  40% {
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+    transform: scale(1.08);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(251, 191, 36, 0);
+    transform: scale(1);
+  }
+}
+
+.auto-glow {
+  animation: auto-glow-pop 0.9s ease-out 1;
+}
