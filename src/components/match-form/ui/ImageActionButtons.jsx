@@ -3,9 +3,8 @@ import PropTypes from "prop-types";
 
 const ImageActionButtons = ({
   variant = "header",
-  canAutoFetch,
-  onAutoFetch,
   onReset,
+  showReset = true,
   onToggleFlip,
   isFlipped,
   canRemoveBackground,
@@ -16,22 +15,15 @@ const ImageActionButtons = ({
   if (variant === "header") {
     return (
       <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-        {canAutoFetch && (
+        {showReset && (
           <button
             type="button"
-            className="rounded-full border border-emerald-400/60 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200 transition hover:border-emerald-300 hover:text-emerald-100"
-            onClick={onAutoFetch}
+            className="rounded-full border border-slate-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow"
+            onClick={onReset}
           >
-            Muat otomatis
+            Reset
           </button>
         )}
-        <button
-          type="button"
-          className="rounded-full border border-slate-600 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow"
-          onClick={onReset}
-        >
-          Reset
-        </button>
       </div>
     );
   }
@@ -70,9 +62,8 @@ const ImageActionButtons = ({
 
 ImageActionButtons.propTypes = {
   variant: PropTypes.oneOf(["header", "footer"]),
-  canAutoFetch: PropTypes.bool,
-  onAutoFetch: PropTypes.func,
   onReset: PropTypes.func,
+  showReset: PropTypes.bool,
   onToggleFlip: PropTypes.func,
   isFlipped: PropTypes.bool,
   canRemoveBackground: PropTypes.bool,

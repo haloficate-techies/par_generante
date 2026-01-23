@@ -7,9 +7,7 @@ const MatchLogosSection = ({
   index,
   match,
   onMatchFieldChange,
-  onAutoLogoRequest,
   onLogoAdjust,
-  resolveAutoLogoSrc,
   canUseBackgroundRemoval,
   onRemoveLogoBackground,
   logoBackgroundRemovalState,
@@ -29,9 +27,11 @@ const MatchLogosSection = ({
         onChange={(value) => onMatchFieldChange(index, "teamHomeLogo", value)}
         inputId={`home-logo-${index}`}
         ratioHint="1:1 (maks 300x300 px)"
-        isAuto={match.teamHomeLogoIsAuto}
-        onAutoFetch={() => onAutoLogoRequest?.(index, "home")}
-        canAutoFetch={Boolean(resolveAutoLogoSrc(match.teamHome))}
+        helperAsTooltip
+        unifiedSlot
+        hideManualInputWhenPreview
+        slotHeight="h-40"
+        autoIndicator={match.teamHomeLogoIsAuto}
         scale={match.teamHomeLogoScale}
         offsetX={match.teamHomeLogoOffsetX}
         offsetY={match.teamHomeLogoOffsetY}
@@ -51,9 +51,11 @@ const MatchLogosSection = ({
         onChange={(value) => onMatchFieldChange(index, "teamAwayLogo", value)}
         inputId={`away-logo-${index}`}
         ratioHint="1:1 (maks 300x300 px)"
-        isAuto={match.teamAwayLogoIsAuto}
-        onAutoFetch={() => onAutoLogoRequest?.(index, "away")}
-        canAutoFetch={Boolean(resolveAutoLogoSrc(match.teamAway))}
+        helperAsTooltip
+        unifiedSlot
+        hideManualInputWhenPreview
+        slotHeight="h-40"
+        autoIndicator={match.teamAwayLogoIsAuto}
         scale={match.teamAwayLogoScale}
         offsetX={match.teamAwayLogoOffsetX}
         offsetY={match.teamAwayLogoOffsetY}
@@ -87,9 +89,7 @@ MatchLogosSection.propTypes = {
   index: PropTypes.number.isRequired,
   match: matchShape.isRequired,
   onMatchFieldChange: PropTypes.func.isRequired,
-  onAutoLogoRequest: PropTypes.func,
   onLogoAdjust: PropTypes.func,
-  resolveAutoLogoSrc: PropTypes.func.isRequired,
   canUseBackgroundRemoval: PropTypes.bool,
   onRemoveLogoBackground: PropTypes.func,
   logoBackgroundRemovalState: PropTypes.object.isRequired,
@@ -97,4 +97,3 @@ MatchLogosSection.propTypes = {
 };
 
 export default MatchLogosSection;
-

@@ -59,13 +59,16 @@ const useImageUpload = ({
 
   const handleFileSelection = useCallback(
     async (event) => {
-      const file = event.target.files?.[0];
+      const inputEl = event.target;
+      const file = inputEl?.files?.[0];
       if (!file) {
+        if (inputEl) inputEl.value = "";
         handleReset();
         return;
       }
       if (!file.type.startsWith("image/")) {
         window.alert("Silakan upload file gambar (JPG/PNG/SVG).");
+        if (inputEl) inputEl.value = "";
         return;
       }
       const requestId = startAsyncRequest();
@@ -79,6 +82,8 @@ const useImageUpload = ({
         console.error(error);
         window.alert("Gagal membaca file gambar. Coba lagi.");
       } finally {
+        // Clear the file input so picking the same file again triggers onChange (common after reset).
+        if (inputEl) inputEl.value = "";
         finishAsyncRequest(requestId);
       }
     },
@@ -117,10 +122,23 @@ const useImageUpload = ({
       if (text) {
         event.preventDefault();
         const normalized = text.trim();
-        onChange(normalized || null);
-        onAdjust?.({ scale: 1, offsetX: 0, offsetY: 0 });
+        if (!normalized) {
+          onChange(null);
+          onAdjust?.({ scale: 1, offsetX: 0, offsetY: 0 });
+          setManualInput("");
+          setInputStatus("");
+          return;
+        }
+        const isValidSource =
+          /^https?:\/\//i.test(normalized) || normalized.startsWith("data:");
         setManualInput(normalized);
-        setInputStatus("");
+        if (isValidSource) {
+          onChange(normalized);
+          onAdjust?.({ scale: 1, offsetX: 0, offsetY: 0 });
+          setInputStatus("");
+        } else {
+          setInputStatus("Masukkan URL gambar yang valid atau data base64 (data:...).");
+        }
       }
     },
     [finishAsyncRequest, onAdjust, onChange, readFileAsDataURL, startAsyncRequest]
@@ -131,9 +149,20 @@ const useImageUpload = ({
       const value = event.target.value;
       setManualInput(value);
       const normalized = value.trim();
-      onChange(normalized ? normalized : null);
-      onAdjust?.({ scale: 1, offsetX: 0, offsetY: 0 });
-      setInputStatus("");
+      if (!normalized) {
+        onChange(null);
+        onAdjust?.({ scale: 1, offsetX: 0, offsetY: 0 });
+        setInputStatus("");
+        return;
+      }
+      const isValidSource = /^https?:\/\//i.test(normalized) || normalized.startsWith("data:");
+      if (isValidSource) {
+        onChange(normalized);
+        onAdjust?.({ scale: 1, offsetX: 0, offsetY: 0 });
+        setInputStatus("");
+      } else {
+        setInputStatus("Masukkan URL gambar yang valid atau data base64 (data:...).");
+      }
     },
     [onAdjust, onChange]
   );
