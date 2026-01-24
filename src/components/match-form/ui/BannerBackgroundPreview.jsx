@@ -9,7 +9,7 @@ const BannerBackgroundPreview = ({ src = "" }) => (
           Background Banner
         </p>
         <p className="text-xs text-slate-400">
-          Background mengikuti brand. Kosongkan brand untuk memakai default.
+          Background mengikuti brand. Jika brand tidak dipilih, sistem akan menggunakan background default.
         </p>
       </div>
     </div>

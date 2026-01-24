@@ -13,7 +13,7 @@ const MatchCountAdjuster = ({
         Jumlah Pertandingan Ditampilkan
       </p>
       <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
-        Banner memuat maksimal 5 pertandingan agar tata letak tetap rapi dan mudah dibaca.
+        Maksimal 5 pertandingan per banner untuk menjaga tata letak tetap rapi dan mudah dibaca.
       </p>
     </div>
     <div className="flex items-center justify-center gap-6 md:gap-10">
@@ -31,7 +31,7 @@ const MatchCountAdjuster = ({
         type="button"
         onClick={() => onChange(count + 1)}
         disabled={count >= maxCount}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-600 text-lg font-bold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600"
+        className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-600 text-lg font-bold text-slate-200 transition hover:border-brand-yellow hover:text-brand-yellow disabled:cursor-not-allowed disabled:border-slate-700 disabled:text-slate-600 disabled:opacity-50"
         aria-label="Tambah jumlah pertandingan"
       >
         +

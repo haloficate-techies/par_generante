@@ -33,7 +33,7 @@ const BannerMetadataSection = ({
               Judul Utama Banner
             </label>
             <Tooltip
-              content="Teks headline yang akan tampil di bagian atas banner."
+              content="Tampil di bagian atas banner. Disarankan ≤ 40 karakter."
               align="left"
             >
               <button
@@ -45,9 +45,7 @@ const BannerMetadataSection = ({
               </button>
             </Tooltip>
           </div>
-          <p className="mt-1 text-xs text-slate-500">
-            Digunakan sebagai judul utama pada banner promosi.
-          </p>
+          <p className="mt-1 text-xs text-slate-500">Judul utama untuk banner promosi.</p>
           <input
             id={titleInputId}
             type="text"
@@ -59,8 +57,8 @@ const BannerMetadataSection = ({
         </div>
       )}
       <BrandAssetSelector
-        label="Brand & Banner Footer"
-        helperText="Pilih brand untuk menampilkan logo header dan banner footer secara otomatis."
+        label="Identitas Brand"
+        helperText="Logo header & banner sponsor"
         selectedHeaderSrc={brandLogoSrc}
         footerPreviewSrc={footerSrc}
         onChange={onBrandLogoChange}
