@@ -66,6 +66,7 @@ const MatchListForm = ({
   onMatchCountChange,
   matchCountOptions = [],
   activeMode,
+  activeModeConfig,
   togelPool,
   onTogelPoolChange,
   togelPoolVariant,
@@ -170,6 +171,7 @@ const MatchListForm = ({
         <BannerMetadataSection
           showTitleField={shouldShowTitleField}
           title={title}
+          titlePlaceholder={activeModeConfig?.titlePlaceholder}
           onTitleChange={onTitleChange}
           brandLogoSrc={brandLogoSrc}
           footerSrc={footerSrc}
@@ -203,6 +205,7 @@ const MatchListForm = ({
           availableGameOptions={availableGameOptions}
           showScoreInputs={isScoreLayoutActive}
           showBigMatchExtras={isBigMatchLayoutActive}
+          teamPlaceholders={activeModeConfig?.teamPlaceholders}
         disableMatchCountAdjuster={isBigMatchLayoutActive}
         />
         <TogelControlsSection
@@ -261,6 +264,13 @@ MatchListForm.propTypes = {
 
   // Mode & toggles
   activeMode: PropTypes.string,
+  activeModeConfig: PropTypes.shape({
+    titlePlaceholder: PropTypes.string,
+    teamPlaceholders: PropTypes.shape({
+      home: PropTypes.string,
+      away: PropTypes.string,
+    }),
+  }),
   modeFeatures: PropTypes.shape({
     showTogelControls: PropTypes.bool,
     showGameOptions: PropTypes.bool,

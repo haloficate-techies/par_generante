@@ -375,6 +375,7 @@ const App = () => {
     activeSubMenu,
     activeMatchCount,
     activeMode,
+    activeModeConfig,
     leagueLogoSrc,
     togelPool,
     setTogelPool,

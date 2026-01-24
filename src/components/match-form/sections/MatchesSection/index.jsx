@@ -14,6 +14,7 @@ const MatchesSection = ({
   availableGameOptions = [],
   showScoreInputs = false,
   showBigMatchExtras = false,
+  teamPlaceholders = {},
   disableMatchCountAdjuster = false,
 }) => {
   if (!shouldShowMatches) {
@@ -45,6 +46,7 @@ const MatchesSection = ({
           gameOptions={availableGameOptions}
           showScoreInputs={showScoreInputs}
           showBigMatchExtras={showBigMatchExtras}
+          teamPlaceholders={teamPlaceholders}
         />
       ))}
     </section>
@@ -74,6 +76,10 @@ MatchesSection.propTypes = {
   ),
   showScoreInputs: PropTypes.bool,
   showBigMatchExtras: PropTypes.bool,
+  teamPlaceholders: PropTypes.shape({
+    home: PropTypes.string,
+    away: PropTypes.string,
+  }),
   disableMatchCountAdjuster: PropTypes.bool,
 };
 

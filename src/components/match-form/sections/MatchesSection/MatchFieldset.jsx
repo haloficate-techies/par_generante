@@ -14,6 +14,7 @@ const MatchFieldset = ({
   gameOptions = [],
   showScoreInputs = false,
   showBigMatchExtras = false,
+  teamPlaceholders = {},
 }) => {
   const { handlers, media, removalState } = useMatchForm();
   const {
@@ -44,6 +45,7 @@ const MatchFieldset = ({
         index={index}
         match={match}
         onMatchFieldChange={onMatchFieldChange}
+        teamPlaceholders={teamPlaceholders}
       />
       {showScoreInputs && (
         <MatchScoreInputs
@@ -115,6 +117,10 @@ MatchFieldset.propTypes = {
   gameOptions: PropTypes.arrayOf(gameOptionShape),
   showScoreInputs: PropTypes.bool,
   showBigMatchExtras: PropTypes.bool,
+  teamPlaceholders: PropTypes.shape({
+    home: PropTypes.string,
+    away: PropTypes.string,
+  }),
 };
 
 export default MatchFieldset;

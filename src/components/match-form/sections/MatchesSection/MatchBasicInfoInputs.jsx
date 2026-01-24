@@ -2,7 +2,16 @@ import React, { useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import Tooltip from "../../../ui/Tooltip";
 
-const MatchBasicInfoInputs = ({ index, match, onMatchFieldChange }) => {
+const MatchBasicInfoInputs = ({
+  index,
+  match,
+  onMatchFieldChange,
+  teamPlaceholders = {},
+}) => {
+  const homePlaceholder =
+    teamPlaceholders.home || "Contoh: Manchester City";
+  const awayPlaceholder =
+    teamPlaceholders.away || "Contoh: Liverpool FC";
   const homeInputId = `match-${index}-home`;
   const awayInputId = `match-${index}-away`;
   const dateInputId = `match-${index}-date`;
@@ -36,7 +45,7 @@ const MatchBasicInfoInputs = ({ index, match, onMatchFieldChange }) => {
           type="text"
           value={match.teamHome}
           onChange={(event) => onMatchFieldChange(index, "teamHome", event.target.value)}
-          placeholder="Contoh: Manchester City"
+          placeholder={homePlaceholder}
           className="mt-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
         />
       </div>
@@ -52,7 +61,7 @@ const MatchBasicInfoInputs = ({ index, match, onMatchFieldChange }) => {
           type="text"
           value={match.teamAway}
           onChange={(event) => onMatchFieldChange(index, "teamAway", event.target.value)}
-          placeholder="Contoh: Liverpool FC"
+          placeholder={awayPlaceholder}
           className="mt-1 rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-slate-100 focus:border-brand-yellow focus:outline-none focus:ring-2 focus:ring-brand-yellow/30"
         />
       </div>
@@ -157,6 +166,10 @@ MatchBasicInfoInputs.propTypes = {
     time: PropTypes.string,
   }).isRequired,
   onMatchFieldChange: PropTypes.func.isRequired,
+  teamPlaceholders: PropTypes.shape({
+    home: PropTypes.string,
+    away: PropTypes.string,
+  }),
 };
 
 export default MatchBasicInfoInputs;

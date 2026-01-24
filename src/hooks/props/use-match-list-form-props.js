@@ -12,6 +12,7 @@ export const useMatchListFormProps = ({
   activeSubMenu,
   activeMatchCount,
   activeMode,
+  activeModeConfig,
   leagueLogoSrc,
 
   // Togel state
@@ -73,6 +74,7 @@ export const useMatchListFormProps = ({
       onMatchCountChange: handleMatchCountChange,
       matchCountOptions,
       activeMode,
+      activeModeConfig,
       togelPool,
       onTogelPoolChange: setTogelPool,
       togelPoolVariant,
@@ -118,6 +120,7 @@ export const useMatchListFormProps = ({
       handleMatchCountChange,
       matchCountOptions,
       activeMode,
+      activeModeConfig,
       togelPool,
       setTogelPool,
       togelPoolVariant,
