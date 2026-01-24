@@ -14,7 +14,7 @@ const BannerPreviewPanel = ({
       <div>
         <h2 className="text-lg font-semibold text-slate-100">Preview Banner</h2>
         <p className="text-xs text-slate-400">
-          Canvas 1080 1080. Gunakan tombol Preview bila perlu refresh manual.
+          Pratinjau hasil akhir banner sebelum diunduh
         </p>
       </div>
       <span className="rounded-full bg-brand-yellow/10 px-3 py-1 text-xs font-semibold text-brand-yellow">
