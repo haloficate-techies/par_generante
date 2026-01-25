@@ -12,11 +12,16 @@ const BannerHeaderComponent = ({
 }) => {
   const resolvedOptions = Array.isArray(options) ? options : [];
   const subMenus = Array.isArray(activeModeConfig?.subMenus) ? activeModeConfig.subMenus : [];
-  const showSubMenus = subMenus.length > 0;
+  const showSubMenus = subMenus.length > 1;
 
   const activeButtonClasses =
-    "bg-brand-yellow text-slate-900 shadow-lg shadow-brand-yellow/40";
-  const inactiveClasses = "bg-slate-800/70 text-slate-300 hover:text-white";
+    "border-slate-600 bg-slate-800/80 text-slate-100 shadow-inner shadow-slate-950/40";
+  const inactiveClasses =
+    "border-slate-800/80 bg-slate-900/40 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+  const tabBaseClasses =
+    "flex-1 rounded-2xl border px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-slate-600/40";
+  const subTabBaseClasses =
+    "flex-1 rounded-2xl border px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus:ring-2 focus:ring-slate-600/40";
 
   return (
     <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
@@ -39,9 +44,7 @@ const BannerHeaderComponent = ({
                   key={mode.id}
                   type="button"
                   onClick={() => onModeChange(mode.id)}
-                    className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-yellow/30 ${
-                    isActive ? activeButtonClasses : inactiveClasses
-                  }`}
+                  className={`${tabBaseClasses} ${isActive ? activeButtonClasses : inactiveClasses}`}
                 >
                   {mode.label}
                 </button>
@@ -57,7 +60,7 @@ const BannerHeaderComponent = ({
                     key={menuItem.id}
                     type="button"
                     onClick={() => onSubMenuChange?.(menuItem.id)}
-                    className={`flex-1 rounded-2xl px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-brand-yellow/30 ${
+                    className={`${subTabBaseClasses} ${
                       isSelected ? activeButtonClasses : inactiveClasses
                     }`}
                   >
