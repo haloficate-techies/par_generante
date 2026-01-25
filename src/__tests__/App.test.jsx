@@ -19,12 +19,12 @@ describe("App", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { level: 2, name: /Preview Banner/i })
+        screen.getByRole("heading", { level: 2, name: /Banner Penuh/i })
       ).toBeInTheDocument();
     });
 
     const previewButtons = screen.getAllByRole("button", {
-      name: /Preview Banner/i,
+      name: /Lihat Banner Penuh/i,
     });
     expect(previewButtons.length).toBeGreaterThan(0);
     expect(

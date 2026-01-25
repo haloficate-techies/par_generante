@@ -27,7 +27,7 @@ const BannerHeaderComponent = ({
             <p className="text-sm text-slate-400">{activeModeConfig.subtitle}</p>
           </div>
           <div className="text-xs text-slate-500">
-            Preview terakhir: {lastRenderAt ? lastRenderAt.toLocaleString("id-ID") : "belum tersedia"}
+            Render terakhir: {lastRenderAt ? lastRenderAt.toLocaleString("id-ID") : "belum tersedia"}
           </div>
         </div>
         <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-2">

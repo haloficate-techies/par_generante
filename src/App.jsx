@@ -445,7 +445,10 @@ const App = () => {
               <MatchListForm {...matchListFormProps} />
             </section>
 
-            <BannerPreviewPanel {...bannerPreviewProps} />
+            <BannerPreviewPanel
+              {...bannerPreviewProps}
+              hidePreviewAction={isPreviewModalOpen}
+            />
           </div>
         </main>
       </div>
@@ -453,6 +456,11 @@ const App = () => {
         isOpen={isPreviewModalOpen}
         imageSrc={previewImage}
         onClose={handleClosePreview}
+        onDownloadPng={downloadBanner}
+        onDownloadZip={downloadAllBanners}
+        isRendering={isRenderingUi}
+        isBulkDownloading={isBulkDownloading}
+        bulkProgress={bulkProgress}
       />
     </>
   );
