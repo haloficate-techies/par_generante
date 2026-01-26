@@ -28,9 +28,16 @@ const ImageUploadPreview = ({
   onRemoveBackground,
   isRemovingBackground = false,
   removeBackgroundError = "",
+  progressiveDisclosure = false,
+  emptyStateHint = "",
+  adjustmentLabels,
+  allowManualInputWhenEmpty = false,
   readFileAsDataURL = async () => null,
 }) => {
   const [showAutoGlow, setShowAutoGlow] = useState(false);
+  const [isAdjustPhase, setIsAdjustPhase] = useState(false);
+  const previousPreviewRef = useRef(previewSrc);
+  const previousRemovingRef = useRef(isRemovingBackground);
   const {
     isLoading,
     manualInput,
@@ -100,9 +107,18 @@ const ImageUploadPreview = ({
   const normalizedScale = clampValue(scale ?? 1, 0.7, 1.5);
   const normalizedOffsetX = clampValue(offsetX ?? 0, -0.75, 0.75);
   const normalizedOffsetY = clampValue(offsetY ?? 0, -0.75, 0.75);
-  const hasAdjustments = Boolean(onAdjust && previewSrc);
+  const hasPreview = Boolean(previewSrc);
+  const shouldShowAdjustments =
+    hasPreview &&
+    (!progressiveDisclosure || isAdjustPhase || (!canRemoveBackground && !isLoading));
+  const hasAdjustments = Boolean(onAdjust && shouldShowAdjustments);
   const showHelperTooltip = Boolean(helperAsTooltip && (helperText || ratioHint));
-  const shouldShowManualInput = !(hideManualInputWhenPreview && previewSrc);
+  const shouldShowManualInput =
+    !(hideManualInputWhenPreview && previewSrc) &&
+    (!progressiveDisclosure || hasPreview || allowManualInputWhenEmpty);
+  const shouldShowFooterActions =
+    !progressiveDisclosure || (hasPreview && (onToggleFlip || canRemoveBackground));
+  const shouldShowEmptyHint = progressiveDisclosure && !hasPreview && emptyStateHint;
 
   const previewOffsetX = isFlipped ? -normalizedOffsetX : normalizedOffsetX;
   const previewTransformStyle = {
@@ -120,6 +136,26 @@ const ImageUploadPreview = ({
       )}
     </>
   );
+
+  useEffect(() => {
+    if (!previewSrc) {
+      setIsAdjustPhase(false);
+      previousPreviewRef.current = previewSrc;
+      return;
+    }
+    if (previousPreviewRef.current !== previewSrc) {
+      setIsAdjustPhase(false);
+    }
+    previousPreviewRef.current = previewSrc;
+  }, [previewSrc]);
+
+  useEffect(() => {
+    const wasRemoving = previousRemovingRef.current;
+    if (wasRemoving && !isRemovingBackground && !removeBackgroundError && previewSrc) {
+      setIsAdjustPhase(true);
+    }
+    previousRemovingRef.current = isRemovingBackground;
+  }, [isRemovingBackground, previewSrc, removeBackgroundError]);
 
   return (
     <div className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
@@ -314,20 +350,26 @@ const ImageUploadPreview = ({
           onScaleReset={handleScaleReset}
           onOffsetChange={handleOffsetChange}
           onOffsetReset={handleOffsetReset}
+          {...(adjustmentLabels || {})}
         />
       )}
 
-      <ImageActionButtons
-        variant="footer"
-        onToggleFlip={onToggleFlip}
-        isFlipped={isFlipped}
-        canRemoveBackground={canRemoveBackground}
-        onRemoveBackground={onRemoveBackground}
-        isRemovingBackground={isRemovingBackground}
-        removeBackgroundError={removeBackgroundError}
-      />
+      {shouldShowFooterActions && (
+        <ImageActionButtons
+          variant="footer"
+          onToggleFlip={onToggleFlip}
+          isFlipped={isFlipped}
+          canRemoveBackground={canRemoveBackground}
+          onRemoveBackground={onRemoveBackground}
+          isRemovingBackground={isRemovingBackground}
+          removeBackgroundError={removeBackgroundError}
+        />
+      )}
 
       {inputStatus && <p className="mt-3 text-xs text-emerald-300">{inputStatus}</p>}
+      {shouldShowEmptyHint && (
+        <p className="mt-3 text-xs text-slate-400">{emptyStateHint}</p>
+      )}
 
       {shouldShowManualInput && (
         <textarea
@@ -365,6 +407,21 @@ ImageUploadPreview.propTypes = {
   onRemoveBackground: PropTypes.func,
   isRemovingBackground: PropTypes.bool,
   removeBackgroundError: PropTypes.string,
+  progressiveDisclosure: PropTypes.bool,
+  emptyStateHint: PropTypes.string,
+  adjustmentLabels: PropTypes.shape({
+    scaleLabel: PropTypes.string,
+    offsetLabel: PropTypes.string,
+    scaleTooltip: PropTypes.string,
+    offsetXTooltip: PropTypes.string,
+    offsetYTooltip: PropTypes.string,
+    scaleAriaLabel: PropTypes.string,
+    offsetXAriaLabel: PropTypes.string,
+    offsetYAriaLabel: PropTypes.string,
+    offsetXLabel: PropTypes.string,
+    offsetYLabel: PropTypes.string,
+  }),
+  allowManualInputWhenEmpty: PropTypes.bool,
   readFileAsDataURL: PropTypes.func,
 };
 

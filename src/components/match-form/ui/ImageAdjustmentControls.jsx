@@ -10,12 +10,22 @@ const ImageAdjustmentControls = ({
   onScaleReset,
   onOffsetChange,
   onOffsetReset,
+  scaleLabel = "Skala Logo",
+  offsetLabel = "Offset Logo",
+  scaleTooltip = "Atur ukuran logo",
+  offsetXTooltip = "Geser horizontal",
+  offsetYTooltip = "Geser vertikal",
+  scaleAriaLabel = "Skala logo",
+  offsetXAriaLabel = "Offset horizontal",
+  offsetYAriaLabel = "Offset vertikal",
+  offsetXLabel = "",
+  offsetYLabel = "",
 }) => (
   <div className="mt-4 grid gap-4">
     <div className="grid gap-2">
       <div className="flex items-center justify-between gap-2">
         <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Skala Logo
+          {scaleLabel}
         </label>
         {onScaleReset && (
           <Tooltip content="Reset skala ke 100%" align="right">
@@ -45,7 +55,7 @@ const ImageAdjustmentControls = ({
       </div>
       <div className="flex items-center gap-3">
         <span className="inline-flex items-center gap-2 text-[11px] font-semibold text-slate-300">
-          <Tooltip content="Atur ukuran logo">
+          <Tooltip content={scaleTooltip}>
             <span className="inline-flex items-center" aria-hidden="true">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +85,7 @@ const ImageAdjustmentControls = ({
           value={scale ?? 1}
           onChange={onScaleChange}
           className="w-full accent-brand-yellow"
-          aria-label="Skala logo"
+          aria-label={scaleAriaLabel}
         />
       </div>
     </div>
@@ -83,7 +93,7 @@ const ImageAdjustmentControls = ({
     <div className="grid gap-2">
       <div className="flex items-center justify-between gap-2">
         <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Offset Logo
+          {offsetLabel}
         </label>
         {onOffsetReset && (
           <Tooltip content="Reset posisi ke tengah" align="right">
@@ -113,7 +123,7 @@ const ImageAdjustmentControls = ({
       </div>
       <div className="grid gap-2">
         <div className="flex items-center gap-2">
-          <Tooltip content="Geser horizontal">
+          <Tooltip content={offsetXTooltip}>
             <span className="inline-flex h-5 w-5 items-center justify-center text-slate-200" aria-hidden="true">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -131,6 +141,11 @@ const ImageAdjustmentControls = ({
               </svg>
             </span>
           </Tooltip>
+          {offsetXLabel && (
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
+              {offsetXLabel}
+            </span>
+          )}
           <input
             type="range"
             min="-0.75"
@@ -139,11 +154,11 @@ const ImageAdjustmentControls = ({
             value={offsetX ?? 0}
             onChange={(event) => onOffsetChange(event, "offsetX")}
             className="w-full accent-brand-yellow"
-            aria-label="Offset horizontal"
+            aria-label={offsetXAriaLabel}
           />
         </div>
         <div className="flex items-center gap-2">
-          <Tooltip content="Geser vertikal">
+          <Tooltip content={offsetYTooltip}>
             <span className="inline-flex h-5 w-5 items-center justify-center text-slate-200" aria-hidden="true">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -161,6 +176,11 @@ const ImageAdjustmentControls = ({
               </svg>
             </span>
           </Tooltip>
+          {offsetYLabel && (
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
+              {offsetYLabel}
+            </span>
+          )}
           <input
             type="range"
             min="-0.75"
@@ -169,7 +189,7 @@ const ImageAdjustmentControls = ({
             value={offsetY ?? 0}
             onChange={(event) => onOffsetChange(event, "offsetY")}
             className="w-full accent-brand-yellow"
-            aria-label="Offset vertikal"
+            aria-label={offsetYAriaLabel}
           />
         </div>
       </div>
@@ -185,6 +205,16 @@ ImageAdjustmentControls.propTypes = {
   onScaleReset: PropTypes.func,
   onOffsetChange: PropTypes.func.isRequired,
   onOffsetReset: PropTypes.func,
+  scaleLabel: PropTypes.string,
+  offsetLabel: PropTypes.string,
+  scaleTooltip: PropTypes.string,
+  offsetXTooltip: PropTypes.string,
+  offsetYTooltip: PropTypes.string,
+  scaleAriaLabel: PropTypes.string,
+  offsetXAriaLabel: PropTypes.string,
+  offsetYAriaLabel: PropTypes.string,
+  offsetXLabel: PropTypes.string,
+  offsetYLabel: PropTypes.string,
 };
 
 export default ImageAdjustmentControls;

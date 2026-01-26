@@ -28,7 +28,10 @@ const MatchPlayerImagesSection = ({
         onChange={(value) => onMatchFieldChange(index, "teamHomePlayerImage", value)}
         inputId={`home-player-${index}`}
         ratioHint="Format potret disarankan"
-        slotHeight="h-52"
+        helperAsTooltip
+        unifiedSlot
+        hideManualInputWhenPreview
+        slotHeight="h-40"
         scale={match.teamHomePlayerScale}
         offsetX={match.teamHomePlayerOffsetX}
         offsetY={match.teamHomePlayerOffsetY}
@@ -41,6 +44,21 @@ const MatchPlayerImagesSection = ({
         }
         isRemovingBackground={Boolean(homeRemovalState.loading)}
         removeBackgroundError={homeRemovalState.error || ""}
+        progressiveDisclosure
+        emptyStateHint="Upload foto pemain untuk mengatur tampilan di banner"
+        allowManualInputWhenEmpty
+        adjustmentLabels={{
+          scaleLabel: "Ukuran Pemain",
+          offsetLabel: "Posisi Pemain",
+          scaleTooltip: "Atur ukuran pemain",
+          offsetXTooltip: "Geser horizontal",
+          offsetYTooltip: "Geser vertikal",
+          scaleAriaLabel: "Ukuran pemain",
+          offsetXAriaLabel: "Posisi horizontal",
+          offsetYAriaLabel: "Posisi vertikal",
+          offsetXLabel: "Posisi Horizontal",
+          offsetYLabel: "Posisi Vertikal",
+        }}
         readFileAsDataURL={readFileAsDataURL}
       />
       <ImageUploadPreview
@@ -50,7 +68,10 @@ const MatchPlayerImagesSection = ({
         onChange={(value) => onMatchFieldChange(index, "teamAwayPlayerImage", value)}
         inputId={`away-player-${index}`}
         ratioHint="Format potret disarankan"
-        slotHeight="h-52"
+        helperAsTooltip
+        unifiedSlot
+        hideManualInputWhenPreview
+        slotHeight="h-40"
         scale={match.teamAwayPlayerScale}
         offsetX={match.teamAwayPlayerOffsetX}
         offsetY={match.teamAwayPlayerOffsetY}
@@ -63,6 +84,21 @@ const MatchPlayerImagesSection = ({
         }
         isRemovingBackground={Boolean(awayRemovalState.loading)}
         removeBackgroundError={awayRemovalState.error || ""}
+        progressiveDisclosure
+        emptyStateHint="Upload foto pemain untuk mengatur tampilan di banner"
+        allowManualInputWhenEmpty
+        adjustmentLabels={{
+          scaleLabel: "Ukuran Pemain",
+          offsetLabel: "Posisi Pemain",
+          scaleTooltip: "Atur ukuran pemain",
+          offsetXTooltip: "Geser horizontal",
+          offsetYTooltip: "Geser vertikal",
+          scaleAriaLabel: "Ukuran pemain",
+          offsetXAriaLabel: "Posisi horizontal",
+          offsetYAriaLabel: "Posisi vertikal",
+          offsetXLabel: "Posisi Horizontal",
+          offsetYLabel: "Posisi Vertikal",
+        }}
         readFileAsDataURL={readFileAsDataURL}
       />
     </div>
