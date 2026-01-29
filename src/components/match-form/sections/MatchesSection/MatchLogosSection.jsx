@@ -17,6 +17,8 @@ const MatchLogosSection = ({
   const awayLogoRemovalKey = buildLogoSlotKey(index, "away");
   const homeLogoRemovalState = logoBackgroundRemovalState[homeLogoRemovalKey] || {};
   const awayLogoRemovalState = logoBackgroundRemovalState[awayLogoRemovalKey] || {};
+  const homeIsAuto = Boolean(match.teamHomeLogoIsAuto);
+  const awayIsAuto = Boolean(match.teamAwayLogoIsAuto);
 
   return (
     <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -37,12 +39,24 @@ const MatchLogosSection = ({
         offsetY={match.teamHomeLogoOffsetY}
         onAdjust={(adjustments) => onLogoAdjust?.(index, "home", adjustments)}
         canRemoveBackground={canUseBackgroundRemoval}
-        onRemoveBackground={() =>
-          onRemoveLogoBackground?.(index, "home", match.teamHomeLogo)
+        onRemoveBackground={
+          homeIsAuto ? undefined : () => onRemoveLogoBackground?.(index, "home", match.teamHomeLogo)
         }
-        isRemovingBackground={Boolean(homeLogoRemovalState.loading)}
-        isBackgroundRemoved={Boolean(homeLogoRemovalState.removed)}
-        removeBackgroundError={homeLogoRemovalState.error || ""}
+        isRemovingBackground={homeIsAuto ? false : Boolean(homeLogoRemovalState.loading)}
+        isBackgroundRemoved={homeIsAuto ? true : Boolean(homeLogoRemovalState.removed)}
+        removeBackgroundError={homeIsAuto ? "" : homeLogoRemovalState.error || ""}
+        adjustmentLabels={{
+          scaleLabel: "Ukuran",
+          offsetLabel: "Posisi",
+          scaleTooltip: "Atur ukuran gambar",
+          offsetXTooltip: "Geser horizontal",
+          offsetYTooltip: "Geser vertikal",
+          scaleAriaLabel: "Ukuran gambar",
+          offsetXAriaLabel: "Posisi horizontal",
+          offsetYAriaLabel: "Posisi vertikal",
+          offsetXLabel: "Horizontal",
+          offsetYLabel: "Vertikal",
+        }}
         readFileAsDataURL={readFileAsDataURL}
       />
       <ImageUploadPreview
@@ -62,12 +76,24 @@ const MatchLogosSection = ({
         offsetY={match.teamAwayLogoOffsetY}
         onAdjust={(adjustments) => onLogoAdjust?.(index, "away", adjustments)}
         canRemoveBackground={canUseBackgroundRemoval}
-        onRemoveBackground={() =>
-          onRemoveLogoBackground?.(index, "away", match.teamAwayLogo)
+        onRemoveBackground={
+          awayIsAuto ? undefined : () => onRemoveLogoBackground?.(index, "away", match.teamAwayLogo)
         }
-        isRemovingBackground={Boolean(awayLogoRemovalState.loading)}
-        isBackgroundRemoved={Boolean(awayLogoRemovalState.removed)}
-        removeBackgroundError={awayLogoRemovalState.error || ""}
+        isRemovingBackground={awayIsAuto ? false : Boolean(awayLogoRemovalState.loading)}
+        isBackgroundRemoved={awayIsAuto ? true : Boolean(awayLogoRemovalState.removed)}
+        removeBackgroundError={awayIsAuto ? "" : awayLogoRemovalState.error || ""}
+        adjustmentLabels={{
+          scaleLabel: "Ukuran",
+          offsetLabel: "Posisi",
+          scaleTooltip: "Atur ukuran gambar",
+          offsetXTooltip: "Geser horizontal",
+          offsetYTooltip: "Geser vertikal",
+          scaleAriaLabel: "Ukuran gambar",
+          offsetXAriaLabel: "Posisi horizontal",
+          offsetYAriaLabel: "Posisi vertikal",
+          offsetXLabel: "Horizontal",
+          offsetYLabel: "Vertikal",
+        }}
         readFileAsDataURL={readFileAsDataURL}
       />
     </div>

@@ -10,23 +10,22 @@ const ImageAdjustmentControls = ({
   onScaleReset,
   onOffsetChange,
   onOffsetReset,
-  scaleLabel = "Skala Logo",
-  offsetLabel = "Offset Logo",
+  scaleLabel = "Ukuran",
+  offsetLabel = "Posisi",
   scaleTooltip = "Atur ukuran logo",
   offsetXTooltip = "Geser horizontal",
   offsetYTooltip = "Geser vertikal",
   scaleAriaLabel = "Skala logo",
   offsetXAriaLabel = "Offset horizontal",
   offsetYAriaLabel = "Offset vertikal",
-  offsetXLabel = "",
-  offsetYLabel = "",
+  offsetXLabel = "Horizontal",
+  offsetYLabel = "Vertikal",
 }) => (
-  <div className="mt-4 grid gap-4">
-    <div className="grid gap-2">
+  <div className="mt-4 grid gap-6">
+    {/* Scale */}
+    <div className="grid gap-3">
       <div className="flex items-center justify-between gap-2">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          {scaleLabel}
-        </label>
+        <label className="text-sm font-medium text-slate-300">{scaleLabel}</label>
         {onScaleReset && (
           <Tooltip content="Reset skala ke 100%" align="right">
             <button
@@ -53,8 +52,9 @@ const ImageAdjustmentControls = ({
           </Tooltip>
         )}
       </div>
+
       <div className="flex items-center gap-3">
-        <span className="inline-flex items-center gap-2 text-[11px] font-semibold text-slate-300">
+        <span className="inline-flex items-center gap-2 text-[11px] font-medium text-slate-300">
           <Tooltip content={scaleTooltip}>
             <span className="inline-flex items-center" aria-hidden="true">
               <svg
@@ -89,12 +89,13 @@ const ImageAdjustmentControls = ({
         />
       </div>
     </div>
+
     <div className="h-px w-full bg-slate-700/60" />
-    <div className="grid gap-2">
+
+    {/* Position */}
+    <div className="grid gap-3">
       <div className="flex items-center justify-between gap-2">
-        <label className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-          {offsetLabel}
-        </label>
+        <label className="text-sm font-medium text-slate-300">{offsetLabel}</label>
         {onOffsetReset && (
           <Tooltip content="Reset posisi ke tengah" align="right">
             <button
@@ -121,76 +122,82 @@ const ImageAdjustmentControls = ({
           </Tooltip>
         )}
       </div>
-      <div className="grid gap-2">
-        <div className="flex items-center gap-2">
-          <Tooltip content={offsetXTooltip}>
-            <span className="inline-flex h-5 w-5 items-center justify-center text-slate-200" aria-hidden="true">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="m9 7-5 5 5 5" />
-                <path d="m15 7 5 5-5 5" />
-              </svg>
-            </span>
-          </Tooltip>
-          {offsetXLabel && (
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
-              {offsetXLabel}
-            </span>
-          )}
-          <input
-            type="range"
-            min="-0.75"
-            max="0.75"
-            step="0.01"
-            value={offsetX ?? 0}
-            onChange={(event) => onOffsetChange(event, "offsetX")}
-            className="w-full accent-brand-yellow"
-            aria-label={offsetXAriaLabel}
-          />
+
+      <div className="grid gap-0.5">
+        <div className="grid h-9 grid-cols-[7rem,1fr] items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Tooltip content={offsetXTooltip}>
+              <span className="inline-flex h-5 w-5 items-center justify-center text-slate-200" aria-hidden="true">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m9 7-5 5 5 5" />
+                  <path d="m15 7 5 5-5 5" />
+                </svg>
+              </span>
+            </Tooltip>
+            {offsetXLabel && (
+              <span className="text-[11px] font-medium text-slate-300">{offsetXLabel}</span>
+            )}
+          </div>
+          <div className="flex h-full w-full items-center">
+            <input
+              type="range"
+              min="-0.75"
+              max="0.75"
+              step="0.01"
+              value={offsetX ?? 0}
+              onChange={(event) => onOffsetChange(event, "offsetX")}
+              className="w-full h-6 accent-brand-yellow translate-y-[1px]"
+              aria-label={offsetXAriaLabel}
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Tooltip content={offsetYTooltip}>
-            <span className="inline-flex h-5 w-5 items-center justify-center text-slate-200" aria-hidden="true">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="m7 9 5-5 5 5" />
-                <path d="m7 15 5 5 5-5" />
-              </svg>
-            </span>
-          </Tooltip>
-          {offsetYLabel && (
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
-              {offsetYLabel}
-            </span>
-          )}
-          <input
-            type="range"
-            min="-0.75"
-            max="0.75"
-            step="0.01"
-            value={offsetY ?? 0}
-            onChange={(event) => onOffsetChange(event, "offsetY")}
-            className="w-full accent-brand-yellow"
-            aria-label={offsetYAriaLabel}
-          />
+
+        <div className="grid h-9 grid-cols-[7rem,1fr] items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Tooltip content={offsetYTooltip}>
+              <span className="inline-flex h-5 w-5 items-center justify-center text-slate-200" aria-hidden="true">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m7 9 5-5 5 5" />
+                  <path d="m7 15 5 5 5-5" />
+                </svg>
+              </span>
+            </Tooltip>
+            {offsetYLabel && (
+              <span className="text-[11px] font-medium text-slate-300">{offsetYLabel}</span>
+            )}
+          </div>
+          <div className="flex h-full w-full items-center">
+            <input
+              type="range"
+              min="-0.75"
+              max="0.75"
+              step="0.01"
+              value={offsetY ?? 0}
+              onChange={(event) => onOffsetChange(event, "offsetY")}
+              className="w-full h-6 accent-brand-yellow translate-y-[1px]"
+              aria-label={offsetYAriaLabel}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -218,4 +225,3 @@ ImageAdjustmentControls.propTypes = {
 };
 
 export default ImageAdjustmentControls;
-

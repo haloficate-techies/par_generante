@@ -49,16 +49,16 @@ const MatchPlayerImagesSection = ({
         emptyStateHint="Upload foto pemain untuk mengatur tampilan di banner"
         allowManualInputWhenEmpty
         adjustmentLabels={{
-          scaleLabel: "Ukuran Pemain",
-          offsetLabel: "Posisi Pemain",
-          scaleTooltip: "Atur ukuran pemain",
+          scaleLabel: "Ukuran",
+          offsetLabel: "Posisi",
+          scaleTooltip: "Atur ukuran gambar",
           offsetXTooltip: "Geser horizontal",
           offsetYTooltip: "Geser vertikal",
-          scaleAriaLabel: "Ukuran pemain",
+          scaleAriaLabel: "Ukuran gambar",
           offsetXAriaLabel: "Posisi horizontal",
           offsetYAriaLabel: "Posisi vertikal",
-          offsetXLabel: "Posisi Horizontal",
-          offsetYLabel: "Posisi Vertikal",
+          offsetXLabel: "Horizontal",
+          offsetYLabel: "Vertikal",
         }}
         readFileAsDataURL={readFileAsDataURL}
       />
@@ -90,16 +90,16 @@ const MatchPlayerImagesSection = ({
         emptyStateHint="Upload foto pemain untuk mengatur tampilan di banner"
         allowManualInputWhenEmpty
         adjustmentLabels={{
-          scaleLabel: "Ukuran Pemain",
-          offsetLabel: "Posisi Pemain",
-          scaleTooltip: "Atur ukuran pemain",
+          scaleLabel: "Ukuran",
+          offsetLabel: "Posisi",
+          scaleTooltip: "Atur ukuran gambar",
           offsetXTooltip: "Geser horizontal",
           offsetYTooltip: "Geser vertikal",
-          scaleAriaLabel: "Ukuran pemain",
+          scaleAriaLabel: "Ukuran gambar",
           offsetXAriaLabel: "Posisi horizontal",
           offsetYAriaLabel: "Posisi vertikal",
-          offsetXLabel: "Posisi Horizontal",
-          offsetYLabel: "Posisi Vertikal",
+          offsetXLabel: "Horizontal",
+          offsetYLabel: "Vertikal",
         }}
         readFileAsDataURL={readFileAsDataURL}
       />
