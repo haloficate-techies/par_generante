@@ -8,6 +8,8 @@ import {
 const buildPlayerSlotKey = (index, side) => `${index}-${side}`;
 const buildLogoSlotKey = (index, side) => `${index}-${side}-logo`;
 
+const defaultStatus = { loading: false, error: "", removed: false };
+
 const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) => {
   const [playerStatus, setPlayerStatus] = useState({});
   const [logoStatus, setLogoStatus] = useState({});
@@ -19,7 +21,7 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
     setter((prev) => ({
       ...prev,
       [key]: {
-        ...(prev[key] || { loading: false, error: "" }),
+        ...(prev[key] || defaultStatus),
         ...updates,
       },
     }));
@@ -39,18 +41,18 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
         return;
       }
       const slotKey = buildPlayerSlotKey(matchIndex, side);
-      updatePlayerStatus(slotKey, { loading: true, error: "" });
+      updatePlayerStatus(slotKey, { loading: true, error: "", removed: false });
       try {
         const cleanedImage = await removePlayerBackground(imageSrc);
         if (typeof onApplyResult === "function") {
           const fieldName = side === "home" ? "teamHomePlayerImage" : "teamAwayPlayerImage";
           onApplyResult(matchIndex, fieldName, cleanedImage);
         }
-        updatePlayerStatus(slotKey, { loading: false, error: "" });
+        updatePlayerStatus(slotKey, { loading: false, error: "", removed: true });
       } catch (error) {
         console.error("Gagal menghapus background pemain:", error);
         const message = error?.message || "Gagal menghapus background. Coba lagi.";
-        updatePlayerStatus(slotKey, { loading: false, error: message });
+        updatePlayerStatus(slotKey, { loading: false, error: message, removed: false });
         alertFn?.(message);
       }
     },
@@ -68,22 +70,38 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
         return;
       }
       const slotKey = buildLogoSlotKey(matchIndex, side);
-      updateLogoStatus(slotKey, { loading: true, error: "" });
+      updateLogoStatus(slotKey, { loading: true, error: "", removed: false });
       try {
         const cleanedImage = await removeLogoBackground(imageSrc);
         if (typeof onApplyResult === "function") {
           const fieldName = side === "home" ? "teamHomeLogo" : "teamAwayLogo";
           onApplyResult(matchIndex, fieldName, cleanedImage);
         }
-        updateLogoStatus(slotKey, { loading: false, error: "" });
+        updateLogoStatus(slotKey, { loading: false, error: "", removed: true });
       } catch (error) {
         console.error("Gagal menghapus background logo:", error);
         const message = error?.message || "Gagal menghapus background logo. Coba lagi.";
-        updateLogoStatus(slotKey, { loading: false, error: message });
+        updateLogoStatus(slotKey, { loading: false, error: message, removed: false });
         alertFn?.(message);
       }
     },
     [alertFn, isAvailable, onApplyResult, updateLogoStatus]
+  );
+
+  const resetPlayerStatus = useCallback(
+    (matchIndex, side) => {
+      const slotKey = buildPlayerSlotKey(matchIndex, side);
+      updatePlayerStatus(slotKey, { ...defaultStatus });
+    },
+    [updatePlayerStatus]
+  );
+
+  const resetLogoStatus = useCallback(
+    (matchIndex, side) => {
+      const slotKey = buildLogoSlotKey(matchIndex, side);
+      updateLogoStatus(slotKey, { ...defaultStatus });
+    },
+    [updateLogoStatus]
   );
 
   return {
@@ -92,6 +110,8 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
     logoStatus,
     handlePlayerRemoval,
     handleLogoRemoval,
+    resetPlayerStatus,
+    resetLogoStatus,
   };
 };
 

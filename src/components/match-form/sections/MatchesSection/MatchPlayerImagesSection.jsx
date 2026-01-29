@@ -43,6 +43,7 @@ const MatchPlayerImagesSection = ({
           onRemovePlayerBackground?.(index, "home", match.teamHomePlayerImage)
         }
         isRemovingBackground={Boolean(homeRemovalState.loading)}
+        isBackgroundRemoved={Boolean(homeRemovalState.removed)}
         removeBackgroundError={homeRemovalState.error || ""}
         progressiveDisclosure
         emptyStateHint="Upload foto pemain untuk mengatur tampilan di banner"
@@ -83,6 +84,7 @@ const MatchPlayerImagesSection = ({
           onRemovePlayerBackground?.(index, "away", match.teamAwayPlayerImage)
         }
         isRemovingBackground={Boolean(awayRemovalState.loading)}
+        isBackgroundRemoved={Boolean(awayRemovalState.removed)}
         removeBackgroundError={awayRemovalState.error || ""}
         progressiveDisclosure
         emptyStateHint="Upload foto pemain untuk mengatur tampilan di banner"

@@ -41,6 +41,7 @@ const MatchLogosSection = ({
           onRemoveLogoBackground?.(index, "home", match.teamHomeLogo)
         }
         isRemovingBackground={Boolean(homeLogoRemovalState.loading)}
+        isBackgroundRemoved={Boolean(homeLogoRemovalState.removed)}
         removeBackgroundError={homeLogoRemovalState.error || ""}
         readFileAsDataURL={readFileAsDataURL}
       />
@@ -65,6 +66,7 @@ const MatchLogosSection = ({
           onRemoveLogoBackground?.(index, "away", match.teamAwayLogo)
         }
         isRemovingBackground={Boolean(awayLogoRemovalState.loading)}
+        isBackgroundRemoved={Boolean(awayLogoRemovalState.removed)}
         removeBackgroundError={awayLogoRemovalState.error || ""}
         readFileAsDataURL={readFileAsDataURL}
       />

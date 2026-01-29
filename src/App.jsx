@@ -280,8 +280,8 @@ const App = () => {
     isRenderingRef,
   });
 
-  // Handles updating a single match field.
-  const handleMatchFieldChange = useCallback(
+  // Base updater used by background-removal hook to avoid resetting its flags.
+  const applyMatchFieldChange = useCallback(
     (index, field, value) => {
       updateMatchField(index, field, value);
     },
@@ -314,8 +314,26 @@ const App = () => {
   );
 
   const backgroundRemoval = useBackgroundRemoval({
-    onApplyResult: handleMatchFieldChange,
+    onApplyResult: applyMatchFieldChange,
   });
+
+  // Public handler used by the UI; also resets background-removal flags on new images/reset.
+  const handleMatchFieldChange = useCallback(
+    (index, field, value) => {
+      const isPlayerImageField =
+        field === "teamHomePlayerImage" || field === "teamAwayPlayerImage";
+      const isLogoImageField = field === "teamHomeLogo" || field === "teamAwayLogo";
+      if (isPlayerImageField) {
+        const side = field === "teamHomePlayerImage" ? "home" : "away";
+        backgroundRemoval.resetPlayerStatus?.(index, side);
+      } else if (isLogoImageField) {
+        const side = field === "teamHomeLogo" ? "home" : "away";
+        backgroundRemoval.resetLogoStatus?.(index, side);
+      }
+      applyMatchFieldChange(index, field, value);
+    },
+    [applyMatchFieldChange, backgroundRemoval]
+  );
 
   const handleMatchCountChange = useCallback(
     (nextCount) => {

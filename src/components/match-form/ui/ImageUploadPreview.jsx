@@ -27,6 +27,7 @@ const ImageUploadPreview = ({
   canRemoveBackground = false,
   onRemoveBackground,
   isRemovingBackground = false,
+  isBackgroundRemoved = false,
   removeBackgroundError = "",
   progressiveDisclosure = false,
   emptyStateHint = "",
@@ -362,6 +363,7 @@ const ImageUploadPreview = ({
           canRemoveBackground={canRemoveBackground}
           onRemoveBackground={onRemoveBackground}
           isRemovingBackground={isRemovingBackground}
+          isBackgroundRemoved={isBackgroundRemoved}
           removeBackgroundError={removeBackgroundError}
         />
       )}
@@ -406,6 +408,7 @@ ImageUploadPreview.propTypes = {
   canRemoveBackground: PropTypes.bool,
   onRemoveBackground: PropTypes.func,
   isRemovingBackground: PropTypes.bool,
+  isBackgroundRemoved: PropTypes.bool,
   removeBackgroundError: PropTypes.string,
   progressiveDisclosure: PropTypes.bool,
   emptyStateHint: PropTypes.string,
