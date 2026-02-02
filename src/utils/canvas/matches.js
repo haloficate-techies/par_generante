@@ -771,7 +771,7 @@ const drawMatches = (
         const timeLabelRaw = match.time ? formatTime(match.time) : "";
         const pillLabel = [dateLabelRaw.toUpperCase(), timeLabelRaw.toUpperCase()]
           .filter(Boolean)
-          .join(" â€¢ ") || "JADWAL TBD";
+          .join(" \u2022 ") || "JADWAL TBD";
         const maxPillWidth = Math.min(ctx.canvas.width - marginX, centerWidth + 480);
         ctx.save();
         ctx.font = `700 ${Math.round(Math.max(20, 28 * scheduleScale))}px "Poppins", sans-serif`;
