@@ -384,6 +384,32 @@ const ensureTransparentBackground = async (image) => {
   }
 };
 
+export const removeLogoBackgroundClientSide = async (src) => {
+  if (!src) {
+    throw new Error("Tidak ada gambar logo yang bisa diproses.");
+  }
+
+  const image = await loadOptionalImage(src);
+  if (!image) {
+    throw new Error("Gagal memuat gambar logo untuk diproses.");
+  }
+
+  const processedImage = await ensureTransparentBackground(image);
+  const width = processedImage.naturalWidth || processedImage.width;
+  const height = processedImage.naturalHeight || processedImage.height;
+  if (!width || !height) {
+    throw new Error("Dimensi gambar logo tidak valid.");
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(processedImage, 0, 0, width, height);
+  return canvas.toDataURL("image/png");
+};
+
 export const loadTeamLogoImage = async (src, { applyAutoProcessing = false } = {}) => {
   if (!src) return null;
   const cacheKey = `${applyAutoProcessing ? "auto" : "raw"}|${src}`;

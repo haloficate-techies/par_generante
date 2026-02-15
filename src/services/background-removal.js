@@ -1,3 +1,5 @@
+import { removeLogoBackgroundClientSide } from "../utils/image-loader";
+
 const backgroundRemovalConfig = {
   // Endpoint utama (misalnya untuk foto pemain)
   endpoint: (import.meta.env.VITE_REMOVE_BG_ENDPOINT || "").trim(),
@@ -107,6 +109,19 @@ const callBackgroundRemoval = async (endpoint, imageDataUrl, { signal } = {}) =>
   return blobToDataUrl(blob);
 };
 
+const normalizeFetchError = (error, fallbackMessage) => {
+  const rawMessage = (error?.message || "").trim();
+  const lower = rawMessage.toLowerCase();
+  if (
+    error instanceof TypeError ||
+    lower.includes("failed to fetch") ||
+    lower.includes("networkerror")
+  ) {
+    return `${fallbackMessage} Endpoint belum tersedia atau CORS belum diizinkan.`;
+  }
+  return rawMessage || fallbackMessage;
+};
+
 /**
  * Removes a player's background via configured endpoint.
  * @param {string} imageDataUrl
@@ -133,13 +148,26 @@ export const removePlayerBackground = async (imageDataUrl, { signal } = {}) => {
  */
 export const removeLogoBackground = async (imageDataUrl, { signal } = {}) => {
   const endpoint = backgroundRemovalConfig.logoEndpoint || backgroundRemovalConfig.endpoint;
-  if (!endpoint) {
-    throw new Error("Background removal endpoint logo belum dikonfigurasi.");
-  }
   if (!imageDataUrl) {
     throw new Error("Tidak ada gambar logo yang bisa diproses.");
   }
 
-  return callBackgroundRemoval(endpoint, imageDataUrl, { signal });
+  if (!endpoint) {
+    return removeLogoBackgroundClientSide(imageDataUrl);
+  }
+
+  try {
+    return await callBackgroundRemoval(endpoint, imageDataUrl, { signal });
+  } catch (error) {
+    try {
+      return await removeLogoBackgroundClientSide(imageDataUrl);
+    } catch (fallbackError) {
+      const message = normalizeFetchError(
+        error,
+        "Gagal menghapus background logo."
+      );
+      throw new Error(message || fallbackError?.message);
+    }
+  }
 };
 

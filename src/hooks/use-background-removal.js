@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   removePlayerBackground,
   removeLogoBackground,
@@ -13,6 +13,9 @@ const defaultStatus = { loading: false, error: "", removed: false };
 const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) => {
   const [playerStatus, setPlayerStatus] = useState({});
   const [logoStatus, setLogoStatus] = useState({});
+  const logoStatusRef = useRef({});
+  const logoQueueRef = useRef(Promise.resolve());
+  const logoRequestIdRef = useRef({});
 
   const isAvailable = useMemo(() => isBackgroundRemovalConfigured(), []);
 
@@ -28,7 +31,27 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
   };
 
   const updatePlayerStatus = updateState(setPlayerStatus);
-  const updateLogoStatus = updateState(setLogoStatus);
+  const updateLogoStatus = useCallback((key, updates) => {
+    if (!key) return;
+    setLogoStatus((prev) => {
+      const next = {
+        ...prev,
+        [key]: {
+          ...(prev[key] || defaultStatus),
+          ...updates,
+        },
+      };
+      logoStatusRef.current = next;
+      return next;
+    });
+  }, []);
+
+  const getNextLogoRequestId = useCallback((slotKey) => {
+    const current = logoRequestIdRef.current[slotKey] || 0;
+    const next = current + 1;
+    logoRequestIdRef.current[slotKey] = next;
+    return next;
+  }, []);
 
   const handlePlayerRemoval = useCallback(
     async (matchIndex, side, imageSrc) => {
@@ -60,7 +83,7 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
   );
 
   const handleLogoRemoval = useCallback(
-    async (matchIndex, side, imageSrc) => {
+    (matchIndex, side, imageSrc) => {
       if (!isAvailable) {
         alertFn?.("Fitur hapus background belum dikonfigurasi.");
         return;
@@ -70,22 +93,41 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
         return;
       }
       const slotKey = buildLogoSlotKey(matchIndex, side);
-      updateLogoStatus(slotKey, { loading: true, error: "", removed: false });
-      try {
-        const cleanedImage = await removeLogoBackground(imageSrc);
-        if (typeof onApplyResult === "function") {
-          const fieldName = side === "home" ? "teamHomeLogo" : "teamAwayLogo";
-          onApplyResult(matchIndex, fieldName, cleanedImage);
-        }
-        updateLogoStatus(slotKey, { loading: false, error: "", removed: true });
-      } catch (error) {
-        console.error("Gagal menghapus background logo:", error);
-        const message = error?.message || "Gagal menghapus background logo. Coba lagi.";
-        updateLogoStatus(slotKey, { loading: false, error: message, removed: false });
-        alertFn?.(message);
+      const currentSlotStatus = logoStatusRef.current[slotKey] || defaultStatus;
+      if (currentSlotStatus.loading) {
+        return logoQueueRef.current;
       }
+
+      const requestId = getNextLogoRequestId(slotKey);
+      updateLogoStatus(slotKey, { loading: true, error: "", removed: false });
+
+      const run = async () => {
+        try {
+          const cleanedImage = await removeLogoBackground(imageSrc);
+          if (logoRequestIdRef.current[slotKey] !== requestId) {
+            return;
+          }
+          if (typeof onApplyResult === "function") {
+            const fieldName = side === "home" ? "teamHomeLogo" : "teamAwayLogo";
+            onApplyResult(matchIndex, fieldName, cleanedImage);
+          }
+          updateLogoStatus(slotKey, { loading: false, error: "", removed: true });
+        } catch (error) {
+          if (logoRequestIdRef.current[slotKey] !== requestId) {
+            return;
+          }
+          console.error("Gagal menghapus background logo:", error);
+          const message = error?.message || "Gagal menghapus background logo. Coba lagi.";
+          updateLogoStatus(slotKey, { loading: false, error: message, removed: false });
+          alertFn?.(message);
+        }
+      };
+
+      const queued = logoQueueRef.current.then(run, run);
+      logoQueueRef.current = queued.catch(() => undefined);
+      return queued;
     },
-    [alertFn, isAvailable, onApplyResult, updateLogoStatus]
+    [alertFn, getNextLogoRequestId, isAvailable, onApplyResult, updateLogoStatus]
   );
 
   const resetPlayerStatus = useCallback(
@@ -99,9 +141,10 @@ const useBackgroundRemoval = ({ onApplyResult, alertFn = window.alert } = {}) =>
   const resetLogoStatus = useCallback(
     (matchIndex, side) => {
       const slotKey = buildLogoSlotKey(matchIndex, side);
+      getNextLogoRequestId(slotKey);
       updateLogoStatus(slotKey, { ...defaultStatus });
     },
-    [updateLogoStatus]
+    [getNextLogoRequestId, updateLogoStatus]
   );
 
   return {
