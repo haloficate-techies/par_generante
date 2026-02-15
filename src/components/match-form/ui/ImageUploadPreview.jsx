@@ -6,6 +6,8 @@ import ImageAdjustmentControls from "./ImageAdjustmentControls";
 import ImageActionButtons from "./ImageActionButtons";
 import Tooltip from "../../ui/Tooltip";
 
+const REMOVE_ACTION_HIDE_DELAY_MS = 3000;
+
 const ImageUploadPreview = ({
   label = "",
   helperText = "",
@@ -29,6 +31,8 @@ const ImageUploadPreview = ({
   isRemovingBackground = false,
   isBackgroundRemoved = false,
   removeBackgroundError = "",
+  collapseRemoveActionOnDone = false,
+  showRemovedBadge = false,
   progressiveDisclosure = false,
   emptyStateHint = "",
   adjustmentLabels,
@@ -37,8 +41,10 @@ const ImageUploadPreview = ({
 }) => {
   const [showAutoGlow, setShowAutoGlow] = useState(false);
   const [isAdjustPhase, setIsAdjustPhase] = useState(false);
+  const [shouldHideActionCard, setShouldHideActionCard] = useState(false);
   const previousPreviewRef = useRef(previewSrc);
   const previousRemovingRef = useRef(isRemovingBackground);
+  const hideActionTimerRef = useRef(null);
   const {
     isLoading,
     manualInput,
@@ -120,6 +126,12 @@ const ImageUploadPreview = ({
   const shouldShowFooterActions =
     !progressiveDisclosure || (hasPreview && (onToggleFlip || canRemoveBackground));
   const shouldShowEmptyHint = progressiveDisclosure && !hasPreview && emptyStateHint;
+  const showRemovedBadgeInFrame =
+    showRemovedBadge &&
+    shouldHideActionCard &&
+    isBackgroundRemoved &&
+    !isRemovingBackground &&
+    !removeBackgroundError;
 
   const previewOffsetX = isFlipped ? -normalizedOffsetX : normalizedOffsetX;
   const previewTransformStyle = {
@@ -157,6 +169,44 @@ const ImageUploadPreview = ({
     }
     previousRemovingRef.current = isRemovingBackground;
   }, [isRemovingBackground, previewSrc, removeBackgroundError]);
+
+  useEffect(() => {
+    if (hideActionTimerRef.current) {
+      window.clearTimeout(hideActionTimerRef.current);
+      hideActionTimerRef.current = null;
+    }
+
+    const shouldScheduleHide =
+      collapseRemoveActionOnDone &&
+      Boolean(previewSrc) &&
+      Boolean(isBackgroundRemoved) &&
+      !isRemovingBackground &&
+      !removeBackgroundError;
+
+    if (!shouldScheduleHide) {
+      setShouldHideActionCard(false);
+      return;
+    }
+
+    setShouldHideActionCard(false);
+    hideActionTimerRef.current = window.setTimeout(() => {
+      setShouldHideActionCard(true);
+      hideActionTimerRef.current = null;
+    }, REMOVE_ACTION_HIDE_DELAY_MS);
+
+    return () => {
+      if (hideActionTimerRef.current) {
+        window.clearTimeout(hideActionTimerRef.current);
+        hideActionTimerRef.current = null;
+      }
+    };
+  }, [
+    collapseRemoveActionOnDone,
+    isBackgroundRemoved,
+    isRemovingBackground,
+    previewSrc,
+    removeBackgroundError,
+  ]);
 
   return (
     <div className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4">
@@ -252,6 +302,29 @@ const ImageUploadPreview = ({
                   </div>
                 </div>
                 <div className="pointer-events-none absolute inset-0 bg-slate-950/10 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
+                {showRemovedBadge && (
+                    <span
+                      className={`pointer-events-none absolute left-2 top-2 inline-flex items-center gap-0.5 rounded-full border border-emerald-500/35 bg-emerald-500/15 px-1 py-0 text-[8px] font-semibold uppercase tracking-normal text-emerald-200 shadow-[0_0_8px_rgba(16,185,129,0.18)] transform transition-all duration-500 ease-out ${
+                        showRemovedBadgeInFrame
+                          ? "opacity-100 translate-y-0 scale-100"
+                          : "opacity-0 -translate-y-1 scale-95"
+                      }`}
+                    >
+                      <svg
+                        className="h-2 w-2 shrink-0"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                      <span className="text-[8px] leading-none">BG Dihapus</span>
+                    </span>
+                  )}
                 <div className="absolute right-2 top-2">
                   <button
                     type="button"
@@ -365,6 +438,8 @@ const ImageUploadPreview = ({
           isRemovingBackground={isRemovingBackground}
           isBackgroundRemoved={isBackgroundRemoved}
           removeBackgroundError={removeBackgroundError}
+          hideCard={shouldHideActionCard && !onToggleFlip}
+          hideRemoveAction={shouldHideActionCard}
         />
       )}
 
@@ -410,6 +485,8 @@ ImageUploadPreview.propTypes = {
   isRemovingBackground: PropTypes.bool,
   isBackgroundRemoved: PropTypes.bool,
   removeBackgroundError: PropTypes.string,
+  collapseRemoveActionOnDone: PropTypes.bool,
+  showRemovedBadge: PropTypes.bool,
   progressiveDisclosure: PropTypes.bool,
   emptyStateHint: PropTypes.string,
   adjustmentLabels: PropTypes.shape({

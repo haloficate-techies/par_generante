@@ -12,6 +12,8 @@ const ImageActionButtons = ({
   isRemovingBackground,
   isBackgroundRemoved,
   removeBackgroundError,
+  hideCard = false,
+  hideRemoveAction = false,
 }) => {
   const baseBtn =
     "inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-semibold whitespace-nowrap rounded-full focus:outline-none transition";
@@ -37,7 +39,14 @@ const ImageActionButtons = ({
   }
 
   return (
-    <div className="mt-4 space-y-3 rounded-xl border border-slate-700/60 bg-slate-900/30 p-3">
+    <div
+      className={`mt-4 space-y-3 rounded-xl border bg-slate-900/30 transition-all duration-300 ease-out ${
+        hideCard
+          ? "max-h-0 overflow-hidden border-transparent p-0 opacity-0"
+          : "max-h-44 border-slate-700/60 p-3 opacity-100"
+      }`}
+      aria-hidden={hideCard}
+    >
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-300">
         Aksi Gambar
       </p>
@@ -66,60 +75,68 @@ const ImageActionButtons = ({
         )}
 
         {canRemoveBackground && (
-          <button
-            type="button"
-            className={`${baseBtn} text-slate-950 focus:ring-2 focus:ring-emerald-300/60 ${
-              isBackgroundRemoved
-                ? "cursor-not-allowed bg-emerald-900/70 text-emerald-200 border border-emerald-800/80"
-              : !onRemoveBackground || isRemovingBackground
-                ? "cursor-not-allowed bg-emerald-800/60 text-emerald-100"
-                : "bg-emerald-400 hover:bg-emerald-300"
+          <div
+            className={`transition-all duration-300 ease-out ${
+              hideRemoveAction
+                ? "max-h-0 overflow-hidden opacity-0 scale-95"
+                : "max-h-14 opacity-100 scale-100"
             }`}
-            onClick={isBackgroundRemoved ? undefined : onRemoveBackground}
-            disabled={!onRemoveBackground || isRemovingBackground || isBackgroundRemoved}
+            aria-hidden={hideRemoveAction}
           >
-            {isRemovingBackground ? (
-              <>
-                <svg
-                  className="h-4 w-4 shrink-0 animate-spin"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  aria-hidden="true"
-                >
-                  <circle cx="12" cy="12" r="9" className="opacity-30" />
-                  <path d="M21 12a9 9 0 0 1-9 9" />
-                </svg>
-                <span>Memproses...</span>
-              </>
-            ) : isBackgroundRemoved ? (
-              <>
-                <svg
-                  className="h-4 w-4 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-                <span>✓ BG Dihapus</span>
-              </>
-            ) : (
-              <>
-                <svg
-                  className="h-4 w-4 shrink-0"
-                  viewBox="0 0 24 24"
-                  fill="none"
+            <button
+              type="button"
+              className={`${baseBtn} w-full text-slate-950 focus:ring-2 focus:ring-emerald-300/60 ${
+                isBackgroundRemoved
+                  ? "cursor-not-allowed bg-emerald-900/70 text-emerald-200 border border-emerald-800/80"
+                  : !onRemoveBackground || isRemovingBackground
+                    ? "cursor-not-allowed bg-emerald-800/60 text-emerald-100"
+                    : "bg-emerald-400 hover:bg-emerald-300"
+              }`}
+              onClick={isBackgroundRemoved ? undefined : onRemoveBackground}
+              disabled={!onRemoveBackground || isRemovingBackground || isBackgroundRemoved}
+            >
+              {isRemovingBackground ? (
+                <>
+                  <svg
+                    className="h-4 w-4 shrink-0 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="9" className="opacity-30" />
+                    <path d="M21 12a9 9 0 0 1-9 9" />
+                  </svg>
+                  <span>Memproses...</span>
+                </>
+              ) : isBackgroundRemoved ? (
+                <>
+                  <svg
+                    className="h-4 w-4 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                  <span>✓ BG Dihapus</span>
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="h-4 w-4 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <path d="m3 21 12-12" />
                     <path d="M15 6V4" />
@@ -129,11 +146,12 @@ const ImageActionButtons = ({
                     <path d="m18 6 2-2" />
                     <path d="m11 6-2-2" />
                     <path d="m18 18 2 2" />
-                </svg>
-                <span>{isBackgroundRemoved ? "BG Dihapus" : "Hapus BG"}</span>
-              </>
-            )}
-          </button>
+                  </svg>
+                  <span>Hapus BG</span>
+                </>
+              )}
+            </button>
+          </div>
         )}
       </div>
 
@@ -155,7 +173,8 @@ ImageActionButtons.propTypes = {
   isRemovingBackground: PropTypes.bool,
   isBackgroundRemoved: PropTypes.bool,
   removeBackgroundError: PropTypes.string,
+  hideCard: PropTypes.bool,
+  hideRemoveAction: PropTypes.bool,
 };
 
 export default ImageActionButtons;
-

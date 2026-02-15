@@ -39,6 +39,8 @@ const MatchPlayerImagesSection = ({
         onToggleFlip={() => onPlayerImageFlipToggle?.(index, "home")}
         isFlipped={Boolean(match.teamHomePlayerFlip)}
         canRemoveBackground={canUseBackgroundRemoval}
+        collapseRemoveActionOnDone
+        showRemovedBadge
         onRemoveBackground={() =>
           onRemovePlayerBackground?.(index, "home", match.teamHomePlayerImage)
         }
@@ -80,6 +82,8 @@ const MatchPlayerImagesSection = ({
         onToggleFlip={() => onPlayerImageFlipToggle?.(index, "away")}
         isFlipped={Boolean(match.teamAwayPlayerFlip)}
         canRemoveBackground={canUseBackgroundRemoval}
+        collapseRemoveActionOnDone
+        showRemovedBadge
         onRemoveBackground={() =>
           onRemovePlayerBackground?.(index, "away", match.teamAwayPlayerImage)
         }

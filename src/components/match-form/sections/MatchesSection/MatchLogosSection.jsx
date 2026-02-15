@@ -38,7 +38,9 @@ const MatchLogosSection = ({
         offsetX={match.teamHomeLogoOffsetX}
         offsetY={match.teamHomeLogoOffsetY}
         onAdjust={(adjustments) => onLogoAdjust?.(index, "home", adjustments)}
-        canRemoveBackground={canUseBackgroundRemoval}
+        canRemoveBackground={canUseBackgroundRemoval && Boolean(match.teamHomeLogo)}
+        collapseRemoveActionOnDone
+        showRemovedBadge
         onRemoveBackground={
           homeIsAuto ? undefined : () => onRemoveLogoBackground?.(index, "home", match.teamHomeLogo)
         }
@@ -75,7 +77,9 @@ const MatchLogosSection = ({
         offsetX={match.teamAwayLogoOffsetX}
         offsetY={match.teamAwayLogoOffsetY}
         onAdjust={(adjustments) => onLogoAdjust?.(index, "away", adjustments)}
-        canRemoveBackground={canUseBackgroundRemoval}
+        canRemoveBackground={canUseBackgroundRemoval && Boolean(match.teamAwayLogo)}
+        collapseRemoveActionOnDone
+        showRemovedBadge
         onRemoveBackground={
           awayIsAuto ? undefined : () => onRemoveLogoBackground?.(index, "away", match.teamAwayLogo)
         }
