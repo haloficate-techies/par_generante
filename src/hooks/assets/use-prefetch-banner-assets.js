@@ -2,8 +2,10 @@ import { useEffect } from "react";
 
 const usePrefetchBannerAssets = ({
   activeMode,
+  activeSubMenu,
   brandOptions,
   footballDefaultBackground,
+  footballBigMatchDefaultBackground,
   includeMiniBanner,
   defaultEsportMiniBanner,
   modeBackgroundDefaults,
@@ -13,8 +15,10 @@ const usePrefetchBannerAssets = ({
     if (!prefetchImages) return;
 
     const modeDefaults = modeBackgroundDefaults || {};
+    const isBigMatchLayoutActive = activeMode === "football" && activeSubMenu === "big_match";
+    const modeKey = isBigMatchLayoutActive ? "football_big_match" : activeMode;
     const modeSpecificBackgrounds = brandOptions
-      .map((option) => option?.backgroundByMode?.[activeMode])
+      .map((option) => option?.backgroundByMode?.[modeKey])
       .filter(Boolean);
     const sharedBackgrounds = brandOptions
       .map((option) => option?.backgroundValue)
@@ -23,7 +27,11 @@ const usePrefetchBannerAssets = ({
       ...modeSpecificBackgrounds,
       ...sharedBackgrounds,
       modeDefaults[activeMode],
-      activeMode === "football" ? footballDefaultBackground : null,
+      activeMode === "football"
+        ? isBigMatchLayoutActive
+          ? footballBigMatchDefaultBackground
+          : footballDefaultBackground
+        : null,
       includeMiniBanner ? defaultEsportMiniBanner : null,
     ].filter(Boolean);
 
@@ -32,8 +40,10 @@ const usePrefetchBannerAssets = ({
     }
   }, [
     activeMode,
+    activeSubMenu,
     brandOptions,
     footballDefaultBackground,
+    footballBigMatchDefaultBackground,
     includeMiniBanner,
     defaultEsportMiniBanner,
     modeBackgroundDefaults,

@@ -5,10 +5,12 @@ import { useCallback, useEffect } from "react";
  *
  * @param {Object} params
  * @param {string} params.activeMode
+ * @param {string} params.activeSubMenu
  * @param {Array} params.availableBrandLogos
  * @param {string} params.brandLogoSrc
  * @param {string} params.defaultRaffleFooter
  * @param {string} params.footballDefaultBackground
+ * @param {string} params.footballBigMatchDefaultBackground
  * @param {boolean} params.isRaffleMode
  * @param {Object} params.modeBackgroundDefaults
  * @param {Function} params.prefetchImages
@@ -18,16 +20,19 @@ import { useCallback, useEffect } from "react";
  * @param {Function} params.setSelectedBasketballBackground
  * @param {Function} params.setSelectedEsportsBackground
  * @param {Function} params.setSelectedFootballBackground
+ * @param {Function} params.setSelectedFootballBigMatchBackground
  * @param {Function} params.createBrandSlug
  * @returns {Object} Helpers
  * @returns {Function} return.handleBrandLogoSelection
  */
 const useBrandSelection = ({
   activeMode,
+  activeSubMenu,
   availableBrandLogos,
   brandLogoSrc,
   defaultRaffleFooter,
   footballDefaultBackground,
+  footballBigMatchDefaultBackground,
   isRaffleMode,
   modeBackgroundDefaults,
   prefetchImages,
@@ -37,8 +42,11 @@ const useBrandSelection = ({
   setSelectedBasketballBackground,
   setSelectedEsportsBackground,
   setSelectedFootballBackground,
+  setSelectedFootballBigMatchBackground,
   createBrandSlug,
 }) => {
+  const isBigMatchLayoutActive = activeMode === "football" && activeSubMenu === "big_match";
+
   useEffect(() => {
     if (!brandLogoSrc) {
       setFooter(isRaffleMode ? defaultRaffleFooter : "", "");
@@ -71,6 +79,7 @@ const useBrandSelection = ({
       if (!newValue) {
         setFooter(isRaffleMode ? defaultRaffleFooter : "", "");
         setSelectedFootballBackground(footballDefaultBackground);
+        setSelectedFootballBigMatchBackground(footballBigMatchDefaultBackground);
         setSelectedBasketballBackground(modeBackgroundDefaults.basketball);
         setSelectedEsportsBackground(modeBackgroundDefaults.esports);
         return;
@@ -96,6 +105,14 @@ const useBrandSelection = ({
             matchedBrandOption.backgroundByMode.football) ||
           matchedBrandOption.backgroundValue ||
           footballDefaultBackground;
+        const footballBigMatchBackground =
+          (matchedBrandOption.backgroundByMode &&
+            matchedBrandOption.backgroundByMode.football_big_match) ||
+          (matchedBrandOption.backgroundByMode &&
+            matchedBrandOption.backgroundByMode.football) ||
+          matchedBrandOption.backgroundValue ||
+          footballBigMatchDefaultBackground ||
+          footballDefaultBackground;
         const basketballBrandBackground =
           (matchedBrandOption.backgroundByMode &&
             matchedBrandOption.backgroundByMode.basketball) ||
@@ -105,6 +122,7 @@ const useBrandSelection = ({
             matchedBrandOption.backgroundByMode.esports) ||
           modeBackgroundDefaults.esports;
         setSelectedFootballBackground(footballBrandBackground);
+        setSelectedFootballBigMatchBackground(footballBigMatchBackground);
         setSelectedBasketballBackground(basketballBrandBackground);
         setSelectedEsportsBackground(esportsBrandBackground);
         const brandSlug = createBrandSlug(matchedBrandOption.brand, {
@@ -116,6 +134,7 @@ const useBrandSelection = ({
         setFooter(fallbackFooter, "");
         resolvedFooterForPrefetch = fallbackFooter;
         setSelectedFootballBackground(footballDefaultBackground);
+        setSelectedFootballBigMatchBackground(footballBigMatchDefaultBackground);
         setSelectedBasketballBackground(modeBackgroundDefaults.basketball);
         setSelectedEsportsBackground(modeBackgroundDefaults.esports);
       }
@@ -123,9 +142,15 @@ const useBrandSelection = ({
       const prefetchCandidates = [
         newValue,
         resolvedFooterForPrefetch,
-        matchedBrandOption?.backgroundByMode?.[activeMode],
+        isBigMatchLayoutActive
+          ? matchedBrandOption?.backgroundByMode?.football_big_match
+          : matchedBrandOption?.backgroundByMode?.[activeMode],
         matchedBrandOption?.backgroundValue,
-        activeMode === "football" ? footballDefaultBackground : null,
+        activeMode === "football"
+          ? isBigMatchLayoutActive
+            ? footballBigMatchDefaultBackground
+            : footballDefaultBackground
+          : null,
         activeMode === "esports" ? modeBackgroundDefaults.esports : null,
         activeMode === "basketball" ? modeBackgroundDefaults.basketball : null,
         activeMode === "raffle" ? modeBackgroundDefaults.raffle : null,
@@ -137,11 +162,14 @@ const useBrandSelection = ({
     },
     [
       activeMode,
+      activeSubMenu,
       availableBrandLogos,
       createBrandSlug,
       defaultRaffleFooter,
       footballDefaultBackground,
+      footballBigMatchDefaultBackground,
       isRaffleMode,
+      isBigMatchLayoutActive,
       modeBackgroundDefaults,
       prefetchImages,
       resolveFooterSrcForBrand,
@@ -150,6 +178,7 @@ const useBrandSelection = ({
       setSelectedBasketballBackground,
       setSelectedEsportsBackground,
       setSelectedFootballBackground,
+      setSelectedFootballBigMatchBackground,
     ]
   );
 

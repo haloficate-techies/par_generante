@@ -1,6 +1,7 @@
 import { BRAND_NAMES } from "../constants/brand-names";
 import {
   BANNER_BACKGROUND_DIRECTORY,
+  BIG_MATCH_BACKGROUND_DIRECTORY,
   BASKETBALL_BRAND_BACKGROUND_DIRECTORY,
   ESPORT_BRAND_BACKGROUND_DIRECTORY,
 } from "../constants/directories";
@@ -11,6 +12,7 @@ import {
 } from "./background-resolver";
 
 const BANNER_BACKGROUND_FILES = createBrandBackgroundFiles(BANNER_BACKGROUND_DIRECTORY);
+const BIG_MATCH_BACKGROUND_FILES = createBrandBackgroundFiles(BIG_MATCH_BACKGROUND_DIRECTORY);
 
 const BANNER_BACKGROUND_LOOKUP = BANNER_BACKGROUND_FILES.reduce((acc, path) => {
   const fileName = path.split("/").pop() || "";
@@ -27,6 +29,8 @@ if (BANNER_BACKGROUND_LOOKUP.BACKGROUND && !BANNER_BACKGROUND_LOOKUP.DEFAULT) {
   BANNER_BACKGROUND_LOOKUP.DEFAULT = BANNER_BACKGROUND_LOOKUP.BACKGROUND;
 }
 
+const BIG_MATCH_BACKGROUND_LOOKUP = createBrandBackgroundLookup(BIG_MATCH_BACKGROUND_DIRECTORY);
+
 const resolveBrandBackgroundPath = (brandName) => {
   if (!brandName) {
     return BANNER_BACKGROUND_LOOKUP.DEFAULT || null;
@@ -37,6 +41,10 @@ const resolveBrandBackgroundPath = (brandName) => {
     null
   );
 };
+
+const resolveBigMatchBrandBackgroundPath = createBrandBackgroundResolver(
+  BIG_MATCH_BACKGROUND_LOOKUP
+);
 
 const BASKETBALL_BRAND_BACKGROUND_LOOKUP = createBrandBackgroundLookup(
   BASKETBALL_BRAND_BACKGROUND_DIRECTORY
@@ -56,6 +64,7 @@ const resolveEsportBrandBackgroundPath = createBrandBackgroundResolver(
 
 const BRAND_ASSET_ENTRIES = BRAND_NAMES.map((brandName) => {
   const footballBackgroundPath = resolveBrandBackgroundPath(brandName);
+  const footballBigMatchBackgroundPath = resolveBigMatchBrandBackgroundPath(brandName);
   const basketballBackgroundPath = resolveBasketballBrandBackgroundPath(brandName);
   const esportsBackgroundPath = resolveEsportBrandBackgroundPath(brandName);
   return {
@@ -65,6 +74,7 @@ const BRAND_ASSET_ENTRIES = BRAND_NAMES.map((brandName) => {
     backgroundPath: footballBackgroundPath,
     backgroundByMode: {
       football: footballBackgroundPath,
+      football_big_match: footballBigMatchBackgroundPath,
       basketball: basketballBackgroundPath,
       esports: esportsBackgroundPath,
     },
@@ -90,6 +100,8 @@ const BANNER_FOOTER_OPTIONS = BRAND_ASSET_ENTRIES.map((entry) => ({
 export {
   BANNER_BACKGROUND_FILES,
   BANNER_BACKGROUND_LOOKUP,
+  BIG_MATCH_BACKGROUND_FILES,
+  BIG_MATCH_BACKGROUND_LOOKUP,
   BANNER_FOOTER_OPTIONS,
   BRAND_LOGO_OPTIONS,
 };

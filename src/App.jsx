@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useMemo } from "react";
 import {
   AVAILABLE_BRAND_LOGOS,
   BACKGROUND_LOOKUP,
+  BIG_MATCH_BACKGROUND_LOOKUP,
   BIG_MATCH_TITLE,
   DEFAULT_ESPORT_MINI_BANNER,
   DEFAULT_RAFFLE_FOOTER,
@@ -124,13 +125,15 @@ const App = () => {
   });
   const {
     footballDefaultBackground,
+    footballBigMatchDefaultBackground,
     backgroundSrc,
     setSelectedFootballBackground,
+    setSelectedFootballBigMatchBackground,
     setSelectedBasketballBackground,
     setSelectedEsportsBackground,
     togelBackgroundSrc,
     applyTogelBackgroundPath,
-  } = useBackgroundManager(activeMode);
+  } = useBackgroundManager(activeMode, activeSubMenu);
   const visibleMatches = useMemo(
     () => matches.slice(0, activeMatchCount),
     [matches, activeMatchCount]
@@ -266,14 +269,17 @@ const App = () => {
     createBrandSlug,
     resolveFooterSrcForBrand,
     backgroundLookup: BACKGROUND_LOOKUP,
+    bigMatchBackgroundLookup: BIG_MATCH_BACKGROUND_LOOKUP,
     modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
     footballDefaultBackground,
+    footballBigMatchDefaultBackground,
     togelBackgroundSrc,
     togelPool,
     includeMiniBanner,
     defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
     prefetchImages,
     activeMode,
+    activeSubMenu,
     isTogelMode,
     footerLink,
     openPreviewModal,
@@ -344,8 +350,10 @@ const App = () => {
 
   usePrefetchBannerAssets({
     activeMode,
+    activeSubMenu,
     brandOptions: AVAILABLE_BRAND_LOGOS,
     footballDefaultBackground,
+    footballBigMatchDefaultBackground,
     includeMiniBanner,
     defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
     modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
@@ -354,10 +362,12 @@ const App = () => {
 
   const { handleBrandLogoSelection } = useBrandSelection({
     activeMode,
+    activeSubMenu,
     availableBrandLogos: AVAILABLE_BRAND_LOGOS,
     brandLogoSrc,
     defaultRaffleFooter: DEFAULT_RAFFLE_FOOTER,
     footballDefaultBackground,
+    footballBigMatchDefaultBackground,
     isRaffleMode,
     modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
     prefetchImages,
@@ -367,6 +377,7 @@ const App = () => {
     setSelectedBasketballBackground,
     setSelectedEsportsBackground,
     setSelectedFootballBackground,
+    setSelectedFootballBigMatchBackground,
     createBrandSlug,
   });
 

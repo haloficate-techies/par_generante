@@ -54,14 +54,17 @@ export const exportPng = async ({ renderBanner, canvasRef, filenamePrefix = "foo
  * @param {Function} params.createBrandSlug
  * @param {Function} params.resolveFooterSrcForBrand
  * @param {Record<string,string>} params.backgroundLookup
+ * @param {Record<string,string>} params.bigMatchBackgroundLookup
  * @param {Record<string,string>} params.modeBackgroundDefaults
  * @param {string} params.footballDefaultBackground
+ * @param {string} params.footballBigMatchDefaultBackground
  * @param {string} params.togelBackgroundSrc
  * @param {string} params.togelPool
  * @param {boolean} params.includeMiniBanner
  * @param {string} params.defaultEsportMiniBanner
  * @param {Function} params.prefetchImages
  * @param {string} params.activeMode
+ * @param {string} params.activeSubMenu
  * @param {boolean} params.isTogelMode
  * @param {string} params.footerLink
  * @param {Function} [params.yieldToFrame]
@@ -75,14 +78,17 @@ export const exportZip = async ({
   createBrandSlug,
   resolveFooterSrcForBrand,
   backgroundLookup,
+  bigMatchBackgroundLookup,
   modeBackgroundDefaults,
   footballDefaultBackground,
+  footballBigMatchDefaultBackground,
   togelBackgroundSrc,
   togelPool,
   includeMiniBanner,
   defaultEsportMiniBanner,
   prefetchImages = async () => {},
   activeMode,
+  activeSubMenu,
   isTogelMode,
   footerLink,
   yieldToFrame = async () => {},
@@ -94,6 +100,7 @@ export const exportZip = async ({
   const timestampBase = defaultTimestamp();
   const modeFilenamePrefix = deriveModePrefix(activeMode);
   const modeDefaultBackground = modeBackgroundDefaults[activeMode] || footballDefaultBackground;
+  const isBigMatchLayoutActive = activeMode === "football" && activeSubMenu === "big_match";
   const togelBulkBackground =
     isTogelMode && togelPool
       ? togelBackgroundSrc || modeBackgroundDefaults.togel
@@ -115,7 +122,15 @@ export const exportZip = async ({
       const brandSlugUpper = createBrandSlug(option.brand, { uppercase: true });
       const footerForBrand = resolveFooterSrcForBrand(option.brand, option.value, activeMode);
       let backgroundForBrand;
-      if (activeMode === "football") {
+      if (activeMode === "football" && isBigMatchLayoutActive) {
+        backgroundForBrand =
+          (option.backgroundByMode && option.backgroundByMode.football_big_match) ||
+          (option.brand ? bigMatchBackgroundLookup?.[option.brand] : null) ||
+          footballBigMatchDefaultBackground ||
+          option.backgroundValue ||
+          (option.brand ? backgroundLookup?.[option.brand] : null) ||
+          footballDefaultBackground;
+      } else if (activeMode === "football") {
         backgroundForBrand =
           option.backgroundValue ||
           (option.brand ? backgroundLookup[option.brand] : null) ||
