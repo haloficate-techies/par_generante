@@ -9,6 +9,7 @@ import {
 import { BANNER_BACKGROUND_FILES, BIG_MATCH_BACKGROUND_FILES } from "../domains/brand";
 const AVAILABLE_BANNER_BACKGROUNDS = BANNER_BACKGROUND_FILES || [];
 const AVAILABLE_BIG_MATCH_BACKGROUNDS = BIG_MATCH_BACKGROUND_FILES || [];
+const BIG_MATCH_DEFAULT_BACKGROUND = "assets/BOLA_BIGMATCH/banner_background/BACKGROUND.webp";
 
 /**
  * Manages background assets per mode and exposes setters for each supported mode.
@@ -37,9 +38,12 @@ const useBackgroundManager = (activeMode, activeSubMenu) => {
   );
   const footballBigMatchDefaultBackground = useMemo(
     () =>
-      BIG_MATCH_BACKGROUND_LOOKUP.BACKGROUND ||
-      BIG_MATCH_BACKGROUND_LOOKUP.DEFAULT ||
-      (AVAILABLE_BIG_MATCH_BACKGROUNDS.length > 0 ? AVAILABLE_BIG_MATCH_BACKGROUNDS[0] : null),
+      [
+        BIG_MATCH_DEFAULT_BACKGROUND,
+        BIG_MATCH_BACKGROUND_LOOKUP.BACKGROUND,
+        BIG_MATCH_BACKGROUND_LOOKUP.DEFAULT,
+        AVAILABLE_BIG_MATCH_BACKGROUNDS.length > 0 ? AVAILABLE_BIG_MATCH_BACKGROUNDS[0] : null,
+      ].find(Boolean) || null,
     []
   );
   const [selectedFootballBackground, setSelectedFootballBackground] = useState(
