@@ -57,6 +57,7 @@ export const exportPng = async ({ renderBanner, canvasRef, filenamePrefix = "foo
  * @param {Record<string,string>} params.bigMatchBackgroundLookup
  * @param {Record<string,string>} params.modeBackgroundDefaults
  * @param {string} params.footballDefaultBackground
+ * @param {string} params.footballScoresDefaultBackground
  * @param {string} params.footballBigMatchDefaultBackground
  * @param {string} params.togelBackgroundSrc
  * @param {string} params.togelPool
@@ -81,6 +82,7 @@ export const exportZip = async ({
   bigMatchBackgroundLookup,
   modeBackgroundDefaults,
   footballDefaultBackground,
+  footballScoresDefaultBackground,
   footballBigMatchDefaultBackground,
   togelBackgroundSrc,
   togelPool,
@@ -101,6 +103,7 @@ export const exportZip = async ({
   const modeFilenamePrefix = deriveModePrefix(activeMode);
   const modeDefaultBackground = modeBackgroundDefaults[activeMode] || footballDefaultBackground;
   const isBigMatchLayoutActive = activeMode === "football" && activeSubMenu === "big_match";
+  const isScoreLayoutActive = activeMode === "football" && activeSubMenu === "scores";
   const togelBulkBackground =
     isTogelMode && togelPool
       ? togelBackgroundSrc || modeBackgroundDefaults.togel
@@ -127,8 +130,17 @@ export const exportZip = async ({
           (option.backgroundByMode && option.backgroundByMode.football_big_match) ||
           (option.brand ? bigMatchBackgroundLookup?.[option.brand] : null) ||
           footballBigMatchDefaultBackground ||
+          (option.backgroundByMode && option.backgroundByMode.football_scores) ||
+          footballScoresDefaultBackground ||
           option.backgroundValue ||
           (option.brand ? backgroundLookup?.[option.brand] : null) ||
+          footballDefaultBackground;
+      } else if (activeMode === "football" && isScoreLayoutActive) {
+        backgroundForBrand =
+          (option.backgroundByMode && option.backgroundByMode.football_scores) ||
+          option.backgroundValue ||
+          (option.brand ? backgroundLookup[option.brand] : null) ||
+          footballScoresDefaultBackground ||
           footballDefaultBackground;
       } else if (activeMode === "football") {
         backgroundForBrand =

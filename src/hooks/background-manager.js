@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import {
   BACKGROUND_LOOKUP,
+  FOOTBALL_SCORES_BACKGROUND_LOOKUP,
   BIG_MATCH_BACKGROUND_LOOKUP,
   MODE_BACKGROUND_DEFAULTS,
   resolveImageAssetSrc,
@@ -10,6 +11,7 @@ import { BANNER_BACKGROUND_FILES, BIG_MATCH_BACKGROUND_FILES } from "../domains/
 const AVAILABLE_BANNER_BACKGROUNDS = BANNER_BACKGROUND_FILES || [];
 const AVAILABLE_BIG_MATCH_BACKGROUNDS = BIG_MATCH_BACKGROUND_FILES || [];
 const BIG_MATCH_DEFAULT_BACKGROUND = "assets/BOLA_BIGMATCH/banner_background/BACKGROUND.webp";
+const FOOTBALL_SCORES_DEFAULT_BACKGROUND = "assets/BOLA_SKORBOLA/banner_background/BACKGROUND.webp";
 
 /**
  * Manages background assets per mode and exposes setters for each supported mode.
@@ -17,9 +19,11 @@ const BIG_MATCH_DEFAULT_BACKGROUND = "assets/BOLA_BIGMATCH/banner_background/BAC
  * @param {string} activeMode
  * @returns {Object} Background manager helpers
  * @returns {string} return.footballDefaultBackground
+ * @returns {string} return.footballScoresDefaultBackground
  * @returns {string} return.footballBigMatchDefaultBackground
  * @returns {string} return.backgroundSrc
  * @returns {Function} return.setSelectedFootballBackground
+ * @returns {Function} return.setSelectedFootballScoresBackground
  * @returns {Function} return.setSelectedFootballBigMatchBackground
  * @returns {Function} return.setSelectedBasketballBackground
  * @returns {Function} return.setSelectedEsportsBackground
@@ -46,8 +50,20 @@ const useBackgroundManager = (activeMode, activeSubMenu) => {
       ].find(Boolean) || null,
     []
   );
+  const footballScoresDefaultBackground = useMemo(
+    () =>
+      [
+        FOOTBALL_SCORES_DEFAULT_BACKGROUND,
+        FOOTBALL_SCORES_BACKGROUND_LOOKUP.BACKGROUND,
+        FOOTBALL_SCORES_BACKGROUND_LOOKUP.DEFAULT,
+      ].find(Boolean) || footballDefaultBackground,
+    [footballDefaultBackground]
+  );
   const [selectedFootballBackground, setSelectedFootballBackground] = useState(
     footballDefaultBackground
+  );
+  const [selectedFootballScoresBackground, setSelectedFootballScoresBackground] = useState(
+    footballScoresDefaultBackground
   );
   const [selectedFootballBigMatchBackground, setSelectedFootballBigMatchBackground] = useState(
     footballBigMatchDefaultBackground
@@ -57,6 +73,11 @@ const useBackgroundManager = (activeMode, activeSubMenu) => {
       setSelectedFootballBackground((prev) => prev || footballDefaultBackground);
     }
   }, [footballDefaultBackground]);
+  useEffect(() => {
+    if (footballScoresDefaultBackground) {
+      setSelectedFootballScoresBackground((prev) => prev || footballScoresDefaultBackground);
+    }
+  }, [footballScoresDefaultBackground]);
   useEffect(() => {
     if (footballBigMatchDefaultBackground) {
       setSelectedFootballBigMatchBackground((prev) => prev || footballBigMatchDefaultBackground);
@@ -95,6 +116,16 @@ const useBackgroundManager = (activeMode, activeSubMenu) => {
           return (
             selectedFootballBigMatchBackground ||
             footballBigMatchDefaultBackground ||
+            selectedFootballScoresBackground ||
+            footballScoresDefaultBackground ||
+            selectedFootballBackground ||
+            footballDefaultBackground
+          );
+        }
+        if (activeSubMenu === "scores") {
+          return (
+            selectedFootballScoresBackground ||
+            footballScoresDefaultBackground ||
             selectedFootballBackground ||
             footballDefaultBackground
           );
@@ -121,22 +152,28 @@ const useBackgroundManager = (activeMode, activeSubMenu) => {
     }
   }, [
     activeMode,
+    activeSubMenu,
     isBigMatchLayoutActive,
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     selectedBasketballBackground,
     selectedEsportsBackground,
     selectedFootballBackground,
+    selectedFootballScoresBackground,
     selectedFootballBigMatchBackground,
     togelBackgroundSrc,
   ]);
 
   return {
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     backgroundSrc,
     selectedFootballBackground,
     setSelectedFootballBackground,
+    selectedFootballScoresBackground,
+    setSelectedFootballScoresBackground,
     selectedFootballBigMatchBackground,
     setSelectedFootballBigMatchBackground,
     selectedBasketballBackground,

@@ -125,9 +125,11 @@ const App = () => {
   });
   const {
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     backgroundSrc,
     setSelectedFootballBackground,
+    setSelectedFootballScoresBackground,
     setSelectedFootballBigMatchBackground,
     setSelectedBasketballBackground,
     setSelectedEsportsBackground,
@@ -272,6 +274,7 @@ const App = () => {
     bigMatchBackgroundLookup: BIG_MATCH_BACKGROUND_LOOKUP,
     modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     togelBackgroundSrc,
     togelPool,
@@ -353,6 +356,7 @@ const App = () => {
     activeSubMenu,
     brandOptions: AVAILABLE_BRAND_LOGOS,
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     includeMiniBanner,
     defaultEsportMiniBanner: DEFAULT_ESPORT_MINI_BANNER,
@@ -367,6 +371,7 @@ const App = () => {
     brandLogoSrc,
     defaultRaffleFooter: DEFAULT_RAFFLE_FOOTER,
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     isRaffleMode,
     modeBackgroundDefaults: MODE_BACKGROUND_DEFAULTS,
@@ -377,6 +382,7 @@ const App = () => {
     setSelectedBasketballBackground,
     setSelectedEsportsBackground,
     setSelectedFootballBackground,
+    setSelectedFootballScoresBackground,
     setSelectedFootballBigMatchBackground,
     createBrandSlug,
   });

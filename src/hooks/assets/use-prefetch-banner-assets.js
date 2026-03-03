@@ -5,6 +5,7 @@ const usePrefetchBannerAssets = ({
   activeSubMenu,
   brandOptions,
   footballDefaultBackground,
+  footballScoresDefaultBackground,
   footballBigMatchDefaultBackground,
   includeMiniBanner,
   defaultEsportMiniBanner,
@@ -16,7 +17,12 @@ const usePrefetchBannerAssets = ({
 
     const modeDefaults = modeBackgroundDefaults || {};
     const isBigMatchLayoutActive = activeMode === "football" && activeSubMenu === "big_match";
-    const modeKey = isBigMatchLayoutActive ? "football_big_match" : activeMode;
+    const isScoreLayoutActive = activeMode === "football" && activeSubMenu === "scores";
+    const modeKey = isBigMatchLayoutActive
+      ? "football_big_match"
+      : isScoreLayoutActive
+      ? "football_scores"
+      : activeMode;
     const modeSpecificBackgrounds = brandOptions
       .map((option) => option?.backgroundByMode?.[modeKey])
       .filter(Boolean);
@@ -30,6 +36,8 @@ const usePrefetchBannerAssets = ({
       activeMode === "football"
         ? isBigMatchLayoutActive
           ? footballBigMatchDefaultBackground
+          : isScoreLayoutActive
+          ? footballScoresDefaultBackground
           : footballDefaultBackground
         : null,
       includeMiniBanner ? defaultEsportMiniBanner : null,
@@ -43,6 +51,7 @@ const usePrefetchBannerAssets = ({
     activeSubMenu,
     brandOptions,
     footballDefaultBackground,
+    footballScoresDefaultBackground,
     footballBigMatchDefaultBackground,
     includeMiniBanner,
     defaultEsportMiniBanner,
