@@ -1,4 +1,5 @@
 export const LEAGUE_LOGO_OPTIONS = [
+  { label: "AFC Challenge League", value: "assets/BOLA/logo_liga/AFC_CHALLENGE_LEAGUE.webp" },
   { label: "UEFA Champions League", value: "assets/BOLA/logo_liga/EUROPEAN_CHAMPIONS_LEAGUE.webp" },
   { label: "UEFA Europa League", value: "assets/BOLA/logo_liga/EUROPA_LEAGUE.webp" },
   {
